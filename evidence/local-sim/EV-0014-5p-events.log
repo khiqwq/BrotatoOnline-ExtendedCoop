@@ -1,0 +1,3 @@
+{"detail":{"players":5,"seed":1,"wave_seconds":20},"event":"local_sim._ready","frame":0,"t":3103}
+{"detail":{"scene":"res://pause.tscn"},"event":"local_sim.scene","frame":0,"t":4105}
+{"detail":{"scene":"res://ui/menus/title_screen/title_screen.tscn"},"event":"local_sim.scene","frame":858,"t":7672}

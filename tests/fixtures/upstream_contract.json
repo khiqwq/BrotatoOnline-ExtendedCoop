@@ -1,0 +1,184 @@
+{
+  "comment": "Upstream methods/constants that AP-006 adapters override or depend on, recorded from Brotato 1.1.15.4 and six666-BrotatoOnline 6.6.6 (normalized fingerprint 17443875...b819). Method values are parameter counts. A change here means the upstream changed: treat as F17 and re-audit before updating.",
+  "scripts": {
+    "res://mods-unpacked/six666-BrotatoOnline/scripts/session_manager.gd": {
+      "methods": {
+        "_sync_host_local_join_listening_state": 0,
+        "_handle_transport_identity": 3,
+        "_remote_connection_rejection_reason": 3,
+        "get_session_member_count": 0,
+        "get_lan_discovery_info": 0,
+        "_publish_session_metadata": 0,
+        "create_session": 1,
+        "set_public_lobby_enabled": 1,
+        "_prepare_friends_only_lobby_for_invite": 0,
+        "_setup_lobby_data": 0,
+        "_get_lobby_status_text": 0,
+        "_ready": 0,
+        "_bind_transports": 0,
+        "_register_remote_connection": 3
+      },
+      "constants": {
+        "MAX_LOBBY_MEMBERS": "4",
+        "NETWORK_PROTOCOL_VERSION": "\"5.0.0\"",
+        "LAN_PROTOCOL_VERSION": "3"
+      }
+    },
+    "res://mods-unpacked/six666-BrotatoOnline/scripts/lan_transport.gd": {
+      "methods": {
+        "start_host": 1
+      },
+      "constants": {
+        "MAX_CLIENTS": "3"
+      }
+    },
+    "res://mods-unpacked/six666-BrotatoOnline/scripts/online_player_slot_manager.gd": {
+      "methods": {
+        "online_sync_remote_steam_ids": 1,
+        "apply_host_selection_layout": 4,
+        "_add_remote_steam_id": 1,
+        "get_available_remote_slot_count": 0,
+        "_get_next_free_remote_device": 0,
+        "_get_next_remote_placeholder_device_from_lists": 3,
+        "_remove_untracked_remote_placeholder_slots": 0,
+        "rebind_remote_peer_key": 2,
+        "apply_resume_identity_layout": 1,
+        "online_reset_to_offline": 1,
+        "set_online_run_slots_locked": 1
+      },
+      "constants": {
+        "MAX_REMOTE_PLAYERS": "3",
+        "REMOTE_PLACEHOLDER_DEVICE_IDS": "[1, 2, 3, 4, 5, 0]"
+      }
+    },
+    "res://mods-unpacked/six666-BrotatoOnline/scripts/menu_sync_manager.gd": {
+      "methods": {
+        "_get_online_coop_layout_player_count": 0,
+        "_ready": 0,
+        "_set_node_array_value": 4
+      },
+      "constants": {}
+    },
+    "res://mods-unpacked/six666-BrotatoOnline/extensions/entity_spawner_online_player_count_guard.gd": {
+      "methods": {
+        "_brotato_online_get_authoritative_online_player_count": 0,
+        "_brotato_online_force_run_player_count": 1,
+        "spawn_entity": 5
+      },
+      "constants": {}
+    },
+    "res://mods-unpacked/six666-BrotatoOnline/extensions/main_safe_pool_exit.gd": {
+      "methods": {
+        "_brotato_online_get_authoritative_online_player_count": 0,
+        "_brotato_online_set_run_player_count_exact": 2,
+        "_brotato_online_trim_spawned_players_to_authoritative_count": 2,
+        "_on_player_died": 2,
+        "on_gold_picked_up": 2,
+        "_on_EntitySpawner_players_spawned": 1
+      },
+      "constants": {}
+    },
+    "res://singletons/coop_service.gd": {
+      "methods": {
+        "get_max_players": 0,
+        "_add_player": 2,
+        "_can_add_new_device": 0,
+        "_ready": 0,
+        "_on_Input_joy_connection_changed": 2
+      },
+      "constants": {
+        "REMAP_END": "8",
+        "GAMEPAD_REMAPPED_DEVICE_ID": "6",
+        "KEYBOARD_REMAPPED_DEVICE_ID": "7",
+        "UI_MAX_PLAYER_COUNT": "4",
+        "FIRST_DEBUG_DEVICE_ID": "8",
+        "DEBUG_DEVICE_COUNT": "4"
+      }
+    },
+    "res://singletons/input_service.gd": {
+      "methods": {
+        "_copy_device_actions": 0,
+        "add_action": 4
+      },
+      "constants": {
+        "MAX_DEVICE_COUNT": "8"
+      }
+    },
+    "res://mods-unpacked/six666-BrotatoOnline/scripts/network_heartbeat.gd": {
+      "methods": {
+        "_receive_host_disconnect_status": 1
+      },
+      "constants": {}
+    },
+    "res://mods-unpacked/six666-BrotatoOnline/scripts/steam_transport.gd": {
+      "methods": {
+        "start_host": 2
+      },
+      "constants": {}
+    },
+    "res://mods-unpacked/six666-BrotatoOnline/extensions/utils_online_manual_aim.gd": {
+      "methods": {
+        "is_manual_aim": 1
+      },
+      "constants": {}
+    },
+    "res://singletons/run_data.gd": {
+      "methods": {
+        "set_player_count": 2,
+        "_reset_per_wave_properties": 0,
+        "reset": 1,
+        "reset_run_caches": 0,
+        "get_player_count": 0
+      },
+      "constants": {}
+    },
+    "res://ui/menus/ingame/upgrades_ui.gd": {
+      "methods": {
+        "_ready": 0,
+        "_get_player_container": 1
+      },
+      "constants": {}
+    },
+    "res://singletons/utils.gd": {
+      "methods": {
+        "reset_stat_caches": 0,
+        "reset_last_elt_selected": 0
+      },
+      "constants": {}
+    },
+    "res://singletons/debug_service.gd": {
+      "methods": {
+        "log_run_info": 2
+      },
+      "constants": {}
+    },
+    "res://ui/menus/run/coop_end_run.gd": {
+      "methods": {
+        "_ready": 0,
+        "_on_popup_toggled": 2
+      },
+      "constants": {}
+    },
+    "res://ui/menus/shop/coop_shop.gd": {
+      "methods": {
+        "_get_coop_player_container": 1,
+        "_get_stat_popup": 1,
+        "_ready": 0
+      },
+      "constants": {}
+    },
+    "res://mods-unpacked/six666-BrotatoOnline/extensions/progress_data_removed_players.gd": {
+      "methods": {
+        "save": 0
+      },
+      "constants": {}
+    },
+    "res://singletons/progress_data.gd": {
+      "methods": {
+        "reset_and_save_run_state": 1,
+        "_get_current_run_state": 0
+      },
+      "constants": {}
+    }
+  }
+}

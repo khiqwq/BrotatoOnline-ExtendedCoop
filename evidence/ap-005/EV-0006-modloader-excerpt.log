@@ -1,0 +1,27 @@
+22:51:01   SUCCESS ModLoader:File: CoopPlus-OnlineExtendedCoop.zip loaded.
+22:51:01   SUCCESS ModLoader:Loader: DONE: Loaded 2 mod files into the virtual filesystem
+22:51:01   SUCCESS ModLoader:Loader: DONE: Setup 2 mods
+22:51:01   INFO ModLoader:ModData: Loading mod_manifest (manifest.json) for -> CoopPlus-OnlineExtendedCoop
+22:51:01   SUCCESS ModLoader:Loader: DONE: Loaded all meta data
+22:51:01   INFO ModLoader:Loader: mod_load_order -> 1) six666-BrotatoOnline
+22:51:01   INFO ModLoader:Loader: mod_load_order -> 2) CoopPlus-OnlineExtendedCoop
+22:51:01   INFO ModLoader:Loader: Initializing -> CoopPlus-OnlineExtendedCoop
+22:51:01   INFO CoopPlus-OnlineExtendedCoop: lifecycle probe extensions queued
+22:51:01   SUCCESS ModLoader:Loader: DONE: Completely finished loading mods
+22:51:01   INFO ModLoader:ScriptExtension: Installing script extension: res://entities/units/player/player.gd <- res://mods-unpacked/six666-BrotatoOnline/extensions/player_local_outline.gd
+22:51:01   INFO ModLoader:ScriptExtension: Installing script extension: res://entities/units/player/player.gd <- res://mods-unpacked/six666-BrotatoOnline/extensions/player_safe_room_cleanup.gd
+22:51:01   INFO ModLoader:ScriptExtension: Installing script extension: res://entities/units/movement_behaviors/follow_target_movement_behavior.gd <- res://mods-unpacked/six666-BrotatoOnline/extensions/follow_target_movement_safe_parent.gd
+22:51:01   INFO ModLoader:ScriptExtension: Installing script extension: res://global/entity_spawner.gd <- res://mods-unpacked/six666-BrotatoOnline/extensions/entity_spawner_online_player_count_guard.gd
+22:51:01   INFO ModLoader:ScriptExtension: Installing script extension: res://global/entity_spawner.gd <- res://mods-unpacked/CoopPlus-OnlineExtendedCoop/debug/probe_extensions/entity_spawner_probe.gd
+22:51:01   INFO ModLoader:ScriptExtension: Installing script extension: res://global/stats_manager.gd <- res://mods-unpacked/six666-BrotatoOnline/extensions/stats_manager_safe_queues.gd
+22:51:02   INFO ModLoader:ScriptExtension: Installing script extension: res://main.gd <- res://mods-unpacked/six666-BrotatoOnline/extensions/main_safe_pool_exit.gd
+22:51:02   INFO ModLoader:ScriptExtension: Installing script extension: res://mods-unpacked/six666-BrotatoOnline/scripts/menu_sync_manager.gd <- res://mods-unpacked/CoopPlus-OnlineExtendedCoop/debug/probe_extensions/menu_sync_probe.gd
+22:51:02   INFO ModLoader:ScriptExtension: Installing script extension: res://mods-unpacked/six666-BrotatoOnline/scripts/session_manager.gd <- res://mods-unpacked/CoopPlus-OnlineExtendedCoop/debug/probe_extensions/session_manager_probe.gd
+22:51:02   INFO ModLoader:ScriptExtension: Installing script extension: res://projectiles/player_projectile.gd <- res://mods-unpacked/six666-BrotatoOnline/extensions/player_projectile_safe_speed.gd
+22:51:02   INFO ModLoader:ScriptExtension: Installing script extension: res://singletons/coop_service.gd <- res://mods-unpacked/CoopPlus-OnlineExtendedCoop/debug/probe_extensions/coop_service_probe.gd
+22:51:02   INFO ModLoader:ScriptExtension: Installing script extension: res://singletons/progress_data.gd <- res://mods-unpacked/six666-BrotatoOnline/extensions/progress_data_removed_players.gd
+22:51:02   INFO ModLoader:ScriptExtension: Installing script extension: res://singletons/utils.gd <- res://mods-unpacked/six666-BrotatoOnline/extensions/utils_online_manual_aim.gd
+22:51:02   INFO ModLoader:ScriptExtension: Installing script extension: res://ui/menus/global/focus_emulator.gd <- res://mods-unpacked/six666-BrotatoOnline/extensions/focus_emulator_safe_disconnect.gd
+22:51:02   INFO ModLoader:ScriptExtension: Installing script extension: res://ui/menus/ingame/pause_menu.gd <- res://mods-unpacked/six666-BrotatoOnline/extensions/pause_menu_focus_safe.gd
+22:51:02   INFO ModLoader:ScriptExtension: Installing script extension: res://ui/menus/shop/shop_item.gd <- res://mods-unpacked/six666-BrotatoOnline/extensions/shop_item_lock_event.gd
+22:51:02   SUCCESS ModLoader:Loader: DONE: Installed all script extensions

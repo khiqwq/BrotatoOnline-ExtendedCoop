@@ -1,0 +1,17 @@
+# Local integration environment: recovered game project, engine copy, isolated
+# user data, raw evidence. Never committed or packaged.
+/.local/
+/build/
+/dist/
+/evidence/raw/
+*.pck
+*.exe
+*.dll
+*.log
+# Evidence logs are part of the record (evidence/index.md); raw evidence stays out.
+!/evidence/**/*.log
+*.tmp
+.import/
+.godot/
+__pycache__/
+tests/.tmp/

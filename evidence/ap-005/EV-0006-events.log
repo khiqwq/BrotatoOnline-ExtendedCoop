@@ -1,0 +1,13 @@
+{"detail":{"bo_session_manager_cached":false,"coop_service_cached":false,"main_loop_set":false},"event":"coopplus.mod_main._init","frame":0,"t":603}
+{"detail":{"path":"debug/probe_extensions/coop_service_probe.gd"},"event":"coopplus.install_script_extension","frame":0,"t":605}
+{"detail":{"path":"debug/probe_extensions/entity_spawner_probe.gd"},"event":"coopplus.install_script_extension","frame":0,"t":606}
+{"detail":{"path":"debug/probe_extensions/session_manager_probe.gd"},"event":"coopplus.install_script_extension","frame":0,"t":607}
+{"detail":{"path":"debug/probe_extensions/menu_sync_probe.gd"},"event":"coopplus.install_script_extension","frame":0,"t":608}
+{"detail":{},"event":"coop_service_probe._init","frame":0,"t":3650}
+{"detail":{},"event":"session_manager_probe._init","frame":0,"t":3747}
+{"detail":{"path":"/root/ModLoader/six666-BrotatoOnline/BrotatoOnlineSessionManager"},"event":"session_manager_probe._ready","frame":0,"t":3749}
+{"detail":{"path":"/root/ModLoader/six666-BrotatoOnline/BrotatoOnlineMenuSyncManager"},"event":"menu_sync_probe._ready","frame":0,"t":3809}
+{"detail":{"path":"/root/ModLoader/CoopPlus-OnlineExtendedCoop"},"event":"coopplus.mod_main._ready","frame":0,"t":3880}
+{"detail":{},"event":"lifecycle_probe._ready","frame":0,"t":3884}
+{"detail":{},"event":"coop_service_probe._ready","frame":0,"t":5346}
+{"detail":{},"event":"lifecycle_probe.settled","frame":3325,"t":18600}

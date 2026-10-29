@@ -1,0 +1,69 @@
+{
+  "format": "coopplus_event_replay",
+  "version": 1,
+  "name": "baseline_four_players",
+  "description": "Vanilla-sized run (R08): 4 players, one upgrade round and one shop round, every message valid. Expect no rejection; a buy without gold is a committed refusal, not a rejection.",
+  "events": [
+    {"type": "join", "identity": "steam:76561198000000001", "local": true, "t": 0},
+    {"type": "join", "identity": "steam:76561198000000002", "t": 100},
+    {"type": "join", "identity": "steam:76561198000000003", "t": 200},
+    {"type": "join", "identity": "steam:76561198000000004", "t": 300},
+    {"type": "freeze", "t": 400},
+    {"type": "begin_run", "run_id": "run-baseline", "t": 1000},
+    {"type": "advance", "wave": 1, "phase": "wave", "t": 2000},
+    {"type": "advance", "wave": 1, "phase": "upgrade", "t": 22000},
+    {"type": "action", "from": "steam:76561198000000001", "kind": "upgrade", "body": {"choice": 0, "stat": "max_hp"}, "t": 22100},
+    {"type": "action", "from": "steam:76561198000000002", "kind": "upgrade", "body": {"choice": 1, "stat": "damage"}, "t": 22200},
+    {"type": "action", "from": "steam:76561198000000003", "kind": "upgrade", "body": {"choice": 2, "stat": "speed"}, "t": 22300},
+    {"type": "action", "from": "steam:76561198000000004", "kind": "upgrade", "body": {"choice": 3, "stat": "armor"}, "t": 22400},
+    {"type": "barrier", "key": "close_upgrade", "t": 22500},
+    {"type": "ready", "from": "steam:76561198000000001", "t": 22600},
+    {"type": "ready", "from": "steam:76561198000000002", "t": 22700},
+    {"type": "ready", "from": "steam:76561198000000003", "t": 22800},
+    {"type": "ready", "from": "steam:76561198000000004", "t": 22900},
+    {"type": "advance", "wave": 1, "phase": "shop", "requires": "close_upgrade", "t": 23000},
+    {"type": "action", "from": "steam:76561198000000001", "kind": "buy", "body": {"shop_slot": 0, "item": "knife", "cost": 12}, "t": 23100},
+    {"type": "action", "from": "steam:76561198000000002", "kind": "buy", "body": {"shop_slot": 1, "item": "pistol", "cost": 25}, "t": 23200},
+    {"type": "action", "from": "steam:76561198000000003", "kind": "reroll", "body": {"cost": 3}, "t": 23300},
+    {"type": "action", "from": "steam:76561198000000004", "kind": "lock", "body": {"shop_slot": 2, "locked": true}, "t": 23400},
+    {"type": "action", "from": "steam:76561198000000002", "kind": "buy", "body": {"shop_slot": 2, "item": "shield", "cost": 10}, "t": 23500, "note": "5 gold left: committed refusal no_gold"},
+    {"type": "action", "from": "steam:76561198000000001", "kind": "sell", "body": {"item": "knife", "value": 6}, "t": 23600},
+    {"type": "barrier", "key": "start_wave", "t": 23700},
+    {"type": "ready", "from": "steam:76561198000000003", "t": 23800},
+    {"type": "ready", "from": "steam:76561198000000001", "t": 23900},
+    {"type": "ready", "from": "steam:76561198000000004", "t": 24000},
+    {"type": "ready", "from": "steam:76561198000000002", "t": 24100},
+    {"type": "advance", "wave": 2, "phase": "wave", "requires": "start_wave", "t": 25000}
+  ],
+  "expect": {
+    "rejection_count": 0,
+    "duplicate_count": 0,
+    "outcomes": [
+      {"eid": 22, "status": "applied", "reason": ""},
+      {"eid": 28, "status": "applied", "reason": ""},
+      {"eid": 29, "status": "applied", "reason": ""}
+    ],
+    "roster": ["steam:76561198000000001", "steam:76561198000000002", "steam:76561198000000003", "steam:76561198000000004"],
+    "devices": [-1, 1, 2, 3],
+    "online": [true, true, true, true],
+    "roster_generation": 0,
+    "flow": {"run_id": "run-baseline", "wave": 2, "phase": "wave", "roster_generation": 0, "seq": 5},
+    "players": [
+      {"slot": 0, "gold": 24, "items": [], "upgrades": ["max_hp"]},
+      {"slot": 1, "gold": 5, "items": ["pistol"], "upgrades": ["damage"]},
+      {"slot": 2, "gold": 27, "rerolls": 1, "upgrades": ["speed"]},
+      {"slot": 3, "gold": 30, "locks": [2], "upgrades": ["armor"]}
+    ],
+    "phase_commits": ["close_upgrade", "start_wave"],
+    "action_count": 10,
+    "action_results": [
+      {"sender": "steam:76561198000000002", "action_id": 3, "ok": false, "reason": "no_gold"},
+      {"sender": "steam:76561198000000001", "action_id": 3, "ok": true, "reason": ""}
+    ],
+    "barriers": [
+      {"key": "close_upgrade", "state": "complete", "ready": [0, 1, 2, 3], "missing": [], "commits": 1},
+      {"key": "start_wave", "state": "complete", "ready": [0, 1, 2, 3], "missing": [], "commits": 1}
+    ],
+    "violations": []
+  }
+}

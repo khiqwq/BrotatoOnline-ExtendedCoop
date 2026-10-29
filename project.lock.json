@@ -1,0 +1,85 @@
+{
+  "schema": 1,
+  "updated": "2026-10-28",
+  "game": {
+    "app_id": 1942280,
+    "version": "1.1.15.4",
+    "steam_build_id": 23429717,
+    "engine_version": "3.7.dev.custom_build.74e86be54",
+    "pck_format": 1,
+    "gdscript_bytecode_version": 13,
+    "files": {
+      "Brotato.exe": "f69a1217fd15daf46300cc6224dd34f7ecd4f56288fc71e95ed6344eff753ae4",
+      "Brotato.pck": "be303f0a320cb099001fdc39c3b807cdd657e93426dc09867cee1d36f5385acf",
+      "steam_api64.dll": "e3fe06e2d802c2f753aeb46869e2af898f34715ce85f08001456fd8a80ecd21e"
+    }
+  },
+  "dlc": [
+    {
+      "name": "Abyssal Terrors",
+      "depot": 2868390,
+      "file": "BrotatoAbyssalTerrors.pck",
+      "sha256": "ee5b45a27bd6ad53e24b6c160c0780bd11c67e9563732091d62ef72c3fef3016"
+    }
+  ],
+  "mod_loader": {
+    "source": "built into Brotato.pck (res://addons/mod_loader)",
+    "version": "6.3.0"
+  },
+  "upstream_mods": [
+    {
+      "id": "six666-BrotatoOnline",
+      "role": "required",
+      "version": "6.6.6",
+      "workshop_id": 3741034628,
+      "workshop_manifest": "8597230023423072091",
+      "workshop_timeupdated": 1792725023,
+      "zip": "six666-BrotatoOnline.zip",
+      "zip_sha256": "b3cba500758cb95e1f60d19bcf50fa2bb929b4061a9977c2d015906bf21d42fe",
+      "normalized_fingerprint": "17443875f52fd7659af33d0f0deb9fb495b0d46110aaeba08d0fc419d439b819",
+      "file_count": 42
+    },
+    {
+      "id": "CoopFix-OnlineMouseUI",
+      "role": "optional",
+      "version": "1.0.1",
+      "workshop_id": 3803857989,
+      "workshop_manifest": "2880042569635395072",
+      "workshop_timeupdated": 1789753367,
+      "zip": "CoopFix-OnlineMouseUI-1.0.1.zip",
+      "zip_sha256": "a7690dbb9efb128a489fbfc21107e1a5a9b891363dfbd8091de9d93a31d906fc",
+      "normalized_fingerprint": "811ebfa7aeeb9fb9c86d7aaf224fe314c3af7cec1abd870e7e650561ab1bee54",
+      "file_count": 10
+    }
+  ],
+  "extension": {
+    "id": "CoopPlus-OnlineExtendedCoop",
+    "version": "0.1.0",
+    "network_capability_version": 1,
+    "save_schema_version": 1,
+    "display_name_zh": "超四人联机合作扩展",
+    "license": "GPL-3.0-only"
+  },
+  "tools": {
+    "powershell": "7.4+",
+    "python": "3.12 (only tools/recovery, local audit helpers)",
+    "test_engine": "copy of the target game engine in .local/engine (see docs/adr/ADR-000-test-runtime.md)"
+  },
+  "package": {
+    "zip_entry_timestamp": "2026-01-01T00:00:00Z",
+    "whitelist": [
+      "mods-unpacked/CoopPlus-OnlineExtendedCoop/manifest.json",
+      "mods-unpacked/CoopPlus-OnlineExtendedCoop/mod_main.gd",
+      "mods-unpacked/CoopPlus-OnlineExtendedCoop/compatibility.json",
+      "mods-unpacked/CoopPlus-OnlineExtendedCoop/scripts/**/*.gd",
+      "mods-unpacked/CoopPlus-OnlineExtendedCoop/extensions/**/*.gd",
+      "mods-unpacked/CoopPlus-OnlineExtendedCoop/ui/**/*.gd",
+      "mods-unpacked/CoopPlus-OnlineExtendedCoop/ui/**/*.tscn",
+      "mods-unpacked/CoopPlus-OnlineExtendedCoop/translations/*.txt",
+      "mods-unpacked/CoopPlus-OnlineExtendedCoop/LICENSE"
+    ],
+    "excluded_dirs": [
+      "mods-unpacked/CoopPlus-OnlineExtendedCoop/debug"
+    ]
+  }
+}

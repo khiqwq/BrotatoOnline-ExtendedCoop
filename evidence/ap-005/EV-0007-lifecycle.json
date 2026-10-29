@@ -1,0 +1,370 @@
+{
+	"probe": {
+		"events": [
+			{
+				"t": 602,
+				"frame": 0,
+				"event": "coopplus.mod_main._init",
+				"detail": {
+					"bo_session_manager_cached": false,
+					"coop_service_cached": false,
+					"main_loop_set": false
+				}
+			},
+			{
+				"t": 603,
+				"frame": 0,
+				"event": "coopplus.install_script_extension",
+				"detail": {
+					"path": "debug/probe_extensions/coop_service_probe.gd"
+				}
+			},
+			{
+				"t": 604,
+				"frame": 0,
+				"event": "coopplus.install_script_extension",
+				"detail": {
+					"path": "debug/probe_extensions/entity_spawner_probe.gd"
+				}
+			},
+			{
+				"t": 604,
+				"frame": 0,
+				"event": "coopplus.install_script_extension",
+				"detail": {
+					"path": "debug/probe_extensions/session_manager_probe.gd"
+				}
+			},
+			{
+				"t": 605,
+				"frame": 0,
+				"event": "coopplus.install_script_extension",
+				"detail": {
+					"path": "debug/probe_extensions/menu_sync_probe.gd"
+				}
+			},
+			{
+				"t": 4587,
+				"frame": 0,
+				"event": "coop_service_probe._init",
+				"detail": {
+
+				}
+			},
+			{
+				"t": 4633,
+				"frame": 0,
+				"event": "coopplus.mod_main._enter_tree",
+				"detail": {
+					"mod_loader_initializing": false,
+					"bo_slot_manager_cached": false,
+					"coop_service_in_tree": true
+				}
+			},
+			{
+				"t": 4634,
+				"frame": 0,
+				"event": "coopplus.install_script_extension",
+				"detail": {
+					"path": "debug/probe_extensions/slot_manager_probe.gd",
+					"stage": "enter_tree"
+				}
+			},
+			{
+				"t": 4649,
+				"frame": 0,
+				"event": "session_manager_probe._init",
+				"detail": {
+
+				}
+			},
+			{
+				"t": 4651,
+				"frame": 0,
+				"event": "session_manager_probe._ready",
+				"detail": {
+					"path": "/root/ModLoader/six666-BrotatoOnline/BrotatoOnlineSessionManager"
+				}
+			},
+			{
+				"t": 4665,
+				"frame": 0,
+				"event": "slot_manager_probe._ready",
+				"detail": {
+					"placeholder_type": 1,
+					"gamepad_xbox": 1,
+					"can_instance": true
+				}
+			},
+			{
+				"t": 4675,
+				"frame": 0,
+				"event": "menu_sync_probe._ready",
+				"detail": {
+					"path": "/root/ModLoader/six666-BrotatoOnline/BrotatoOnlineMenuSyncManager"
+				}
+			},
+			{
+				"t": 4722,
+				"frame": 0,
+				"event": "coopplus.mod_main._ready",
+				"detail": {
+					"path": "/root/ModLoader/CoopPlus-OnlineExtendedCoop"
+				}
+			},
+			{
+				"t": 4725,
+				"frame": 0,
+				"event": "lifecycle_probe._ready",
+				"detail": {
+
+				}
+			},
+			{
+				"t": 5690,
+				"frame": 0,
+				"event": "coop_service_probe._ready",
+				"detail": {
+
+				}
+			},
+			{
+				"t": 18759,
+				"frame": 3404,
+				"event": "lifecycle_probe.settled",
+				"detail": {
+
+				}
+			}
+		],
+		"counters": {
+			"coop_service._init": 1,
+			"session_manager._init": 1,
+			"session_manager._ready": 1,
+			"slot_manager._ready": 1,
+			"menu_sync._ready": 1,
+			"coop_service._ready": 1,
+			"session_manager._bind_transports": 1
+		}
+	},
+	"mod_loader_version": "6.3.0",
+	"engine": {
+		"major": 3,
+		"minor": 7,
+		"patch": 0,
+		"hex": 198400,
+		"status": "dev",
+		"build": "custom_build",
+		"year": 2024,
+		"hash": "74e86be5492080f6a4e903a973f2f4f7e9471af2",
+		"string": "3.7-dev (custom_build)"
+	},
+	"mod_loader_children": [
+		{
+			"name": "six666-BrotatoOnline",
+			"chain": [
+				"res://mods-unpacked/six666-BrotatoOnline/mod_main.gd"
+			],
+			"children": [
+				{
+					"name": "BrotatoOnlineI18n",
+					"chain": [
+						"res://mods-unpacked/six666-BrotatoOnline/scripts/brotato_online_i18n.gd"
+					]
+				},
+				{
+					"name": "BrotatoOnlineVersionAdapter",
+					"chain": [
+						"res://mods-unpacked/six666-BrotatoOnline/scripts/brotato_version_adapter.gd"
+					]
+				},
+				{
+					"name": "BrotatoOnlineSessionManager",
+					"chain": [
+						"res://mods-unpacked/six666-BrotatoOnline/scripts/session_manager.gd",
+						"res://mods-unpacked/six666-BrotatoOnline/scripts/session_manager.gd"
+					]
+				},
+				{
+					"name": "BrotatoOnlineSteamTransport",
+					"chain": [
+						"res://mods-unpacked/six666-BrotatoOnline/scripts/steam_transport.gd"
+					]
+				},
+				{
+					"name": "BrotatoOnlineLanTransport",
+					"chain": [
+						"res://mods-unpacked/six666-BrotatoOnline/scripts/lan_transport.gd"
+					]
+				},
+				{
+					"name": "BrotatoOnlineNetworkHeartbeat",
+					"chain": [
+						"res://mods-unpacked/six666-BrotatoOnline/scripts/network_heartbeat.gd"
+					]
+				},
+				{
+					"name": "BrotatoOnlineLanDiscovery",
+					"chain": [
+						"res://mods-unpacked/six666-BrotatoOnline/scripts/lan_discovery.gd"
+					]
+				},
+				{
+					"name": "BrotatoOnlineLobbyBrowser",
+					"chain": [
+						"res://mods-unpacked/six666-BrotatoOnline/scripts/public_lobby_browser.gd"
+					]
+				},
+				{
+					"name": "BrotatoOnlineOnlinePlayerSlotManager",
+					"chain": [
+						"res://mods-unpacked/six666-BrotatoOnline/scripts/online_player_slot_manager.gd",
+						"res://mods-unpacked/six666-BrotatoOnline/scripts/online_player_slot_manager.gd"
+					]
+				},
+				{
+					"name": "BrotatoOnlinePlayerIdentityManager",
+					"chain": [
+						"res://mods-unpacked/six666-BrotatoOnline/scripts/player_identity_manager.gd"
+					]
+				},
+				{
+					"name": "BrotatoOnlineUpgradeRuntimeSync",
+					"chain": [
+						"res://mods-unpacked/six666-BrotatoOnline/scripts/upgrade_runtime_sync.gd"
+					]
+				},
+				{
+					"name": "BrotatoOnlineMenuSyncManager",
+					"chain": [
+						"res://mods-unpacked/six666-BrotatoOnline/scripts/menu_sync_manager.gd",
+						"res://mods-unpacked/six666-BrotatoOnline/scripts/menu_sync_manager.gd"
+					]
+				},
+				{
+					"name": "BrotatoOnlineQuickChatWheel",
+					"chain": [
+						"res://mods-unpacked/six666-BrotatoOnline/scripts/quick_chat_wheel.gd"
+					]
+				},
+				{
+					"name": "BrotatoOnlineOnlineInputManager",
+					"chain": [
+						"res://mods-unpacked/six666-BrotatoOnline/scripts/online_input_manager.gd"
+					]
+				},
+				{
+					"name": "BrotatoOnlineRuntimeLocator",
+					"chain": [
+						"res://mods-unpacked/six666-BrotatoOnline/scripts/runtime_locator.gd"
+					]
+				},
+				{
+					"name": "BrotatoOnlineModSettingsManager",
+					"chain": [
+						"res://mods-unpacked/six666-BrotatoOnline/scripts/online_mod_settings_manager.gd"
+					]
+				},
+				{
+					"name": "BrotatoOnlineNetIdRegistry",
+					"chain": [
+						"res://mods-unpacked/six666-BrotatoOnline/scripts/net_id_registry.gd"
+					]
+				},
+				{
+					"name": "BrotatoOnlineStateSnapshot",
+					"chain": [
+						"res://mods-unpacked/six666-BrotatoOnline/scripts/state_snapshot.gd"
+					]
+				},
+				{
+					"name": "BrotatoOnlineBattleReplicaManager",
+					"chain": [
+						"res://mods-unpacked/six666-BrotatoOnline/scripts/battle_replica_manager.gd"
+					]
+				},
+				{
+					"name": "BrotatoOnlineAPI",
+					"chain": [
+						"res://mods-unpacked/six666-BrotatoOnline/scripts/brotato_online_api.gd"
+					]
+				},
+				{
+					"name": "BrotatoOnlinePlayerRemovalManager",
+					"chain": [
+						"res://mods-unpacked/six666-BrotatoOnline/scripts/player_removal_manager.gd"
+					]
+				},
+				{
+					"name": "BrotatoOnlinePlayerListOverlay",
+					"chain": [
+						"res://mods-unpacked/six666-BrotatoOnline/scripts/player_list_overlay.gd"
+					]
+				},
+				{
+					"name": "BrotatoOnlinePauseFocusAliasManager",
+					"chain": [
+						"res://mods-unpacked/six666-BrotatoOnline/scripts/pause_focus_alias_manager.gd"
+					]
+				}
+			]
+		},
+		{
+			"name": "CoopPlus-OnlineExtendedCoop",
+			"chain": [
+				"res://mods-unpacked/CoopPlus-OnlineExtendedCoop/mod_main.gd"
+			],
+			"children": [
+				{
+					"name": "CoopPlusLifecycleProbe",
+					"chain": [
+						"res://mods-unpacked/CoopPlus-OnlineExtendedCoop/debug/lifecycle_probe.gd"
+					]
+				}
+			]
+		}
+	],
+	"autoload_chains": {
+		"CoopService": [
+			"res://singletons/coop_service.gd",
+			"res://singletons/coop_service.gd"
+		],
+		"RunData": [
+			"res://singletons/run_data.gd"
+		],
+		"InputService": [
+			"res://singletons/input_service.gd"
+		],
+		"ProgressData": [
+			"res://singletons/progress_data.gd",
+			"res://singletons/progress_data.gd"
+		]
+	},
+	"stacked_chains": {
+		"res://global/entity_spawner.gd": [
+			"res://mods-unpacked/CoopPlus-OnlineExtendedCoop/debug/probe_extensions/entity_spawner_probe.gd",
+			"res://mods-unpacked/six666-BrotatoOnline/extensions/entity_spawner_online_player_count_guard.gd",
+			"<vanilla bytecode>"
+		],
+		"res://singletons/coop_service.gd": [
+			"res://mods-unpacked/CoopPlus-OnlineExtendedCoop/debug/probe_extensions/coop_service_probe.gd",
+			"<vanilla bytecode>"
+		],
+		"res://mods-unpacked/six666-BrotatoOnline/scripts/session_manager.gd": [
+			"res://mods-unpacked/CoopPlus-OnlineExtendedCoop/debug/probe_extensions/session_manager_probe.gd",
+			"res://mods-unpacked/six666-BrotatoOnline/scripts/session_manager.gd"
+		],
+		"res://mods-unpacked/six666-BrotatoOnline/scripts/online_player_slot_manager.gd": [
+			"res://mods-unpacked/CoopPlus-OnlineExtendedCoop/debug/probe_extensions/slot_manager_probe.gd",
+			"res://mods-unpacked/six666-BrotatoOnline/scripts/online_player_slot_manager.gd"
+		]
+	},
+	"coop_service_max_players": 4,
+	"upstream_fingerprint": {
+		"ok": true,
+		"reason": "",
+		"fingerprint": "17443875f52fd7659af33d0f0deb9fb495b0d46110aaeba08d0fc419d439b819",
+		"file_count": 42
+	},
+	"current_scene": "res://ui/menus/title_screen/title_screen.tscn"
+}

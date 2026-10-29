@@ -1,0 +1,5291 @@
+{
+	"reason": "reached:coop_shop.tscn after 3 waves",
+	"players_wanted": 8,
+	"wave_seconds": 20,
+	"setup": {
+		"gate": {
+			"extended": true,
+			"capacity": 8,
+			"reasons": [
+
+			]
+		},
+		"connected_players": [
+			[
+				7,
+				0
+			],
+			[
+				16,
+				1
+			],
+			[
+				17,
+				1
+			],
+			[
+				18,
+				1
+			],
+			[
+				19,
+				1
+			],
+			[
+				20,
+				1
+			],
+			[
+				21,
+				1
+			],
+			[
+				22,
+				1
+			]
+		],
+		"missing_actions": [
+
+		],
+		"players": [
+			{
+				"player": 1,
+				"character": "character_well_rounded",
+				"weapon": "weapon_knife_1",
+				"device": 7
+			},
+			{
+				"player": 2,
+				"character": "character_brawler",
+				"weapon": "weapon_fist_1",
+				"device": 16
+			},
+			{
+				"player": 3,
+				"character": "character_crazy",
+				"weapon": "weapon_knife_1",
+				"device": 17
+			},
+			{
+				"player": 4,
+				"character": "character_ranger",
+				"weapon": "weapon_pistol_1",
+				"device": 18
+			},
+			{
+				"player": 5,
+				"character": "character_mage",
+				"weapon": "weapon_torch_1",
+				"device": 19
+			},
+			{
+				"player": 6,
+				"character": "character_chunky",
+				"weapon": "weapon_fist_1",
+				"device": 20
+			},
+			{
+				"player": 7,
+				"character": "character_old",
+				"weapon": "weapon_scissors_1",
+				"device": 21
+			},
+			{
+				"player": 8,
+				"character": "character_lucky",
+				"weapon": "weapon_stick_1",
+				"device": 22
+			}
+		],
+		"run_data_player_count": 8,
+		"change_scene_error": 0
+	},
+	"scenes": [
+		{
+			"t": 0.15,
+			"scene": "res://pause.tscn"
+		},
+		{
+			"t": 3.41,
+			"scene": "res://ui/menus/title_screen/title_screen.tscn"
+		},
+		{
+			"t": 0.14,
+			"scene": "res://main.tscn"
+		},
+		{
+			"t": 22.92,
+			"scene": "res://ui/menus/shop/coop_shop.tscn"
+		},
+		{
+			"t": 33.3,
+			"scene": "res://main.tscn"
+		},
+		{
+			"t": 55.71,
+			"scene": "res://ui/menus/shop/coop_shop.tscn"
+		},
+		{
+			"t": 58.86,
+			"scene": "res://main.tscn"
+		},
+		{
+			"t": 81.26,
+			"scene": "res://ui/menus/shop/coop_shop.tscn"
+		}
+	],
+	"summary": {
+		"spawned_players": 8,
+		"players_that_moved": 8,
+		"distinct_devices": 8,
+		"max_distance": {
+			"0": 648.260986,
+			"1": 803.94751,
+			"2": 794.933105,
+			"3": 705.598267,
+			"4": 855.78949,
+			"5": 687.127075,
+			"6": 685.277466,
+			"7": 671.468079
+		},
+		"samples": 68,
+		"wave_over_at": 78.71,
+		"accept_rounds": 11,
+		"waves_done": 3,
+		"waves_wanted": 3,
+		"current_wave": 3,
+		"mortal": false,
+		"losses": 0,
+		"player_data_by_shop_visit": [
+			{
+				"after_wave": 1,
+				"players": [
+					{
+						"player": 1,
+						"character": "character_well_rounded",
+						"gold": 57,
+						"level": 1,
+						"xp": 11,
+						"items": 1,
+						"weapons": 1
+					},
+					{
+						"player": 2,
+						"character": "character_brawler",
+						"gold": 49,
+						"level": 1,
+						"xp": 3,
+						"items": 1,
+						"weapons": 2
+					},
+					{
+						"player": 3,
+						"character": "character_crazy",
+						"gold": 49,
+						"level": 1,
+						"xp": 3,
+						"items": 1,
+						"weapons": 2
+					},
+					{
+						"player": 4,
+						"character": "character_ranger",
+						"gold": 49,
+						"level": 1,
+						"xp": 3,
+						"items": 1,
+						"weapons": 2
+					},
+					{
+						"player": 5,
+						"character": "character_mage",
+						"gold": 49,
+						"level": 1,
+						"xp": 3,
+						"items": 3,
+						"weapons": 1
+					},
+					{
+						"player": 6,
+						"character": "character_chunky",
+						"gold": 48,
+						"level": 1,
+						"xp": 2,
+						"items": 1,
+						"weapons": 1
+					},
+					{
+						"player": 7,
+						"character": "character_old",
+						"gold": 58,
+						"level": 1,
+						"xp": 12,
+						"items": 1,
+						"weapons": 1
+					},
+					{
+						"player": 8,
+						"character": "character_lucky",
+						"gold": 48,
+						"level": 0,
+						"xp": 9,
+						"items": 1,
+						"weapons": 1
+					}
+				]
+			},
+			{
+				"after_wave": 2,
+				"players": [
+					{
+						"player": 1,
+						"character": "character_well_rounded",
+						"gold": 92,
+						"level": 2,
+						"xp": 21,
+						"items": 1,
+						"weapons": 1
+					},
+					{
+						"player": 2,
+						"character": "character_brawler",
+						"gold": 74,
+						"level": 2,
+						"xp": 3,
+						"items": 1,
+						"weapons": 2
+					},
+					{
+						"player": 3,
+						"character": "character_crazy",
+						"gold": 74,
+						"level": 2,
+						"xp": 3,
+						"items": 1,
+						"weapons": 2
+					},
+					{
+						"player": 4,
+						"character": "character_ranger",
+						"gold": 74,
+						"level": 2,
+						"xp": 3,
+						"items": 1,
+						"weapons": 2
+					},
+					{
+						"player": 5,
+						"character": "character_mage",
+						"gold": 74,
+						"level": 2,
+						"xp": 3,
+						"items": 3,
+						"weapons": 1
+					},
+					{
+						"player": 6,
+						"character": "character_chunky",
+						"gold": 73,
+						"level": 2,
+						"xp": 2,
+						"items": 1,
+						"weapons": 1
+					},
+					{
+						"player": 7,
+						"character": "character_old",
+						"gold": 95,
+						"level": 2,
+						"xp": 24,
+						"items": 1,
+						"weapons": 1
+					},
+					{
+						"player": 8,
+						"character": "character_lucky",
+						"gold": 74,
+						"level": 1,
+						"xp": 6,
+						"items": 1,
+						"weapons": 1
+					}
+				]
+			}
+		],
+		"player_data_now": [
+			{
+				"player": 1,
+				"character": "character_well_rounded",
+				"gold": 131,
+				"level": 3,
+				"xp": 24,
+				"items": 1,
+				"weapons": 1
+			},
+			{
+				"player": 2,
+				"character": "character_brawler",
+				"gold": 103,
+				"level": 2,
+				"xp": 32,
+				"items": 1,
+				"weapons": 2
+			},
+			{
+				"player": 3,
+				"character": "character_crazy",
+				"gold": 103,
+				"level": 2,
+				"xp": 32,
+				"items": 1,
+				"weapons": 2
+			},
+			{
+				"player": 4,
+				"character": "character_ranger",
+				"gold": 102,
+				"level": 2,
+				"xp": 31,
+				"items": 1,
+				"weapons": 2
+			},
+			{
+				"player": 5,
+				"character": "character_mage",
+				"gold": 102,
+				"level": 2,
+				"xp": 31,
+				"items": 3,
+				"weapons": 1
+			},
+			{
+				"player": 6,
+				"character": "character_chunky",
+				"gold": 102,
+				"level": 2,
+				"xp": 31,
+				"items": 1,
+				"weapons": 1
+			},
+			{
+				"player": 7,
+				"character": "character_old",
+				"gold": 136,
+				"level": 3,
+				"xp": 29,
+				"items": 1,
+				"weapons": 1
+			},
+			{
+				"player": 8,
+				"character": "character_lucky",
+				"gold": 103,
+				"level": 1,
+				"xp": 20,
+				"items": 1,
+				"weapons": 1
+			}
+		],
+		"padded": {
+
+		}
+	},
+	"samples": [
+		{
+			"t": 0.14,
+			"players": [
+				{
+					"index": 0,
+					"valid": true,
+					"x": 572,
+					"y": 512,
+					"device": 7,
+					"dead": false
+				},
+				{
+					"index": 1,
+					"valid": true,
+					"x": 672,
+					"y": 512,
+					"device": 16,
+					"dead": false
+				},
+				{
+					"index": 2,
+					"valid": true,
+					"x": 572,
+					"y": 612,
+					"device": 17,
+					"dead": false
+				},
+				{
+					"index": 3,
+					"valid": true,
+					"x": 672,
+					"y": 612,
+					"device": 18,
+					"dead": false
+				},
+				{
+					"index": 4,
+					"valid": true,
+					"x": 772,
+					"y": 512,
+					"device": 19,
+					"dead": false
+				},
+				{
+					"index": 5,
+					"valid": true,
+					"x": 872,
+					"y": 512,
+					"device": 20,
+					"dead": false
+				},
+				{
+					"index": 6,
+					"valid": true,
+					"x": 772,
+					"y": 612,
+					"device": 21,
+					"dead": false
+				},
+				{
+					"index": 7,
+					"valid": true,
+					"x": 872,
+					"y": 612,
+					"device": 22,
+					"dead": false
+				}
+			],
+			"hud_entries": 8,
+			"run_data_players": 8,
+			"paused": false
+		},
+		{
+			"t": 1.15,
+			"players": [
+				{
+					"index": 0,
+					"valid": true,
+					"x": 549,
+					"y": 511,
+					"device": 7,
+					"dead": false
+				},
+				{
+					"index": 1,
+					"valid": true,
+					"x": 669,
+					"y": 422,
+					"device": 16,
+					"dead": false
+				},
+				{
+					"index": 2,
+					"valid": true,
+					"x": 697,
+					"y": 488,
+					"device": 17,
+					"dead": false
+				},
+				{
+					"index": 3,
+					"valid": true,
+					"x": 850,
+					"y": 565,
+					"device": 18,
+					"dead": false
+				},
+				{
+					"index": 4,
+					"valid": true,
+					"x": 1004,
+					"y": 377,
+					"device": 19,
+					"dead": false
+				},
+				{
+					"index": 5,
+					"valid": true,
+					"x": 986,
+					"y": 506,
+					"device": 20,
+					"dead": false
+				},
+				{
+					"index": 6,
+					"valid": true,
+					"x": 1033,
+					"y": 632,
+					"device": 21,
+					"dead": false
+				},
+				{
+					"index": 7,
+					"valid": true,
+					"x": 1194,
+					"y": 747,
+					"device": 22,
+					"dead": false
+				}
+			],
+			"hud_entries": 8,
+			"run_data_players": 8,
+			"paused": false
+		},
+		{
+			"t": 2.15,
+			"players": [
+				{
+					"index": 0,
+					"valid": true,
+					"x": 163,
+					"y": 425,
+					"device": 7,
+					"dead": false
+				},
+				{
+					"index": 1,
+					"valid": true,
+					"x": 714,
+					"y": 554,
+					"device": 16,
+					"dead": false
+				},
+				{
+					"index": 2,
+					"valid": true,
+					"x": 638,
+					"y": 554,
+					"device": 17,
+					"dead": false
+				},
+				{
+					"index": 3,
+					"valid": true,
+					"x": 949,
+					"y": 481,
+					"device": 18,
+					"dead": false
+				},
+				{
+					"index": 4,
+					"valid": true,
+					"x": 1094,
+					"y": 377,
+					"device": 19,
+					"dead": false
+				},
+				{
+					"index": 5,
+					"valid": true,
+					"x": 889,
+					"y": 153,
+					"device": 20,
+					"dead": false
+				},
+				{
+					"index": 6,
+					"valid": true,
+					"x": 1067,
+					"y": 827,
+					"device": 21,
+					"dead": false
+				},
+				{
+					"index": 7,
+					"valid": true,
+					"x": 1319,
+					"y": 612,
+					"device": 22,
+					"dead": false
+				}
+			],
+			"hud_entries": 8,
+			"run_data_players": 8,
+			"paused": false
+		},
+		{
+			"t": 3.16,
+			"players": [
+				{
+					"index": 0,
+					"valid": true,
+					"x": 157,
+					"y": 511,
+					"device": 7,
+					"dead": false
+				},
+				{
+					"index": 1,
+					"valid": true,
+					"x": 859,
+					"y": 540,
+					"device": 16,
+					"dead": false
+				},
+				{
+					"index": 2,
+					"valid": true,
+					"x": 548,
+					"y": 816,
+					"device": 17,
+					"dead": false
+				},
+				{
+					"index": 3,
+					"valid": true,
+					"x": 947,
+					"y": 297,
+					"device": 18,
+					"dead": false
+				},
+				{
+					"index": 4,
+					"valid": true,
+					"x": 1177,
+					"y": 647,
+					"device": 19,
+					"dead": false
+				},
+				{
+					"index": 5,
+					"valid": true,
+					"x": 881,
+					"y": 228,
+					"device": 20,
+					"dead": false
+				},
+				{
+					"index": 6,
+					"valid": true,
+					"x": 1073,
+					"y": 1003,
+					"device": 21,
+					"dead": false
+				},
+				{
+					"index": 7,
+					"valid": true,
+					"x": 1192,
+					"y": 477,
+					"device": 22,
+					"dead": false
+				}
+			],
+			"hud_entries": 8,
+			"run_data_players": 8,
+			"paused": false
+		},
+		{
+			"t": 4.16,
+			"players": [
+				{
+					"index": 0,
+					"valid": true,
+					"x": 55,
+					"y": 519,
+					"device": 7,
+					"dead": false
+				},
+				{
+					"index": 1,
+					"valid": true,
+					"x": 992,
+					"y": 348,
+					"device": 16,
+					"dead": false
+				},
+				{
+					"index": 2,
+					"valid": true,
+					"x": 525,
+					"y": 959,
+					"device": 17,
+					"dead": false
+				},
+				{
+					"index": 3,
+					"valid": true,
+					"x": 1202,
+					"y": 432,
+					"device": 18,
+					"dead": false
+				},
+				{
+					"index": 4,
+					"valid": true,
+					"x": 1301,
+					"y": 717,
+					"device": 19,
+					"dead": false
+				},
+				{
+					"index": 5,
+					"valid": true,
+					"x": 770,
+					"y": 494,
+					"device": 20,
+					"dead": false
+				},
+				{
+					"index": 6,
+					"valid": true,
+					"x": 844,
+					"y": 881,
+					"device": 21,
+					"dead": false
+				},
+				{
+					"index": 7,
+					"valid": true,
+					"x": 1320,
+					"y": 668,
+					"device": 22,
+					"dead": false
+				}
+			],
+			"hud_entries": 8,
+			"run_data_players": 8,
+			"paused": false
+		},
+		{
+			"t": 5.17,
+			"players": [
+				{
+					"index": 0,
+					"valid": true,
+					"x": 527,
+					"y": 519,
+					"device": 7,
+					"dead": false
+				},
+				{
+					"index": 1,
+					"valid": true,
+					"x": 936,
+					"y": 445,
+					"device": 16,
+					"dead": false
+				},
+				{
+					"index": 2,
+					"valid": true,
+					"x": 345,
+					"y": 959,
+					"device": 17,
+					"dead": false
+				},
+				{
+					"index": 3,
+					"valid": true,
+					"x": 993,
+					"y": 342,
+					"device": 18,
+					"dead": false
+				},
+				{
+					"index": 4,
+					"valid": true,
+					"x": 1319,
+					"y": 661,
+					"device": 19,
+					"dead": false
+				},
+				{
+					"index": 5,
+					"valid": true,
+					"x": 1007,
+					"y": 403,
+					"device": 20,
+					"dead": false
+				},
+				{
+					"index": 6,
+					"valid": true,
+					"x": 999,
+					"y": 875,
+					"device": 21,
+					"dead": false
+				},
+				{
+					"index": 7,
+					"valid": true,
+					"x": 1319,
+					"y": 606,
+					"device": 22,
+					"dead": false
+				}
+			],
+			"hud_entries": 8,
+			"run_data_players": 8,
+			"paused": false
+		},
+		{
+			"t": 6.17,
+			"players": [
+				{
+					"index": 0,
+					"valid": true,
+					"x": 739,
+					"y": 779,
+					"device": 7,
+					"dead": false
+				},
+				{
+					"index": 1,
+					"valid": true,
+					"x": 771,
+					"y": 445,
+					"device": 16,
+					"dead": false
+				},
+				{
+					"index": 2,
+					"valid": true,
+					"x": 308,
+					"y": 816,
+					"device": 17,
+					"dead": false
+				},
+				{
+					"index": 3,
+					"valid": true,
+					"x": 1319,
+					"y": 332,
+					"device": 18,
+					"dead": false
+				},
+				{
+					"index": 4,
+					"valid": true,
+					"x": 1319,
+					"y": 908,
+					"device": 19,
+					"dead": false
+				},
+				{
+					"index": 5,
+					"valid": true,
+					"x": 1254,
+					"y": 336,
+					"device": 20,
+					"dead": false
+				},
+				{
+					"index": 6,
+					"valid": true,
+					"x": 1060,
+					"y": 1011,
+					"device": 21,
+					"dead": false
+				},
+				{
+					"index": 7,
+					"valid": true,
+					"x": 1319,
+					"y": 380,
+					"device": 22,
+					"dead": false
+				}
+			],
+			"hud_entries": 8,
+			"run_data_players": 8,
+			"paused": false
+		},
+		{
+			"t": 7.17,
+			"players": [
+				{
+					"index": 0,
+					"valid": true,
+					"x": 732,
+					"y": 1011,
+					"device": 7,
+					"dead": false
+				},
+				{
+					"index": 1,
+					"valid": true,
+					"x": 756,
+					"y": 580,
+					"device": 16,
+					"dead": false
+				},
+				{
+					"index": 2,
+					"valid": true,
+					"x": 135,
+					"y": 539,
+					"device": 17,
+					"dead": false
+				},
+				{
+					"index": 3,
+					"valid": true,
+					"x": 927,
+					"y": 322,
+					"device": 18,
+					"dead": false
+				},
+				{
+					"index": 4,
+					"valid": true,
+					"x": 1319,
+					"y": 876,
+					"device": 19,
+					"dead": false
+				},
+				{
+					"index": 5,
+					"valid": true,
+					"x": 1312,
+					"y": 474,
+					"device": 20,
+					"dead": false
+				},
+				{
+					"index": 6,
+					"valid": true,
+					"x": 1181,
+					"y": 1005,
+					"device": 21,
+					"dead": false
+				},
+				{
+					"index": 7,
+					"valid": true,
+					"x": 1184,
+					"y": 433,
+					"device": 22,
+					"dead": false
+				}
+			],
+			"hud_entries": 8,
+			"run_data_players": 8,
+			"paused": false
+		},
+		{
+			"t": 8.17,
+			"players": [
+				{
+					"index": 0,
+					"valid": true,
+					"x": 598,
+					"y": 1011,
+					"device": 7,
+					"dead": false
+				},
+				{
+					"index": 1,
+					"valid": true,
+					"x": 973,
+					"y": 438,
+					"device": 16,
+					"dead": false
+				},
+				{
+					"index": 2,
+					"valid": true,
+					"x": 24,
+					"y": 494,
+					"device": 17,
+					"dead": false
+				},
+				{
+					"index": 3,
+					"valid": true,
+					"x": 993,
+					"y": 311,
+					"device": 18,
+					"dead": false
+				},
+				{
+					"index": 4,
+					"valid": true,
+					"x": 1319,
+					"y": 554,
+					"device": 19,
+					"dead": false
+				},
+				{
+					"index": 5,
+					"valid": true,
+					"x": 1096,
+					"y": 365,
+					"device": 20,
+					"dead": false
+				},
+				{
+					"index": 6,
+					"valid": true,
+					"x": 891,
+					"y": 890,
+					"device": 21,
+					"dead": false
+				},
+				{
+					"index": 7,
+					"valid": true,
+					"x": 1184,
+					"y": 523,
+					"device": 22,
+					"dead": false
+				}
+			],
+			"hud_entries": 8,
+			"run_data_players": 8,
+			"paused": false
+		},
+		{
+			"t": 9.17,
+			"players": [
+				{
+					"index": 0,
+					"valid": true,
+					"x": 598,
+					"y": 917,
+					"device": 7,
+					"dead": false
+				},
+				{
+					"index": 1,
+					"valid": true,
+					"x": 838,
+					"y": 573,
+					"device": 16,
+					"dead": false
+				},
+				{
+					"index": 2,
+					"valid": true,
+					"x": 159,
+					"y": 494,
+					"device": 17,
+					"dead": false
+				},
+				{
+					"index": 3,
+					"valid": true,
+					"x": 948,
+					"y": 176,
+					"device": 18,
+					"dead": false
+				},
+				{
+					"index": 4,
+					"valid": true,
+					"x": 1319,
+					"y": 599,
+					"device": 19,
+					"dead": false
+				},
+				{
+					"index": 5,
+					"valid": true,
+					"x": 1319,
+					"y": 230,
+					"device": 20,
+					"dead": false
+				},
+				{
+					"index": 6,
+					"valid": true,
+					"x": 1013,
+					"y": 768,
+					"device": 21,
+					"dead": false
+				},
+				{
+					"index": 7,
+					"valid": true,
+					"x": 959,
+					"y": 568,
+					"device": 22,
+					"dead": false
+				}
+			],
+			"hud_entries": 8,
+			"run_data_players": 8,
+			"paused": false
+		},
+		{
+			"t": 10.18,
+			"players": [
+				{
+					"index": 0,
+					"valid": true,
+					"x": 739,
+					"y": 579,
+					"device": 7,
+					"dead": false
+				},
+				{
+					"index": 1,
+					"valid": true,
+					"x": 978,
+					"y": 325,
+					"device": 16,
+					"dead": false
+				},
+				{
+					"index": 2,
+					"valid": true,
+					"x": 159,
+					"y": 411,
+					"device": 17,
+					"dead": false
+				},
+				{
+					"index": 3,
+					"valid": true,
+					"x": 896,
+					"y": 581,
+					"device": 18,
+					"dead": false
+				},
+				{
+					"index": 4,
+					"valid": true,
+					"x": 1049,
+					"y": 734,
+					"device": 19,
+					"dead": false
+				},
+				{
+					"index": 5,
+					"valid": true,
+					"x": 1319,
+					"y": 500,
+					"device": 20,
+					"dead": false
+				},
+				{
+					"index": 6,
+					"valid": true,
+					"x": 1060,
+					"y": 890,
+					"device": 21,
+					"dead": false
+				},
+				{
+					"index": 7,
+					"valid": true,
+					"x": 1089,
+					"y": 546,
+					"device": 22,
+					"dead": false
+				}
+			],
+			"hud_entries": 8,
+			"run_data_players": 8,
+			"paused": false
+		},
+		{
+			"t": 11.18,
+			"players": [
+				{
+					"index": 0,
+					"valid": true,
+					"x": 700,
+					"y": 429,
+					"device": 7,
+					"dead": false
+				},
+				{
+					"index": 1,
+					"valid": true,
+					"x": 941,
+					"y": 36,
+					"device": 16,
+					"dead": false
+				},
+				{
+					"index": 2,
+					"valid": true,
+					"x": 286,
+					"y": 104,
+					"device": 17,
+					"dead": false
+				},
+				{
+					"index": 3,
+					"valid": true,
+					"x": 761,
+					"y": 551,
+					"device": 18,
+					"dead": false
+				},
+				{
+					"index": 4,
+					"valid": true,
+					"x": 1049,
+					"y": 839,
+					"device": 19,
+					"dead": false
+				},
+				{
+					"index": 5,
+					"valid": true,
+					"x": 1319,
+					"y": 605,
+					"device": 20,
+					"dead": false
+				},
+				{
+					"index": 6,
+					"valid": true,
+					"x": 1175,
+					"y": 1011,
+					"device": 21,
+					"dead": false
+				},
+				{
+					"index": 7,
+					"valid": true,
+					"x": 962,
+					"y": 238,
+					"device": 22,
+					"dead": false
+				}
+			],
+			"hud_entries": 8,
+			"run_data_players": 8,
+			"paused": false
+		},
+		{
+			"t": 12.18,
+			"players": [
+				{
+					"index": 0,
+					"valid": true,
+					"x": 511,
+					"y": 429,
+					"device": 7,
+					"dead": false
+				},
+				{
+					"index": 1,
+					"valid": true,
+					"x": 761,
+					"y": 36,
+					"device": 16,
+					"dead": false
+				},
+				{
+					"index": 2,
+					"valid": true,
+					"x": 286,
+					"y": 36,
+					"device": 17,
+					"dead": false
+				},
+				{
+					"index": 3,
+					"valid": true,
+					"x": 686,
+					"y": 446,
+					"device": 18,
+					"dead": false
+				},
+				{
+					"index": 4,
+					"valid": true,
+					"x": 914,
+					"y": 794,
+					"device": 19,
+					"dead": false
+				},
+				{
+					"index": 5,
+					"valid": true,
+					"x": 1193,
+					"y": 298,
+					"device": 20,
+					"dead": false
+				},
+				{
+					"index": 6,
+					"valid": true,
+					"x": 1296,
+					"y": 1011,
+					"device": 21,
+					"dead": false
+				},
+				{
+					"index": 7,
+					"valid": true,
+					"x": 1170,
+					"y": 259,
+					"device": 22,
+					"dead": false
+				}
+			],
+			"hud_entries": 8,
+			"run_data_players": 8,
+			"paused": false
+		},
+		{
+			"t": 13.18,
+			"players": [
+				{
+					"index": 0,
+					"valid": true,
+					"x": 417,
+					"y": 571,
+					"device": 7,
+					"dead": false
+				},
+				{
+					"index": 1,
+					"valid": true,
+					"x": 828,
+					"y": 148,
+					"device": 16,
+					"dead": false
+				},
+				{
+					"index": 2,
+					"valid": true,
+					"x": 669,
+					"y": 36,
+					"device": 17,
+					"dead": false
+				},
+				{
+					"index": 3,
+					"valid": true,
+					"x": 776,
+					"y": 446,
+					"device": 18,
+					"dead": false
+				},
+				{
+					"index": 4,
+					"valid": true,
+					"x": 1027,
+					"y": 726,
+					"device": 19,
+					"dead": false
+				},
+				{
+					"index": 5,
+					"valid": true,
+					"x": 1213,
+					"y": 401,
+					"device": 20,
+					"dead": false
+				},
+				{
+					"index": 6,
+					"valid": true,
+					"x": 1276,
+					"y": 890,
+					"device": 21,
+					"dead": false
+				},
+				{
+					"index": 7,
+					"valid": true,
+					"x": 959,
+					"y": 127,
+					"device": 22,
+					"dead": false
+				}
+			],
+			"hud_entries": 8,
+			"run_data_players": 8,
+			"paused": false
+		},
+		{
+			"t": 14.18,
+			"players": [
+				{
+					"index": 0,
+					"valid": true,
+					"x": 291,
+					"y": 571,
+					"device": 7,
+					"dead": false
+				},
+				{
+					"index": 1,
+					"valid": true,
+					"x": 836,
+					"y": 306,
+					"device": 16,
+					"dead": false
+				},
+				{
+					"index": 2,
+					"valid": true,
+					"x": 571,
+					"y": 43,
+					"device": 17,
+					"dead": false
+				},
+				{
+					"index": 3,
+					"valid": true,
+					"x": 888,
+					"y": 438,
+					"device": 18,
+					"dead": false
+				},
+				{
+					"index": 4,
+					"valid": true,
+					"x": 1199,
+					"y": 464,
+					"device": 19,
+					"dead": false
+				},
+				{
+					"index": 5,
+					"valid": true,
+					"x": 1103,
+					"y": 150,
+					"device": 20,
+					"dead": false
+				},
+				{
+					"index": 6,
+					"valid": true,
+					"x": 1319,
+					"y": 890,
+					"device": 21,
+					"dead": false
+				},
+				{
+					"index": 7,
+					"valid": true,
+					"x": 1085,
+					"y": 190,
+					"device": 22,
+					"dead": false
+				}
+			],
+			"hud_entries": 8,
+			"run_data_players": 8,
+			"paused": false
+		},
+		{
+			"t": 15.18,
+			"players": [
+				{
+					"index": 0,
+					"valid": true,
+					"x": 299,
+					"y": 673,
+					"device": 7,
+					"dead": false
+				},
+				{
+					"index": 1,
+					"valid": true,
+					"x": 791,
+					"y": 456,
+					"device": 16,
+					"dead": false
+				},
+				{
+					"index": 2,
+					"valid": true,
+					"x": 759,
+					"y": 306,
+					"device": 17,
+					"dead": false
+				},
+				{
+					"index": 3,
+					"valid": true,
+					"x": 888,
+					"y": 36,
+					"device": 18,
+					"dead": false
+				},
+				{
+					"index": 4,
+					"valid": true,
+					"x": 922,
+					"y": 546,
+					"device": 19,
+					"dead": false
+				},
+				{
+					"index": 5,
+					"valid": true,
+					"x": 1149,
+					"y": 509,
+					"device": 20,
+					"dead": false
+				},
+				{
+					"index": 6,
+					"valid": true,
+					"x": 1198,
+					"y": 802,
+					"device": 21,
+					"dead": false
+				},
+				{
+					"index": 7,
+					"valid": true,
+					"x": 1209,
+					"y": 149,
+					"device": 22,
+					"dead": false
+				}
+			],
+			"hud_entries": 8,
+			"run_data_players": 8,
+			"paused": false
+		},
+		{
+			"t": 16.18,
+			"players": [
+				{
+					"index": 0,
+					"valid": true,
+					"x": 24,
+					"y": 665,
+					"device": 7,
+					"dead": false
+				},
+				{
+					"index": 1,
+					"valid": true,
+					"x": 618,
+					"y": 448,
+					"device": 16,
+					"dead": false
+				},
+				{
+					"index": 2,
+					"valid": true,
+					"x": 855,
+					"y": 403,
+					"device": 17,
+					"dead": false
+				},
+				{
+					"index": 3,
+					"valid": true,
+					"x": 881,
+					"y": 118,
+					"device": 18,
+					"dead": false
+				},
+				{
+					"index": 4,
+					"valid": true,
+					"x": 779,
+					"y": 404,
+					"device": 19,
+					"dead": false
+				},
+				{
+					"index": 5,
+					"valid": true,
+					"x": 1156,
+					"y": 517,
+					"device": 20,
+					"dead": false
+				},
+				{
+					"index": 6,
+					"valid": true,
+					"x": 995,
+					"y": 762,
+					"device": 21,
+					"dead": false
+				},
+				{
+					"index": 7,
+					"valid": true,
+					"x": 1217,
+					"y": 36,
+					"device": 22,
+					"dead": false
+				}
+			],
+			"hud_entries": 8,
+			"run_data_players": 8,
+			"paused": false
+		},
+		{
+			"t": 17.18,
+			"players": [
+				{
+					"index": 0,
+					"valid": true,
+					"x": 24,
+					"y": 712,
+					"device": 7,
+					"dead": false
+				},
+				{
+					"index": 1,
+					"valid": true,
+					"x": 701,
+					"y": 711,
+					"device": 16,
+					"dead": false
+				},
+				{
+					"index": 2,
+					"valid": true,
+					"x": 878,
+					"y": 321,
+					"device": 17,
+					"dead": false
+				},
+				{
+					"index": 3,
+					"valid": true,
+					"x": 626,
+					"y": 313,
+					"device": 18,
+					"dead": false
+				},
+				{
+					"index": 4,
+					"valid": true,
+					"x": 1057,
+					"y": 576,
+					"device": 19,
+					"dead": false
+				},
+				{
+					"index": 5,
+					"valid": true,
+					"x": 1224,
+					"y": 239,
+					"device": 20,
+					"dead": false
+				},
+				{
+					"index": 6,
+					"valid": true,
+					"x": 1178,
+					"y": 633,
+					"device": 21,
+					"dead": false
+				},
+				{
+					"index": 7,
+					"valid": true,
+					"x": 1057,
+					"y": 36,
+					"device": 22,
+					"dead": false
+				}
+			],
+			"hud_entries": 8,
+			"run_data_players": 8,
+			"paused": false
+		},
+		{
+			"t": 18.18,
+			"players": [
+				{
+					"index": 0,
+					"valid": true,
+					"x": 307,
+					"y": 886,
+					"device": 7,
+					"dead": false
+				},
+				{
+					"index": 1,
+					"valid": true,
+					"x": 813,
+					"y": 733,
+					"device": 16,
+					"dead": false
+				},
+				{
+					"index": 2,
+					"valid": true,
+					"x": 872,
+					"y": 194,
+					"device": 17,
+					"dead": false
+				},
+				{
+					"index": 3,
+					"valid": true,
+					"x": 826,
+					"y": 166,
+					"device": 18,
+					"dead": false
+				},
+				{
+					"index": 4,
+					"valid": true,
+					"x": 922,
+					"y": 561,
+					"device": 19,
+					"dead": false
+				},
+				{
+					"index": 5,
+					"valid": true,
+					"x": 1297,
+					"y": 517,
+					"device": 20,
+					"dead": false
+				},
+				{
+					"index": 6,
+					"valid": true,
+					"x": 1063,
+					"y": 897,
+					"device": 21,
+					"dead": false
+				},
+				{
+					"index": 7,
+					"valid": true,
+					"x": 1057,
+					"y": 36,
+					"device": 22,
+					"dead": false
+				}
+			],
+			"hud_entries": 8,
+			"run_data_players": 8,
+			"paused": false
+		},
+		{
+			"t": 19.18,
+			"players": [
+				{
+					"index": 0,
+					"valid": true,
+					"x": 456,
+					"y": 925,
+					"device": 7,
+					"dead": false
+				},
+				{
+					"index": 1,
+					"valid": true,
+					"x": 708,
+					"y": 793,
+					"device": 16,
+					"dead": false
+				},
+				{
+					"index": 2,
+					"valid": true,
+					"x": 536,
+					"y": 262,
+					"device": 17,
+					"dead": false
+				},
+				{
+					"index": 3,
+					"valid": true,
+					"x": 697,
+					"y": 497,
+					"device": 18,
+					"dead": false
+				},
+				{
+					"index": 4,
+					"valid": true,
+					"x": 1139,
+					"y": 449,
+					"device": 19,
+					"dead": false
+				},
+				{
+					"index": 5,
+					"valid": true,
+					"x": 1319,
+					"y": 719,
+					"device": 20,
+					"dead": false
+				},
+				{
+					"index": 6,
+					"valid": true,
+					"x": 1319,
+					"y": 998,
+					"device": 21,
+					"dead": false
+				},
+				{
+					"index": 7,
+					"valid": true,
+					"x": 892,
+					"y": 96,
+					"device": 22,
+					"dead": false
+				}
+			],
+			"hud_entries": 8,
+			"run_data_players": 8,
+			"paused": false
+		},
+		{
+			"t": 20.18,
+			"players": [
+				{
+					"index": 0,
+					"valid": true,
+					"x": 149,
+					"y": 1004,
+					"device": 7,
+					"dead": false
+				},
+				{
+					"index": 1,
+					"valid": true,
+					"x": 866,
+					"y": 733,
+					"device": 16,
+					"dead": false
+				},
+				{
+					"index": 2,
+					"valid": true,
+					"x": 551,
+					"y": 344,
+					"device": 17,
+					"dead": false
+				},
+				{
+					"index": 3,
+					"valid": true,
+					"x": 704,
+					"y": 572,
+					"device": 18,
+					"dead": false
+				},
+				{
+					"index": 4,
+					"valid": true,
+					"x": 1072,
+					"y": 449,
+					"device": 19,
+					"dead": false
+				},
+				{
+					"index": 5,
+					"valid": true,
+					"x": 1304,
+					"y": 659,
+					"device": 20,
+					"dead": false
+				},
+				{
+					"index": 6,
+					"valid": true,
+					"x": 1306,
+					"y": 876,
+					"device": 21,
+					"dead": false
+				},
+				{
+					"index": 7,
+					"valid": true,
+					"x": 1034,
+					"y": 36,
+					"device": 22,
+					"dead": false
+				}
+			],
+			"hud_entries": 8,
+			"run_data_players": 8,
+			"paused": false
+		},
+		{
+			"t": 21.18,
+			"players": [
+				{
+					"index": 0,
+					"valid": true,
+					"x": 149,
+					"y": 1004,
+					"device": 7,
+					"dead": false
+				},
+				{
+					"index": 1,
+					"valid": true,
+					"x": 866,
+					"y": 733,
+					"device": 16,
+					"dead": false
+				},
+				{
+					"index": 2,
+					"valid": true,
+					"x": 551,
+					"y": 344,
+					"device": 17,
+					"dead": false
+				},
+				{
+					"index": 3,
+					"valid": true,
+					"x": 704,
+					"y": 572,
+					"device": 18,
+					"dead": false
+				},
+				{
+					"index": 4,
+					"valid": true,
+					"x": 1072,
+					"y": 449,
+					"device": 19,
+					"dead": false
+				},
+				{
+					"index": 5,
+					"valid": true,
+					"x": 1304,
+					"y": 659,
+					"device": 20,
+					"dead": false
+				},
+				{
+					"index": 6,
+					"valid": true,
+					"x": 1306,
+					"y": 876,
+					"device": 21,
+					"dead": false
+				},
+				{
+					"index": 7,
+					"valid": true,
+					"x": 1034,
+					"y": 36,
+					"device": 22,
+					"dead": false
+				}
+			],
+			"hud_entries": 8,
+			"run_data_players": 8,
+			"paused": false
+		},
+		{
+			"t": 22.19,
+			"players": [
+				{
+					"index": 0,
+					"valid": true,
+					"x": 149,
+					"y": 1004,
+					"device": 7,
+					"dead": false
+				},
+				{
+					"index": 1,
+					"valid": true,
+					"x": 866,
+					"y": 733,
+					"device": 16,
+					"dead": false
+				},
+				{
+					"index": 2,
+					"valid": true,
+					"x": 551,
+					"y": 344,
+					"device": 17,
+					"dead": false
+				},
+				{
+					"index": 3,
+					"valid": true,
+					"x": 704,
+					"y": 572,
+					"device": 18,
+					"dead": false
+				},
+				{
+					"index": 4,
+					"valid": true,
+					"x": 1072,
+					"y": 449,
+					"device": 19,
+					"dead": false
+				},
+				{
+					"index": 5,
+					"valid": true,
+					"x": 1304,
+					"y": 659,
+					"device": 20,
+					"dead": false
+				},
+				{
+					"index": 6,
+					"valid": true,
+					"x": 1306,
+					"y": 876,
+					"device": 21,
+					"dead": false
+				},
+				{
+					"index": 7,
+					"valid": true,
+					"x": 1034,
+					"y": 36,
+					"device": 22,
+					"dead": false
+				}
+			],
+			"hud_entries": 8,
+			"run_data_players": 8,
+			"paused": false
+		},
+		{
+			"t": 33.69,
+			"players": [
+				{
+					"index": 0,
+					"valid": true,
+					"x": 572,
+					"y": 622,
+					"device": 7,
+					"dead": false
+				},
+				{
+					"index": 1,
+					"valid": true,
+					"x": 642,
+					"y": 377,
+					"device": 16,
+					"dead": false
+				},
+				{
+					"index": 2,
+					"valid": true,
+					"x": 467,
+					"y": 612,
+					"device": 17,
+					"dead": false
+				},
+				{
+					"index": 3,
+					"valid": true,
+					"x": 702,
+					"y": 477,
+					"device": 18,
+					"dead": false
+				},
+				{
+					"index": 4,
+					"valid": true,
+					"x": 742,
+					"y": 377,
+					"device": 19,
+					"dead": false
+				},
+				{
+					"index": 5,
+					"valid": true,
+					"x": 872,
+					"y": 617,
+					"device": 20,
+					"dead": false
+				},
+				{
+					"index": 6,
+					"valid": true,
+					"x": 772,
+					"y": 706,
+					"device": 21,
+					"dead": false
+				},
+				{
+					"index": 7,
+					"valid": true,
+					"x": 707,
+					"y": 612,
+					"device": 22,
+					"dead": false
+				}
+			],
+			"hud_entries": 8,
+			"run_data_players": 8,
+			"paused": false
+		},
+		{
+			"t": 34.69,
+			"players": [
+				{
+					"index": 0,
+					"valid": true,
+					"x": 509,
+					"y": 370,
+					"device": 7,
+					"dead": false
+				},
+				{
+					"index": 1,
+					"valid": true,
+					"x": 627,
+					"y": 377,
+					"device": 16,
+					"dead": false
+				},
+				{
+					"index": 2,
+					"valid": true,
+					"x": 636,
+					"y": 882,
+					"device": 17,
+					"dead": false
+				},
+				{
+					"index": 3,
+					"valid": true,
+					"x": 808,
+					"y": 421,
+					"device": 18,
+					"dead": false
+				},
+				{
+					"index": 4,
+					"valid": true,
+					"x": 822,
+					"y": 374,
+					"device": 19,
+					"dead": false
+				},
+				{
+					"index": 5,
+					"valid": true,
+					"x": 899,
+					"y": 697,
+					"device": 20,
+					"dead": false
+				},
+				{
+					"index": 6,
+					"valid": true,
+					"x": 1022,
+					"y": 632,
+					"device": 21,
+					"dead": false
+				},
+				{
+					"index": 7,
+					"valid": true,
+					"x": 284,
+					"y": 604,
+					"device": 22,
+					"dead": false
+				}
+			],
+			"hud_entries": 8,
+			"run_data_players": 8,
+			"paused": false
+		},
+		{
+			"t": 35.69,
+			"players": [
+				{
+					"index": 0,
+					"valid": true,
+					"x": 559,
+					"y": 508,
+					"device": 7,
+					"dead": false
+				},
+				{
+					"index": 1,
+					"valid": true,
+					"x": 837,
+					"y": 277,
+					"device": 16,
+					"dead": false
+				},
+				{
+					"index": 2,
+					"valid": true,
+					"x": 426,
+					"y": 1002,
+					"device": 17,
+					"dead": false
+				},
+				{
+					"index": 3,
+					"valid": true,
+					"x": 677,
+					"y": 349,
+					"device": 18,
+					"dead": false
+				},
+				{
+					"index": 4,
+					"valid": true,
+					"x": 1002,
+					"y": 374,
+					"device": 19,
+					"dead": false
+				},
+				{
+					"index": 5,
+					"valid": true,
+					"x": 899,
+					"y": 1011,
+					"device": 20,
+					"dead": false
+				},
+				{
+					"index": 6,
+					"valid": true,
+					"x": 1198,
+					"y": 402,
+					"device": 21,
+					"dead": false
+				},
+				{
+					"index": 7,
+					"valid": true,
+					"x": 224,
+					"y": 484,
+					"device": 22,
+					"dead": false
+				}
+			],
+			"hud_entries": 8,
+			"run_data_players": 8,
+			"paused": false
+		},
+		{
+			"t": 36.69,
+			"players": [
+				{
+					"index": 0,
+					"valid": true,
+					"x": 391,
+					"y": 704,
+					"device": 7,
+					"dead": false
+				},
+				{
+					"index": 1,
+					"valid": true,
+					"x": 702,
+					"y": 66,
+					"device": 16,
+					"dead": false
+				},
+				{
+					"index": 2,
+					"valid": true,
+					"x": 291,
+					"y": 846,
+					"device": 17,
+					"dead": false
+				},
+				{
+					"index": 3,
+					"valid": true,
+					"x": 587,
+					"y": 619,
+					"device": 18,
+					"dead": false
+				},
+				{
+					"index": 4,
+					"valid": true,
+					"x": 777,
+					"y": 239,
+					"device": 19,
+					"dead": false
+				},
+				{
+					"index": 5,
+					"valid": true,
+					"x": 899,
+					"y": 981,
+					"device": 20,
+					"dead": false
+				},
+				{
+					"index": 6,
+					"valid": true,
+					"x": 1198,
+					"y": 537,
+					"device": 21,
+					"dead": false
+				},
+				{
+					"index": 7,
+					"valid": true,
+					"x": 435,
+					"y": 580,
+					"device": 22,
+					"dead": false
+				}
+			],
+			"hud_entries": 8,
+			"run_data_players": 8,
+			"paused": false
+		},
+		{
+			"t": 37.69,
+			"players": [
+				{
+					"index": 0,
+					"valid": true,
+					"x": 501,
+					"y": 783,
+					"device": 7,
+					"dead": false
+				},
+				{
+					"index": 1,
+					"valid": true,
+					"x": 837,
+					"y": 36,
+					"device": 16,
+					"dead": false
+				},
+				{
+					"index": 2,
+					"valid": true,
+					"x": 426,
+					"y": 951,
+					"device": 17,
+					"dead": false
+				},
+				{
+					"index": 3,
+					"valid": true,
+					"x": 866,
+					"y": 605,
+					"device": 18,
+					"dead": false
+				},
+				{
+					"index": 4,
+					"valid": true,
+					"x": 1152,
+					"y": 314,
+					"device": 19,
+					"dead": false
+				},
+				{
+					"index": 5,
+					"valid": true,
+					"x": 1169,
+					"y": 801,
+					"device": 20,
+					"dead": false
+				},
+				{
+					"index": 6,
+					"valid": true,
+					"x": 1041,
+					"y": 644,
+					"device": 21,
+					"dead": false
+				},
+				{
+					"index": 7,
+					"valid": true,
+					"x": 615,
+					"y": 580,
+					"device": 22,
+					"dead": false
+				}
+			],
+			"hud_entries": 8,
+			"run_data_players": 8,
+			"paused": false
+		},
+		{
+			"t": 38.69,
+			"players": [
+				{
+					"index": 0,
+					"valid": true,
+					"x": 234,
+					"y": 704,
+					"device": 7,
+					"dead": false
+				},
+				{
+					"index": 1,
+					"valid": true,
+					"x": 837,
+					"y": 36,
+					"device": 16,
+					"dead": false
+				},
+				{
+					"index": 2,
+					"valid": true,
+					"x": 156,
+					"y": 1011,
+					"device": 17,
+					"dead": false
+				},
+				{
+					"index": 3,
+					"valid": true,
+					"x": 540,
+					"y": 737,
+					"device": 18,
+					"dead": false
+				},
+				{
+					"index": 4,
+					"valid": true,
+					"x": 1167,
+					"y": 239,
+					"device": 19,
+					"dead": false
+				},
+				{
+					"index": 5,
+					"valid": true,
+					"x": 1049,
+					"y": 1011,
+					"device": 20,
+					"dead": false
+				},
+				{
+					"index": 6,
+					"valid": true,
+					"x": 973,
+					"y": 631,
+					"device": 21,
+					"dead": false
+				},
+				{
+					"index": 7,
+					"valid": true,
+					"x": 671,
+					"y": 447,
+					"device": 22,
+					"dead": false
+				}
+			],
+			"hud_entries": 8,
+			"run_data_players": 8,
+			"paused": false
+		},
+		{
+			"t": 39.69,
+			"players": [
+				{
+					"index": 0,
+					"valid": true,
+					"x": 501,
+					"y": 531,
+					"device": 7,
+					"dead": false
+				},
+				{
+					"index": 1,
+					"valid": true,
+					"x": 807,
+					"y": 36,
+					"device": 16,
+					"dead": false
+				},
+				{
+					"index": 2,
+					"valid": true,
+					"x": 186,
+					"y": 876,
+					"device": 17,
+					"dead": false
+				},
+				{
+					"index": 3,
+					"valid": true,
+					"x": 540,
+					"y": 647,
+					"device": 18,
+					"dead": false
+				},
+				{
+					"index": 4,
+					"valid": true,
+					"x": 1257,
+					"y": 509,
+					"device": 19,
+					"dead": false
+				},
+				{
+					"index": 5,
+					"valid": true,
+					"x": 1064,
+					"y": 606,
+					"device": 20,
+					"dead": false
+				},
+				{
+					"index": 6,
+					"valid": true,
+					"x": 946,
+					"y": 766,
+					"device": 21,
+					"dead": false
+				},
+				{
+					"index": 7,
+					"valid": true,
+					"x": 671,
+					"y": 327,
+					"device": 22,
+					"dead": false
+				}
+			],
+			"hud_entries": 8,
+			"run_data_players": 8,
+			"paused": false
+		},
+		{
+			"t": 40.69,
+			"players": [
+				{
+					"index": 0,
+					"valid": true,
+					"x": 564,
+					"y": 563,
+					"device": 7,
+					"dead": false
+				},
+				{
+					"index": 1,
+					"valid": true,
+					"x": 627,
+					"y": 36,
+					"device": 16,
+					"dead": false
+				},
+				{
+					"index": 2,
+					"valid": true,
+					"x": 216,
+					"y": 876,
+					"device": 17,
+					"dead": false
+				},
+				{
+					"index": 3,
+					"valid": true,
+					"x": 330,
+					"y": 887,
+					"device": 18,
+					"dead": false
+				},
+				{
+					"index": 4,
+					"valid": true,
+					"x": 1017,
+					"y": 449,
+					"device": 19,
+					"dead": false
+				},
+				{
+					"index": 5,
+					"valid": true,
+					"x": 824,
+					"y": 606,
+					"device": 20,
+					"dead": false
+				},
+				{
+					"index": 6,
+					"valid": true,
+					"x": 609,
+					"y": 698,
+					"device": 21,
+					"dead": false
+				},
+				{
+					"index": 7,
+					"valid": true,
+					"x": 671,
+					"y": 777,
+					"device": 22,
+					"dead": false
+				}
+			],
+			"hud_entries": 8,
+			"run_data_players": 8,
+			"paused": false
+		},
+		{
+			"t": 41.69,
+			"players": [
+				{
+					"index": 0,
+					"valid": true,
+					"x": 501,
+					"y": 406,
+					"device": 7,
+					"dead": false
+				},
+				{
+					"index": 1,
+					"valid": true,
+					"x": 567,
+					"y": 156,
+					"device": 16,
+					"dead": false
+				},
+				{
+					"index": 2,
+					"valid": true,
+					"x": 156,
+					"y": 756,
+					"device": 17,
+					"dead": false
+				},
+				{
+					"index": 3,
+					"valid": true,
+					"x": 390,
+					"y": 887,
+					"device": 18,
+					"dead": false
+				},
+				{
+					"index": 4,
+					"valid": true,
+					"x": 1152,
+					"y": 494,
+					"device": 19,
+					"dead": false
+				},
+				{
+					"index": 5,
+					"valid": true,
+					"x": 487,
+					"y": 482,
+					"device": 20,
+					"dead": false
+				},
+				{
+					"index": 6,
+					"valid": true,
+					"x": 595,
+					"y": 523,
+					"device": 21,
+					"dead": false
+				},
+				{
+					"index": 7,
+					"valid": true,
+					"x": 926,
+					"y": 702,
+					"device": 22,
+					"dead": false
+				}
+			],
+			"hud_entries": 8,
+			"run_data_players": 8,
+			"paused": false
+		},
+		{
+			"t": 42.69,
+			"players": [
+				{
+					"index": 0,
+					"valid": true,
+					"x": 642,
+					"y": 391,
+					"device": 7,
+					"dead": false
+				},
+				{
+					"index": 1,
+					"valid": true,
+					"x": 297,
+					"y": 36,
+					"device": 16,
+					"dead": false
+				},
+				{
+					"index": 2,
+					"valid": true,
+					"x": 24,
+					"y": 981,
+					"device": 17,
+					"dead": false
+				},
+				{
+					"index": 3,
+					"valid": true,
+					"x": 405,
+					"y": 722,
+					"device": 18,
+					"dead": false
+				},
+				{
+					"index": 4,
+					"valid": true,
+					"x": 1182,
+					"y": 374,
+					"device": 19,
+					"dead": false
+				},
+				{
+					"index": 5,
+					"valid": true,
+					"x": 218,
+					"y": 300,
+					"device": 20,
+					"dead": false
+				},
+				{
+					"index": 6,
+					"valid": true,
+					"x": 582,
+					"y": 644,
+					"device": 21,
+					"dead": false
+				},
+				{
+					"index": 7,
+					"valid": true,
+					"x": 776,
+					"y": 702,
+					"device": 22,
+					"dead": false
+				}
+			],
+			"hud_entries": 8,
+			"run_data_players": 8,
+			"paused": false
+		},
+		{
+			"t": 43.69,
+			"players": [
+				{
+					"index": 0,
+					"valid": true,
+					"x": 501,
+					"y": 344,
+					"device": 7,
+					"dead": false
+				},
+				{
+					"index": 1,
+					"valid": true,
+					"x": 27,
+					"y": 111,
+					"device": 16,
+					"dead": false
+				},
+				{
+					"index": 2,
+					"valid": true,
+					"x": 99,
+					"y": 876,
+					"device": 17,
+					"dead": false
+				},
+				{
+					"index": 3,
+					"valid": true,
+					"x": 540,
+					"y": 827,
+					"device": 18,
+					"dead": false
+				},
+				{
+					"index": 4,
+					"valid": true,
+					"x": 1287,
+					"y": 179,
+					"device": 19,
+					"dead": false
+				},
+				{
+					"index": 5,
+					"valid": true,
+					"x": 428,
+					"y": 330,
+					"device": 20,
+					"dead": false
+				},
+				{
+					"index": 6,
+					"valid": true,
+					"x": 555,
+					"y": 644,
+					"device": 21,
+					"dead": false
+				},
+				{
+					"index": 7,
+					"valid": true,
+					"x": 731,
+					"y": 837,
+					"device": 22,
+					"dead": false
+				}
+			],
+			"hud_entries": 8,
+			"run_data_players": 8,
+			"paused": false
+		},
+		{
+			"t": 44.69,
+			"players": [
+				{
+					"index": 0,
+					"valid": true,
+					"x": 768,
+					"y": 140,
+					"device": 7,
+					"dead": false
+				},
+				{
+					"index": 1,
+					"valid": true,
+					"x": 27,
+					"y": 66,
+					"device": 16,
+					"dead": false
+				},
+				{
+					"index": 2,
+					"valid": true,
+					"x": 301,
+					"y": 899,
+					"device": 17,
+					"dead": false
+				},
+				{
+					"index": 3,
+					"valid": true,
+					"x": 518,
+					"y": 1011,
+					"device": 18,
+					"dead": false
+				},
+				{
+					"index": 4,
+					"valid": true,
+					"x": 1174,
+					"y": 246,
+					"device": 19,
+					"dead": false
+				},
+				{
+					"index": 5,
+					"valid": true,
+					"x": 503,
+					"y": 195,
+					"device": 20,
+					"dead": false
+				},
+				{
+					"index": 6,
+					"valid": true,
+					"x": 609,
+					"y": 752,
+					"device": 21,
+					"dead": false
+				},
+				{
+					"index": 7,
+					"valid": true,
+					"x": 671,
+					"y": 447,
+					"device": 22,
+					"dead": false
+				}
+			],
+			"hud_entries": 8,
+			"run_data_players": 8,
+			"paused": false
+		},
+		{
+			"t": 45.69,
+			"players": [
+				{
+					"index": 0,
+					"valid": true,
+					"x": 792,
+					"y": 36,
+					"device": 7,
+					"dead": false
+				},
+				{
+					"index": 1,
+					"valid": true,
+					"x": 181,
+					"y": 178,
+					"device": 16,
+					"dead": false
+				},
+				{
+					"index": 2,
+					"valid": true,
+					"x": 301,
+					"y": 764,
+					"device": 17,
+					"dead": false
+				},
+				{
+					"index": 3,
+					"valid": true,
+					"x": 552,
+					"y": 885,
+					"device": 18,
+					"dead": false
+				},
+				{
+					"index": 4,
+					"valid": true,
+					"x": 1287,
+					"y": 58,
+					"device": 19,
+					"dead": false
+				},
+				{
+					"index": 5,
+					"valid": true,
+					"x": 503,
+					"y": 60,
+					"device": 20,
+					"dead": false
+				},
+				{
+					"index": 6,
+					"valid": true,
+					"x": 609,
+					"y": 914,
+					"device": 21,
+					"dead": false
+				},
+				{
+					"index": 7,
+					"valid": true,
+					"x": 558,
+					"y": 695,
+					"device": 22,
+					"dead": false
+				}
+			],
+			"hud_entries": 8,
+			"run_data_players": 8,
+			"paused": false
+		},
+		{
+			"t": 46.69,
+			"players": [
+				{
+					"index": 0,
+					"valid": true,
+					"x": 579,
+					"y": 36,
+					"device": 7,
+					"dead": false
+				},
+				{
+					"index": 1,
+					"valid": true,
+					"x": 631,
+					"y": 178,
+					"device": 16,
+					"dead": false
+				},
+				{
+					"index": 2,
+					"valid": true,
+					"x": 301,
+					"y": 944,
+					"device": 17,
+					"dead": false
+				},
+				{
+					"index": 3,
+					"valid": true,
+					"x": 1002,
+					"y": 885,
+					"device": 18,
+					"dead": false
+				},
+				{
+					"index": 4,
+					"valid": true,
+					"x": 1287,
+					"y": 36,
+					"device": 19,
+					"dead": false
+				},
+				{
+					"index": 5,
+					"valid": true,
+					"x": 345,
+					"y": 128,
+					"device": 20,
+					"dead": false
+				},
+				{
+					"index": 6,
+					"valid": true,
+					"x": 548,
+					"y": 768,
+					"device": 21,
+					"dead": false
+				},
+				{
+					"index": 7,
+					"valid": true,
+					"x": 873,
+					"y": 830,
+					"device": 22,
+					"dead": false
+				}
+			],
+			"hud_entries": 8,
+			"run_data_players": 8,
+			"paused": false
+		},
+		{
+			"t": 47.69,
+			"players": [
+				{
+					"index": 0,
+					"valid": true,
+					"x": 343,
+					"y": 36,
+					"device": 7,
+					"dead": false
+				},
+				{
+					"index": 1,
+					"valid": true,
+					"x": 451,
+					"y": 43,
+					"device": 16,
+					"dead": false
+				},
+				{
+					"index": 2,
+					"valid": true,
+					"x": 312,
+					"y": 916,
+					"device": 17,
+					"dead": false
+				},
+				{
+					"index": 3,
+					"valid": true,
+					"x": 1070,
+					"y": 503,
+					"device": 18,
+					"dead": false
+				},
+				{
+					"index": 4,
+					"valid": true,
+					"x": 1319,
+					"y": 36,
+					"device": 19,
+					"dead": false
+				},
+				{
+					"index": 5,
+					"valid": true,
+					"x": 480,
+					"y": 218,
+					"device": 20,
+					"dead": false
+				},
+				{
+					"index": 6,
+					"valid": true,
+					"x": 265,
+					"y": 890,
+					"device": 21,
+					"dead": false
+				},
+				{
+					"index": 7,
+					"valid": true,
+					"x": 1053,
+					"y": 830,
+					"device": 22,
+					"dead": false
+				}
+			],
+			"hud_entries": 8,
+			"run_data_players": 8,
+			"paused": false
+		},
+		{
+			"t": 48.69,
+			"players": [
+				{
+					"index": 0,
+					"valid": true,
+					"x": 503,
+					"y": 38,
+					"device": 7,
+					"dead": false
+				},
+				{
+					"index": 1,
+					"valid": true,
+					"x": 558,
+					"y": 36,
+					"device": 16,
+					"dead": false
+				},
+				{
+					"index": 2,
+					"valid": true,
+					"x": 190,
+					"y": 873,
+					"device": 17,
+					"dead": false
+				},
+				{
+					"index": 3,
+					"valid": true,
+					"x": 1070,
+					"y": 585,
+					"device": 18,
+					"dead": false
+				},
+				{
+					"index": 4,
+					"valid": true,
+					"x": 1319,
+					"y": 201,
+					"device": 19,
+					"dead": false
+				},
+				{
+					"index": 5,
+					"valid": true,
+					"x": 375,
+					"y": 195,
+					"device": 20,
+					"dead": false
+				},
+				{
+					"index": 6,
+					"valid": true,
+					"x": 366,
+					"y": 674,
+					"device": 21,
+					"dead": false
+				},
+				{
+					"index": 7,
+					"valid": true,
+					"x": 1181,
+					"y": 830,
+					"device": 22,
+					"dead": false
+				}
+			],
+			"hud_entries": 8,
+			"run_data_players": 8,
+			"paused": false
+		},
+		{
+			"t": 49.69,
+			"players": [
+				{
+					"index": 0,
+					"valid": true,
+					"x": 288,
+					"y": 36,
+					"device": 7,
+					"dead": false
+				},
+				{
+					"index": 1,
+					"valid": true,
+					"x": 826,
+					"y": 111,
+					"device": 16,
+					"dead": false
+				},
+				{
+					"index": 2,
+					"valid": true,
+					"x": 55,
+					"y": 828,
+					"device": 17,
+					"dead": false
+				},
+				{
+					"index": 3,
+					"valid": true,
+					"x": 1130,
+					"y": 345,
+					"device": 18,
+					"dead": false
+				},
+				{
+					"index": 4,
+					"valid": true,
+					"x": 1319,
+					"y": 231,
+					"device": 19,
+					"dead": false
+				},
+				{
+					"index": 5,
+					"valid": true,
+					"x": 615,
+					"y": 255,
+					"device": 20,
+					"dead": false
+				},
+				{
+					"index": 6,
+					"valid": true,
+					"x": 366,
+					"y": 944,
+					"device": 21,
+					"dead": false
+				},
+				{
+					"index": 7,
+					"valid": true,
+					"x": 1211,
+					"y": 1011,
+					"device": 22,
+					"dead": false
+				}
+			],
+			"hud_entries": 8,
+			"run_data_players": 8,
+			"paused": false
+		},
+		{
+			"t": 50.69,
+			"players": [
+				{
+					"index": 0,
+					"valid": true,
+					"x": 83,
+					"y": 303,
+					"device": 7,
+					"dead": false
+				},
+				{
+					"index": 1,
+					"valid": true,
+					"x": 706,
+					"y": 171,
+					"device": 16,
+					"dead": false
+				},
+				{
+					"index": 2,
+					"valid": true,
+					"x": 190,
+					"y": 753,
+					"device": 17,
+					"dead": false
+				},
+				{
+					"index": 3,
+					"valid": true,
+					"x": 1070,
+					"y": 36,
+					"device": 18,
+					"dead": false
+				},
+				{
+					"index": 4,
+					"valid": true,
+					"x": 1319,
+					"y": 156,
+					"device": 19,
+					"dead": false
+				},
+				{
+					"index": 5,
+					"valid": true,
+					"x": 600,
+					"y": 60,
+					"device": 20,
+					"dead": false
+				},
+				{
+					"index": 6,
+					"valid": true,
+					"x": 487,
+					"y": 1011,
+					"device": 21,
+					"dead": false
+				},
+				{
+					"index": 7,
+					"valid": true,
+					"x": 1211,
+					"y": 891,
+					"device": 22,
+					"dead": false
+				}
+			],
+			"hud_entries": 8,
+			"run_data_players": 8,
+			"paused": false
+		},
+		{
+			"t": 51.69,
+			"players": [
+				{
+					"index": 0,
+					"valid": true,
+					"x": 225,
+					"y": 350,
+					"device": 7,
+					"dead": false
+				},
+				{
+					"index": 1,
+					"valid": true,
+					"x": 691,
+					"y": 336,
+					"device": 16,
+					"dead": false
+				},
+				{
+					"index": 2,
+					"valid": true,
+					"x": 460,
+					"y": 663,
+					"device": 17,
+					"dead": false
+				},
+				{
+					"index": 3,
+					"valid": true,
+					"x": 1070,
+					"y": 336,
+					"device": 18,
+					"dead": false
+				},
+				{
+					"index": 4,
+					"valid": true,
+					"x": 1049,
+					"y": 36,
+					"device": 19,
+					"dead": false
+				},
+				{
+					"index": 5,
+					"valid": true,
+					"x": 510,
+					"y": 36,
+					"device": 20,
+					"dead": false
+				},
+				{
+					"index": 6,
+					"valid": true,
+					"x": 366,
+					"y": 984,
+					"device": 21,
+					"dead": false
+				},
+				{
+					"index": 7,
+					"valid": true,
+					"x": 776,
+					"y": 876,
+					"device": 22,
+					"dead": false
+				}
+			],
+			"hud_entries": 8,
+			"run_data_players": 8,
+			"paused": false
+		},
+		{
+			"t": 52.69,
+			"players": [
+				{
+					"index": 0,
+					"valid": true,
+					"x": 225,
+					"y": 665,
+					"device": 7,
+					"dead": false
+				},
+				{
+					"index": 1,
+					"valid": true,
+					"x": 826,
+					"y": 231,
+					"device": 16,
+					"dead": false
+				},
+				{
+					"index": 2,
+					"valid": true,
+					"x": 535,
+					"y": 768,
+					"device": 17,
+					"dead": false
+				},
+				{
+					"index": 3,
+					"valid": true,
+					"x": 1070,
+					"y": 516,
+					"device": 18,
+					"dead": false
+				},
+				{
+					"index": 4,
+					"valid": true,
+					"x": 914,
+					"y": 96,
+					"device": 19,
+					"dead": false
+				},
+				{
+					"index": 5,
+					"valid": true,
+					"x": 615,
+					"y": 36,
+					"device": 20,
+					"dead": false
+				},
+				{
+					"index": 6,
+					"valid": true,
+					"x": 420,
+					"y": 1011,
+					"device": 21,
+					"dead": false
+				},
+				{
+					"index": 7,
+					"valid": true,
+					"x": 611,
+					"y": 741,
+					"device": 22,
+					"dead": false
+				}
+			],
+			"hud_entries": 8,
+			"run_data_players": 8,
+			"paused": false
+		},
+		{
+			"t": 53.69,
+			"players": [
+				{
+					"index": 0,
+					"valid": true,
+					"x": 83,
+					"y": 586,
+					"device": 7,
+					"dead": false
+				},
+				{
+					"index": 1,
+					"valid": true,
+					"x": 848,
+					"y": 65,
+					"device": 16,
+					"dead": false
+				},
+				{
+					"index": 2,
+					"valid": true,
+					"x": 595,
+					"y": 648,
+					"device": 17,
+					"dead": false
+				},
+				{
+					"index": 3,
+					"valid": true,
+					"x": 920,
+					"y": 576,
+					"device": 18,
+					"dead": false
+				},
+				{
+					"index": 4,
+					"valid": true,
+					"x": 787,
+					"y": 51,
+					"device": 19,
+					"dead": false
+				},
+				{
+					"index": 5,
+					"valid": true,
+					"x": 615,
+					"y": 51,
+					"device": 20,
+					"dead": false
+				},
+				{
+					"index": 6,
+					"valid": true,
+					"x": 366,
+					"y": 998,
+					"device": 21,
+					"dead": false
+				},
+				{
+					"index": 7,
+					"valid": true,
+					"x": 656,
+					"y": 876,
+					"device": 22,
+					"dead": false
+				}
+			],
+			"hud_entries": 8,
+			"run_data_players": 8,
+			"paused": false
+		},
+		{
+			"t": 54.69,
+			"players": [
+				{
+					"index": 0,
+					"valid": true,
+					"x": 83,
+					"y": 586,
+					"device": 7,
+					"dead": false
+				},
+				{
+					"index": 1,
+					"valid": true,
+					"x": 848,
+					"y": 65,
+					"device": 16,
+					"dead": false
+				},
+				{
+					"index": 2,
+					"valid": true,
+					"x": 595,
+					"y": 648,
+					"device": 17,
+					"dead": false
+				},
+				{
+					"index": 3,
+					"valid": true,
+					"x": 920,
+					"y": 576,
+					"device": 18,
+					"dead": false
+				},
+				{
+					"index": 4,
+					"valid": true,
+					"x": 787,
+					"y": 51,
+					"device": 19,
+					"dead": false
+				},
+				{
+					"index": 5,
+					"valid": true,
+					"x": 615,
+					"y": 51,
+					"device": 20,
+					"dead": false
+				},
+				{
+					"index": 6,
+					"valid": true,
+					"x": 366,
+					"y": 998,
+					"device": 21,
+					"dead": false
+				},
+				{
+					"index": 7,
+					"valid": true,
+					"x": 656,
+					"y": 876,
+					"device": 22,
+					"dead": false
+				}
+			],
+			"hud_entries": 8,
+			"run_data_players": 8,
+			"paused": false
+		},
+		{
+			"t": 58.99,
+			"players": [
+				{
+					"index": 0,
+					"valid": true,
+					"x": 619,
+					"y": 512,
+					"device": 7,
+					"dead": false
+				},
+				{
+					"index": 1,
+					"valid": true,
+					"x": 718,
+					"y": 512,
+					"device": 16,
+					"dead": false
+				},
+				{
+					"index": 2,
+					"valid": true,
+					"x": 572,
+					"y": 567,
+					"device": 17,
+					"dead": false
+				},
+				{
+					"index": 3,
+					"valid": true,
+					"x": 717,
+					"y": 612,
+					"device": 18,
+					"dead": false
+				},
+				{
+					"index": 4,
+					"valid": true,
+					"x": 817,
+					"y": 512,
+					"device": 19,
+					"dead": false
+				},
+				{
+					"index": 5,
+					"valid": true,
+					"x": 872,
+					"y": 467,
+					"device": 20,
+					"dead": false
+				},
+				{
+					"index": 6,
+					"valid": true,
+					"x": 772,
+					"y": 652,
+					"device": 21,
+					"dead": false
+				},
+				{
+					"index": 7,
+					"valid": true,
+					"x": 872,
+					"y": 658,
+					"device": 22,
+					"dead": false
+				}
+			],
+			"hud_entries": 8,
+			"run_data_players": 8,
+			"paused": false
+		},
+		{
+			"t": 59.99,
+			"players": [
+				{
+					"index": 0,
+					"valid": true,
+					"x": 430,
+					"y": 606,
+					"device": 7,
+					"dead": false
+				},
+				{
+					"index": 1,
+					"valid": true,
+					"x": 764,
+					"y": 373,
+					"device": 16,
+					"dead": false
+				},
+				{
+					"index": 2,
+					"valid": true,
+					"x": 572,
+					"y": 387,
+					"device": 17,
+					"dead": false
+				},
+				{
+					"index": 3,
+					"valid": true,
+					"x": 717,
+					"y": 612,
+					"device": 18,
+					"dead": false
+				},
+				{
+					"index": 4,
+					"valid": true,
+					"x": 914,
+					"y": 421,
+					"device": 19,
+					"dead": false
+				},
+				{
+					"index": 5,
+					"valid": true,
+					"x": 647,
+					"y": 512,
+					"device": 20,
+					"dead": false
+				},
+				{
+					"index": 6,
+					"valid": true,
+					"x": 731,
+					"y": 855,
+					"device": 21,
+					"dead": false
+				},
+				{
+					"index": 7,
+					"valid": true,
+					"x": 864,
+					"y": 381,
+					"device": 22,
+					"dead": false
+				}
+			],
+			"hud_entries": 8,
+			"run_data_players": 8,
+			"paused": false
+		},
+		{
+			"t": 60.99,
+			"players": [
+				{
+					"index": 0,
+					"valid": true,
+					"x": 288,
+					"y": 653,
+					"device": 7,
+					"dead": false
+				},
+				{
+					"index": 1,
+					"valid": true,
+					"x": 965,
+					"y": 546,
+					"device": 16,
+					"dead": false
+				},
+				{
+					"index": 2,
+					"valid": true,
+					"x": 437,
+					"y": 72,
+					"device": 17,
+					"dead": false
+				},
+				{
+					"index": 3,
+					"valid": true,
+					"x": 672,
+					"y": 477,
+					"device": 18,
+					"dead": false
+				},
+				{
+					"index": 4,
+					"valid": true,
+					"x": 908,
+					"y": 135,
+					"device": 19,
+					"dead": false
+				},
+				{
+					"index": 5,
+					"valid": true,
+					"x": 472,
+					"y": 510,
+					"device": 20,
+					"dead": false
+				},
+				{
+					"index": 6,
+					"valid": true,
+					"x": 772,
+					"y": 976,
+					"device": 21,
+					"dead": false
+				},
+				{
+					"index": 7,
+					"valid": true,
+					"x": 850,
+					"y": 586,
+					"device": 22,
+					"dead": false
+				}
+			],
+			"hud_entries": 8,
+			"run_data_players": 8,
+			"paused": false
+		},
+		{
+			"t": 61.99,
+			"players": [
+				{
+					"index": 0,
+					"valid": true,
+					"x": 619,
+					"y": 512,
+					"device": 7,
+					"dead": false
+				},
+				{
+					"index": 1,
+					"valid": true,
+					"x": 734,
+					"y": 407,
+					"device": 16,
+					"dead": false
+				},
+				{
+					"index": 2,
+					"valid": true,
+					"x": 257,
+					"y": 72,
+					"device": 17,
+					"dead": false
+				},
+				{
+					"index": 3,
+					"valid": true,
+					"x": 807,
+					"y": 702,
+					"device": 18,
+					"dead": false
+				},
+				{
+					"index": 4,
+					"valid": true,
+					"x": 863,
+					"y": 540,
+					"device": 19,
+					"dead": false
+				},
+				{
+					"index": 5,
+					"valid": true,
+					"x": 337,
+					"y": 195,
+					"device": 20,
+					"dead": false
+				},
+				{
+					"index": 6,
+					"valid": true,
+					"x": 772,
+					"y": 895,
+					"device": 21,
+					"dead": false
+				},
+				{
+					"index": 7,
+					"valid": true,
+					"x": 1174,
+					"y": 725,
+					"device": 22,
+					"dead": false
+				}
+			],
+			"hud_entries": 8,
+			"run_data_players": 8,
+			"paused": false
+		},
+		{
+			"t": 62.99,
+			"players": [
+				{
+					"index": 0,
+					"valid": true,
+					"x": 611,
+					"y": 229,
+					"device": 7,
+					"dead": false
+				},
+				{
+					"index": 1,
+					"valid": true,
+					"x": 865,
+					"y": 546,
+					"device": 16,
+					"dead": false
+				},
+				{
+					"index": 2,
+					"valid": true,
+					"x": 204,
+					"y": 36,
+					"device": 17,
+					"dead": false
+				},
+				{
+					"index": 3,
+					"valid": true,
+					"x": 709,
+					"y": 612,
+					"device": 18,
+					"dead": false
+				},
+				{
+					"index": 4,
+					"valid": true,
+					"x": 600,
+					"y": 540,
+					"device": 19,
+					"dead": false
+				},
+				{
+					"index": 5,
+					"valid": true,
+					"x": 570,
+					"y": 240,
+					"device": 20,
+					"dead": false
+				},
+				{
+					"index": 6,
+					"valid": true,
+					"x": 772,
+					"y": 1011,
+					"device": 21,
+					"dead": false
+				},
+				{
+					"index": 7,
+					"valid": true,
+					"x": 1228,
+					"y": 586,
+					"device": 22,
+					"dead": false
+				}
+			],
+			"hud_entries": 8,
+			"run_data_players": 8,
+			"paused": false
+		},
+		{
+			"t": 63.99,
+			"players": [
+				{
+					"index": 0,
+					"valid": true,
+					"x": 457,
+					"y": 214,
+					"device": 7,
+					"dead": false
+				},
+				{
+					"index": 1,
+					"valid": true,
+					"x": 965,
+					"y": 538,
+					"device": 16,
+					"dead": false
+				},
+				{
+					"index": 2,
+					"valid": true,
+					"x": 32,
+					"y": 36,
+					"device": 17,
+					"dead": false
+				},
+				{
+					"index": 3,
+					"valid": true,
+					"x": 814,
+					"y": 612,
+					"device": 18,
+					"dead": false
+				},
+				{
+					"index": 4,
+					"valid": true,
+					"x": 765,
+					"y": 270,
+					"device": 19,
+					"dead": false
+				},
+				{
+					"index": 5,
+					"valid": true,
+					"x": 579,
+					"y": 385,
+					"device": 20,
+					"dead": false
+				},
+				{
+					"index": 6,
+					"valid": true,
+					"x": 772,
+					"y": 1011,
+					"device": 21,
+					"dead": false
+				},
+				{
+					"index": 7,
+					"valid": true,
+					"x": 1319,
+					"y": 856,
+					"device": 22,
+					"dead": false
+				}
+			],
+			"hud_entries": 8,
+			"run_data_players": 8,
+			"paused": false
+		},
+		{
+			"t": 64.99,
+			"players": [
+				{
+					"index": 0,
+					"valid": true,
+					"x": 269,
+					"y": 214,
+					"device": 7,
+					"dead": false
+				},
+				{
+					"index": 1,
+					"valid": true,
+					"x": 1019,
+					"y": 407,
+					"device": 16,
+					"dead": false
+				},
+				{
+					"index": 2,
+					"valid": true,
+					"x": 24,
+					"y": 88,
+					"device": 17,
+					"dead": false
+				},
+				{
+					"index": 3,
+					"valid": true,
+					"x": 754,
+					"y": 747,
+					"device": 18,
+					"dead": false
+				},
+				{
+					"index": 4,
+					"valid": true,
+					"x": 607,
+					"y": 263,
+					"device": 19,
+					"dead": false
+				},
+				{
+					"index": 5,
+					"valid": true,
+					"x": 391,
+					"y": 393,
+					"device": 20,
+					"dead": false
+				},
+				{
+					"index": 6,
+					"valid": true,
+					"x": 650,
+					"y": 937,
+					"device": 21,
+					"dead": false
+				},
+				{
+					"index": 7,
+					"valid": true,
+					"x": 1319,
+					"y": 779,
+					"device": 22,
+					"dead": false
+				}
+			],
+			"hud_entries": 8,
+			"run_data_players": 8,
+			"paused": false
+		},
+		{
+			"t": 65.99,
+			"players": [
+				{
+					"index": 0,
+					"valid": true,
+					"x": 324,
+					"y": 175,
+					"device": 7,
+					"dead": false
+				},
+				{
+					"index": 1,
+					"valid": true,
+					"x": 1066,
+					"y": 268,
+					"device": 16,
+					"dead": false
+				},
+				{
+					"index": 2,
+					"valid": true,
+					"x": 24,
+					"y": 36,
+					"device": 17,
+					"dead": false
+				},
+				{
+					"index": 3,
+					"valid": true,
+					"x": 814,
+					"y": 978,
+					"device": 18,
+					"dead": false
+				},
+				{
+					"index": 4,
+					"valid": true,
+					"x": 794,
+					"y": 360,
+					"device": 19,
+					"dead": false
+				},
+				{
+					"index": 5,
+					"valid": true,
+					"x": 540,
+					"y": 261,
+					"device": 20,
+					"dead": false
+				},
+				{
+					"index": 6,
+					"valid": true,
+					"x": 677,
+					"y": 891,
+					"device": 21,
+					"dead": false
+				},
+				{
+					"index": 7,
+					"valid": true,
+					"x": 1219,
+					"y": 1011,
+					"device": 22,
+					"dead": false
+				}
+			],
+			"hud_entries": 8,
+			"run_data_players": 8,
+			"paused": false
+		},
+		{
+			"t": 67,
+			"players": [
+				{
+					"index": 0,
+					"valid": true,
+					"x": 182,
+					"y": 505,
+					"device": 7,
+					"dead": false
+				},
+				{
+					"index": 1,
+					"valid": true,
+					"x": 1235,
+					"y": 36,
+					"device": 16,
+					"dead": false
+				},
+				{
+					"index": 2,
+					"valid": true,
+					"x": 31,
+					"y": 171,
+					"device": 17,
+					"dead": false
+				},
+				{
+					"index": 3,
+					"valid": true,
+					"x": 814,
+					"y": 1011,
+					"device": 18,
+					"dead": false
+				},
+				{
+					"index": 4,
+					"valid": true,
+					"x": 922,
+					"y": 128,
+					"device": 19,
+					"dead": false
+				},
+				{
+					"index": 5,
+					"valid": true,
+					"x": 705,
+					"y": 531,
+					"device": 20,
+					"dead": false
+				},
+				{
+					"index": 6,
+					"valid": true,
+					"x": 765,
+					"y": 641,
+					"device": 21,
+					"dead": false
+				},
+				{
+					"index": 7,
+					"valid": true,
+					"x": 1049,
+					"y": 1011,
+					"device": 22,
+					"dead": false
+				}
+			],
+			"hud_entries": 8,
+			"run_data_players": 8,
+			"paused": false
+		},
+		{
+			"t": 68,
+			"players": [
+				{
+					"index": 0,
+					"valid": true,
+					"x": 182,
+					"y": 694,
+					"device": 7,
+					"dead": false
+				},
+				{
+					"index": 1,
+					"valid": true,
+					"x": 911,
+					"y": 36,
+					"device": 16,
+					"dead": false
+				},
+				{
+					"index": 2,
+					"valid": true,
+					"x": 159,
+					"y": 223,
+					"device": 17,
+					"dead": false
+				},
+				{
+					"index": 3,
+					"valid": true,
+					"x": 1002,
+					"y": 876,
+					"device": 18,
+					"dead": false
+				},
+				{
+					"index": 4,
+					"valid": true,
+					"x": 607,
+					"y": 36,
+					"device": 19,
+					"dead": false
+				},
+				{
+					"index": 5,
+					"valid": true,
+					"x": 307,
+					"y": 479,
+					"device": 20,
+					"dead": false
+				},
+				{
+					"index": 6,
+					"valid": true,
+					"x": 717,
+					"y": 283,
+					"device": 21,
+					"dead": false
+				},
+				{
+					"index": 7,
+					"valid": true,
+					"x": 957,
+					"y": 1011,
+					"device": 22,
+					"dead": false
+				}
+			],
+			"hud_entries": 8,
+			"run_data_players": 8,
+			"paused": false
+		},
+		{
+			"t": 69,
+			"players": [
+				{
+					"index": 0,
+					"valid": true,
+					"x": 221,
+					"y": 639,
+					"device": 7,
+					"dead": false
+				},
+				{
+					"index": 1,
+					"valid": true,
+					"x": 927,
+					"y": 36,
+					"device": 16,
+					"dead": false
+				},
+				{
+					"index": 2,
+					"valid": true,
+					"x": 159,
+					"y": 403,
+					"device": 17,
+					"dead": false
+				},
+				{
+					"index": 3,
+					"valid": true,
+					"x": 1034,
+					"y": 872,
+					"device": 18,
+					"dead": false
+				},
+				{
+					"index": 4,
+					"valid": true,
+					"x": 622,
+					"y": 306,
+					"device": 19,
+					"dead": false
+				},
+				{
+					"index": 5,
+					"valid": true,
+					"x": 480,
+					"y": 396,
+					"device": 20,
+					"dead": false
+				},
+				{
+					"index": 6,
+					"valid": true,
+					"x": 765,
+					"y": 74,
+					"device": 21,
+					"dead": false
+				},
+				{
+					"index": 7,
+					"valid": true,
+					"x": 1023,
+					"y": 806,
+					"device": 22,
+					"dead": false
+				}
+			],
+			"hud_entries": 8,
+			"run_data_players": 8,
+			"paused": false
+		},
+		{
+			"t": 70,
+			"players": [
+				{
+					"index": 0,
+					"valid": true,
+					"x": 316,
+					"y": 639,
+					"device": 7,
+					"dead": false
+				},
+				{
+					"index": 1,
+					"valid": true,
+					"x": 988,
+					"y": 173,
+					"device": 16,
+					"dead": false
+				},
+				{
+					"index": 2,
+					"valid": true,
+					"x": 24,
+					"y": 583,
+					"device": 17,
+					"dead": false
+				},
+				{
+					"index": 3,
+					"valid": true,
+					"x": 1259,
+					"y": 737,
+					"device": 18,
+					"dead": false
+				},
+				{
+					"index": 4,
+					"valid": true,
+					"x": 665,
+					"y": 164,
+					"device": 19,
+					"dead": false
+				},
+				{
+					"index": 5,
+					"valid": true,
+					"x": 435,
+					"y": 261,
+					"device": 20,
+					"dead": false
+				},
+				{
+					"index": 6,
+					"valid": true,
+					"x": 643,
+					"y": 36,
+					"device": 21,
+					"dead": false
+				},
+				{
+					"index": 7,
+					"valid": true,
+					"x": 1023,
+					"y": 343,
+					"device": 22,
+					"dead": false
+				}
+			],
+			"hud_entries": 8,
+			"run_data_players": 8,
+			"paused": false
+		},
+		{
+			"t": 71,
+			"players": [
+				{
+					"index": 0,
+					"valid": true,
+					"x": 174,
+					"y": 969,
+					"device": 7,
+					"dead": false
+				},
+				{
+					"index": 1,
+					"valid": true,
+					"x": 1173,
+					"y": 36,
+					"device": 16,
+					"dead": false
+				},
+				{
+					"index": 2,
+					"valid": true,
+					"x": 24,
+					"y": 718,
+					"device": 17,
+					"dead": false
+				},
+				{
+					"index": 3,
+					"valid": true,
+					"x": 1259,
+					"y": 557,
+					"device": 18,
+					"dead": false
+				},
+				{
+					"index": 4,
+					"valid": true,
+					"x": 665,
+					"y": 524,
+					"device": 19,
+					"dead": false
+				},
+				{
+					"index": 5,
+					"valid": true,
+					"x": 615,
+					"y": 261,
+					"device": 20,
+					"dead": false
+				},
+				{
+					"index": 6,
+					"valid": true,
+					"x": 562,
+					"y": 36,
+					"device": 21,
+					"dead": false
+				},
+				{
+					"index": 7,
+					"valid": true,
+					"x": 1070,
+					"y": 481,
+					"device": 22,
+					"dead": false
+				}
+			],
+			"hud_entries": 8,
+			"run_data_players": 8,
+			"paused": false
+		},
+		{
+			"t": 72,
+			"players": [
+				{
+					"index": 0,
+					"valid": true,
+					"x": 127,
+					"y": 870,
+					"device": 7,
+					"dead": false
+				},
+				{
+					"index": 1,
+					"valid": true,
+					"x": 1266,
+					"y": 267,
+					"device": 16,
+					"dead": false
+				},
+				{
+					"index": 2,
+					"valid": true,
+					"x": 24,
+					"y": 718,
+					"device": 17,
+					"dead": false
+				},
+				{
+					"index": 3,
+					"valid": true,
+					"x": 1034,
+					"y": 332,
+					"device": 18,
+					"dead": false
+				},
+				{
+					"index": 4,
+					"valid": true,
+					"x": 440,
+					"y": 299,
+					"device": 19,
+					"dead": false
+				},
+				{
+					"index": 5,
+					"valid": true,
+					"x": 615,
+					"y": 261,
+					"device": 20,
+					"dead": false
+				},
+				{
+					"index": 6,
+					"valid": true,
+					"x": 562,
+					"y": 36,
+					"device": 21,
+					"dead": false
+				},
+				{
+					"index": 7,
+					"valid": true,
+					"x": 1070,
+					"y": 759,
+					"device": 22,
+					"dead": false
+				}
+			],
+			"hud_entries": 8,
+			"run_data_players": 8,
+			"paused": false
+		},
+		{
+			"t": 73,
+			"players": [
+				{
+					"index": 0,
+					"valid": true,
+					"x": 316,
+					"y": 870,
+					"device": 7,
+					"dead": false
+				},
+				{
+					"index": 1,
+					"valid": true,
+					"x": 1319,
+					"y": 313,
+					"device": 16,
+					"dead": false
+				},
+				{
+					"index": 2,
+					"valid": true,
+					"x": 159,
+					"y": 718,
+					"device": 17,
+					"dead": false
+				},
+				{
+					"index": 3,
+					"valid": true,
+					"x": 719,
+					"y": 467,
+					"device": 18,
+					"dead": false
+				},
+				{
+					"index": 4,
+					"valid": true,
+					"x": 395,
+					"y": 164,
+					"device": 19,
+					"dead": false
+				},
+				{
+					"index": 5,
+					"valid": true,
+					"x": 570,
+					"y": 396,
+					"device": 20,
+					"dead": false
+				},
+				{
+					"index": 6,
+					"valid": true,
+					"x": 400,
+					"y": 36,
+					"device": 21,
+					"dead": false
+				},
+				{
+					"index": 7,
+					"valid": true,
+					"x": 1162,
+					"y": 759,
+					"device": 22,
+					"dead": false
+				}
+			],
+			"hud_entries": 8,
+			"run_data_players": 8,
+			"paused": false
+		},
+		{
+			"t": 74,
+			"players": [
+				{
+					"index": 0,
+					"valid": true,
+					"x": 410,
+					"y": 587,
+					"device": 7,
+					"dead": false
+				},
+				{
+					"index": 1,
+					"valid": true,
+					"x": 1319,
+					"y": 267,
+					"device": 16,
+					"dead": false
+				},
+				{
+					"index": 2,
+					"valid": true,
+					"x": 159,
+					"y": 898,
+					"device": 17,
+					"dead": false
+				},
+				{
+					"index": 3,
+					"valid": true,
+					"x": 764,
+					"y": 602,
+					"device": 18,
+					"dead": false
+				},
+				{
+					"index": 4,
+					"valid": true,
+					"x": 250,
+					"y": 171,
+					"device": 19,
+					"dead": false
+				},
+				{
+					"index": 5,
+					"valid": true,
+					"x": 615,
+					"y": 801,
+					"device": 20,
+					"dead": false
+				},
+				{
+					"index": 6,
+					"valid": true,
+					"x": 400,
+					"y": 36,
+					"device": 21,
+					"dead": false
+				},
+				{
+					"index": 7,
+					"valid": true,
+					"x": 885,
+					"y": 667,
+					"device": 22,
+					"dead": false
+				}
+			],
+			"hud_entries": 8,
+			"run_data_players": 8,
+			"paused": false
+		},
+		{
+			"t": 75,
+			"players": [
+				{
+					"index": 0,
+					"valid": true,
+					"x": 316,
+					"y": 681,
+					"device": 7,
+					"dead": false
+				},
+				{
+					"index": 1,
+					"valid": true,
+					"x": 1319,
+					"y": 36,
+					"device": 16,
+					"dead": false
+				},
+				{
+					"index": 2,
+					"valid": true,
+					"x": 294,
+					"y": 943,
+					"device": 17,
+					"dead": false
+				},
+				{
+					"index": 3,
+					"valid": true,
+					"x": 1034,
+					"y": 602,
+					"device": 18,
+					"dead": false
+				},
+				{
+					"index": 4,
+					"valid": true,
+					"x": 114,
+					"y": 81,
+					"device": 19,
+					"dead": false
+				},
+				{
+					"index": 5,
+					"valid": true,
+					"x": 570,
+					"y": 756,
+					"device": 20,
+					"dead": false
+				},
+				{
+					"index": 6,
+					"valid": true,
+					"x": 724,
+					"y": 36,
+					"device": 21,
+					"dead": false
+				},
+				{
+					"index": 7,
+					"valid": true,
+					"x": 885,
+					"y": 852,
+					"device": 22,
+					"dead": false
+				}
+			],
+			"hud_entries": 8,
+			"run_data_players": 8,
+			"paused": false
+		},
+		{
+			"t": 76,
+			"players": [
+				{
+					"index": 0,
+					"valid": true,
+					"x": 599,
+					"y": 587,
+					"device": 7,
+					"dead": false
+				},
+				{
+					"index": 1,
+					"valid": true,
+					"x": 1319,
+					"y": 36,
+					"device": 16,
+					"dead": false
+				},
+				{
+					"index": 2,
+					"valid": true,
+					"x": 159,
+					"y": 718,
+					"device": 17,
+					"dead": false
+				},
+				{
+					"index": 3,
+					"valid": true,
+					"x": 1124,
+					"y": 602,
+					"device": 18,
+					"dead": false
+				},
+				{
+					"index": 4,
+					"valid": true,
+					"x": 24,
+					"y": 171,
+					"device": 19,
+					"dead": false
+				},
+				{
+					"index": 5,
+					"valid": true,
+					"x": 435,
+					"y": 1011,
+					"device": 20,
+					"dead": false
+				},
+				{
+					"index": 6,
+					"valid": true,
+					"x": 400,
+					"y": 36,
+					"device": 21,
+					"dead": false
+				},
+				{
+					"index": 7,
+					"valid": true,
+					"x": 746,
+					"y": 873,
+					"device": 22,
+					"dead": false
+				}
+			],
+			"hud_entries": 8,
+			"run_data_players": 8,
+			"paused": false
+		},
+		{
+			"t": 77,
+			"players": [
+				{
+					"index": 0,
+					"valid": true,
+					"x": 560,
+					"y": 437,
+					"device": 7,
+					"dead": false
+				},
+				{
+					"index": 1,
+					"valid": true,
+					"x": 1312,
+					"y": 36,
+					"device": 16,
+					"dead": false
+				},
+				{
+					"index": 2,
+					"valid": true,
+					"x": 331,
+					"y": 726,
+					"device": 17,
+					"dead": false
+				},
+				{
+					"index": 3,
+					"valid": true,
+					"x": 1319,
+					"y": 504,
+					"device": 18,
+					"dead": false
+				},
+				{
+					"index": 4,
+					"valid": true,
+					"x": 61,
+					"y": 43,
+					"device": 19,
+					"dead": false
+				},
+				{
+					"index": 5,
+					"valid": true,
+					"x": 689,
+					"y": 1011,
+					"device": 20,
+					"dead": false
+				},
+				{
+					"index": 6,
+					"valid": true,
+					"x": 238,
+					"y": 279,
+					"device": 21,
+					"dead": false
+				},
+				{
+					"index": 7,
+					"valid": true,
+					"x": 749,
+					"y": 973,
+					"device": 22,
+					"dead": false
+				}
+			],
+			"hud_entries": 8,
+			"run_data_players": 8,
+			"paused": false
+		},
+		{
+			"t": 78,
+			"players": [
+				{
+					"index": 0,
+					"valid": true,
+					"x": 544,
+					"y": 154,
+					"device": 7,
+					"dead": false
+				},
+				{
+					"index": 1,
+					"valid": true,
+					"x": 1088,
+					"y": 174,
+					"device": 16,
+					"dead": false
+				},
+				{
+					"index": 2,
+					"valid": true,
+					"x": 376,
+					"y": 591,
+					"device": 17,
+					"dead": false
+				},
+				{
+					"index": 3,
+					"valid": true,
+					"x": 1319,
+					"y": 654,
+					"device": 18,
+					"dead": false
+				},
+				{
+					"index": 4,
+					"valid": true,
+					"x": 24,
+					"y": 96,
+					"device": 19,
+					"dead": false
+				},
+				{
+					"index": 5,
+					"valid": true,
+					"x": 824,
+					"y": 959,
+					"device": 20,
+					"dead": false
+				},
+				{
+					"index": 6,
+					"valid": true,
+					"x": 346,
+					"y": 157,
+					"device": 21,
+					"dead": false
+				},
+				{
+					"index": 7,
+					"valid": true,
+					"x": 664,
+					"y": 595,
+					"device": 22,
+					"dead": false
+				}
+			],
+			"hud_entries": 8,
+			"run_data_players": 8,
+			"paused": false
+		},
+		{
+			"t": 79,
+			"players": [
+				{
+					"index": 0,
+					"valid": true,
+					"x": 599,
+					"y": 437,
+					"device": 7,
+					"dead": false
+				},
+				{
+					"index": 1,
+					"valid": true,
+					"x": 1173,
+					"y": 36,
+					"device": 16,
+					"dead": false
+				},
+				{
+					"index": 2,
+					"valid": true,
+					"x": 294,
+					"y": 726,
+					"device": 17,
+					"dead": false
+				},
+				{
+					"index": 3,
+					"valid": true,
+					"x": 1319,
+					"y": 602,
+					"device": 18,
+					"dead": false
+				},
+				{
+					"index": 4,
+					"valid": true,
+					"x": 159,
+					"y": 178,
+					"device": 19,
+					"dead": false
+				},
+				{
+					"index": 5,
+					"valid": true,
+					"x": 689,
+					"y": 1011,
+					"device": 20,
+					"dead": false
+				},
+				{
+					"index": 6,
+					"valid": true,
+					"x": 515,
+					"y": 279,
+					"device": 21,
+					"dead": false
+				},
+				{
+					"index": 7,
+					"valid": true,
+					"x": 332,
+					"y": 595,
+					"device": 22,
+					"dead": false
+				}
+			],
+			"hud_entries": 8,
+			"run_data_players": 8,
+			"paused": false
+		},
+		{
+			"t": 80,
+			"players": [
+				{
+					"index": 0,
+					"valid": true,
+					"x": 599,
+					"y": 437,
+					"device": 7,
+					"dead": false
+				},
+				{
+					"index": 1,
+					"valid": true,
+					"x": 1173,
+					"y": 36,
+					"device": 16,
+					"dead": false
+				},
+				{
+					"index": 2,
+					"valid": true,
+					"x": 294,
+					"y": 726,
+					"device": 17,
+					"dead": false
+				},
+				{
+					"index": 3,
+					"valid": true,
+					"x": 1319,
+					"y": 602,
+					"device": 18,
+					"dead": false
+				},
+				{
+					"index": 4,
+					"valid": true,
+					"x": 159,
+					"y": 178,
+					"device": 19,
+					"dead": false
+				},
+				{
+					"index": 5,
+					"valid": true,
+					"x": 689,
+					"y": 1011,
+					"device": 20,
+					"dead": false
+				},
+				{
+					"index": 6,
+					"valid": true,
+					"x": 515,
+					"y": 279,
+					"device": 21,
+					"dead": false
+				},
+				{
+					"index": 7,
+					"valid": true,
+					"x": 332,
+					"y": 595,
+					"device": 22,
+					"dead": false
+				}
+			],
+			"hud_entries": 8,
+			"run_data_players": 8,
+			"paused": false
+		},
+		{
+			"t": 81,
+			"players": [
+				{
+					"index": 0,
+					"valid": true,
+					"x": 599,
+					"y": 437,
+					"device": 7,
+					"dead": false
+				},
+				{
+					"index": 1,
+					"valid": true,
+					"x": 1173,
+					"y": 36,
+					"device": 16,
+					"dead": false
+				},
+				{
+					"index": 2,
+					"valid": true,
+					"x": 294,
+					"y": 726,
+					"device": 17,
+					"dead": false
+				},
+				{
+					"index": 3,
+					"valid": true,
+					"x": 1319,
+					"y": 602,
+					"device": 18,
+					"dead": false
+				},
+				{
+					"index": 4,
+					"valid": true,
+					"x": 159,
+					"y": 178,
+					"device": 19,
+					"dead": false
+				},
+				{
+					"index": 5,
+					"valid": true,
+					"x": 689,
+					"y": 1011,
+					"device": 20,
+					"dead": false
+				},
+				{
+					"index": 6,
+					"valid": true,
+					"x": 515,
+					"y": 279,
+					"device": 21,
+					"dead": false
+				},
+				{
+					"index": 7,
+					"valid": true,
+					"x": 332,
+					"y": 595,
+					"device": 22,
+					"dead": false
+				}
+			],
+			"hud_entries": 8,
+			"run_data_players": 8,
+			"paused": false
+		}
+	]
+}

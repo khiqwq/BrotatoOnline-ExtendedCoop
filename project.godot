@@ -1,0 +1,11 @@
+; Test harness project only. Lets the target engine run rule tests with the same
+; res://mods-unpacked/... paths the game uses. Never packaged.
+config_version=4
+
+[application]
+
+config/name="CoopPlus-OnlineExtendedCoop-tests"
+
+[logging]
+
+file_logging/enable_file_logging=false

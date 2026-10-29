@@ -1,0 +1,138 @@
+{
+	"mode": "extended",
+	"gate": {
+		"capacity": 8,
+		"extended": true,
+		"max_remote_players": 7,
+		"virtual_device_ids": [
+			16,
+			17,
+			18,
+			19,
+			20,
+			21,
+			22
+		],
+		"reasons": [
+
+		],
+		"install_extensions": true,
+		"details": {
+			"compatibility": "ok",
+			"game_version": "1.1.15.4",
+			"engine_version": "3.7.dev.custom_build.74e86be54",
+			"mod_loader_version": "6.3.0",
+			"upstream": {
+				"six666-BrotatoOnline": {
+					"loader": "running",
+					"actual": "17443875",
+					"file_count": 42,
+					"expected": "17443875",
+					"result": "match"
+				}
+			},
+			"unsupported_running": [
+
+			]
+		}
+	},
+	"block_reasons": [
+
+	],
+	"capacity": 8,
+	"max_remote_players": 7,
+	"virtual_device_ids": [
+		16,
+		17,
+		18,
+		19,
+		20,
+		21,
+		22
+	],
+	"scene": "res://ui/menus/title_screen/title_screen.tscn",
+	"connected_joypads": [
+
+	],
+	"t_msec": 11262,
+	"observe_sec": 30,
+	"chains": {
+		"slot_manager": [
+			"res://mods-unpacked/CoopPlus-OnlineExtendedCoop/extensions/bo/online_player_slot_manager_ext.gd",
+			"res://mods-unpacked/six666-BrotatoOnline/scripts/online_player_slot_manager.gd"
+		],
+		"coop_service": [
+			"res://mods-unpacked/CoopPlus-OnlineExtendedCoop/extensions/vanilla/coop_service_ext.gd",
+			"res://singletons/coop_service.gd"
+		],
+		"input_service": [
+			"res://mods-unpacked/CoopPlus-OnlineExtendedCoop/extensions/vanilla/input_service_ext.gd",
+			"res://singletons/input_service.gd"
+		]
+	},
+	"steps": {
+		"before": {
+			"players": [
+
+			],
+			"remote": [
+
+			],
+			"remote_keys": [
+
+			],
+			"run_data_player_count": 1,
+			"is_coop_run": false,
+			"play_mode": 0,
+			"listening_for_inputs": false
+		},
+		"after": {
+			"players": [
+
+			],
+			"remote": [
+
+			],
+			"remote_keys": [
+
+			],
+			"run_data_player_count": 1,
+			"is_coop_run": false,
+			"play_mode": 0,
+			"listening_for_inputs": false
+		}
+	},
+	"scene_after": "res://ui/menus/title_screen/title_screen.tscn",
+	"error": "",
+	"checks": {
+		"gate.mode": {
+			"ok": true,
+			"expected": "extended",
+			"actual": "extended"
+		},
+		"observe.title_screen_current": {
+			"ok": true,
+			"expected": "res://ui/menus/title_screen/title_screen.tscn",
+			"actual": "res://ui/menus/title_screen/title_screen.tscn"
+		},
+		"observe.state_unchanged": {
+			"ok": true,
+			"expected": "{\n\"is_coop_run\": false,\n\"listening_for_inputs\": false,\n\"play_mode\": 0,\n\"players\": [  ],\n\"run_data_player_count\": 1\n}",
+			"actual": "{\n\"is_coop_run\": false,\n\"listening_for_inputs\": false,\n\"play_mode\": 0,\n\"players\": [  ],\n\"run_data_player_count\": 1\n}"
+		},
+		"observe.no_session": {
+			"ok": true,
+			"expected": false,
+			"actual": false
+		},
+		"coop_service.max_players_unchanged": {
+			"ok": true,
+			"expected": 4,
+			"actual": 4
+		}
+	},
+	"failed_checks": [
+
+	],
+	"result": "done"
+}

@@ -1,0 +1,19 @@
+00:20:07   SUCCESS ModLoader:File: CoopPlus-OnlineExtendedCoop.zip loaded.
+00:20:07   INFO ModLoader:ModData: Loading mod_manifest (manifest.json) for -> CoopPlus-OnlineExtendedCoop
+00:20:07   INFO ModLoader:Loader: mod_load_order -> 2) CoopPlus-OnlineExtendedCoop
+00:20:07   INFO ModLoader:Loader: Initializing -> CoopPlus-OnlineExtendedCoop
+00:20:07   INFO CoopPlus-OnlineExtendedCoop: runtime gate: extended capacity=8 virtual_devices=16..22 six666-BrotatoOnline=17443875(match, expected 17443875)
+00:20:07   INFO CoopPlus-OnlineExtendedCoop: queued 10 of 10 extensions
+00:20:08   INFO ModLoader:ScriptExtension: Installing script extension: res://global/entity_spawner.gd <- res://mods-unpacked/CoopPlus-OnlineExtendedCoop/extensions/vanilla/entity_spawner_ext.gd
+00:20:08   INFO ModLoader:ScriptExtension: Installing script extension: res://main.gd <- res://mods-unpacked/CoopPlus-OnlineExtendedCoop/extensions/vanilla/main_ext.gd
+00:20:08   INFO ModLoader:ScriptExtension: Installing script extension: res://mods-unpacked/six666-BrotatoOnline/scripts/lan_transport.gd <- res://mods-unpacked/CoopPlus-OnlineExtendedCoop/extensions/bo/lan_transport_ext.gd
+00:20:08   INFO ModLoader:ScriptExtension: Installing script extension: res://mods-unpacked/six666-BrotatoOnline/scripts/menu_sync_manager.gd <- res://mods-unpacked/CoopPlus-OnlineExtendedCoop/extensions/bo/menu_sync_manager_ext.gd
+00:20:08   INFO ModLoader:ScriptExtension: Installing script extension: res://mods-unpacked/six666-BrotatoOnline/scripts/network_heartbeat.gd <- res://mods-unpacked/CoopPlus-OnlineExtendedCoop/extensions/bo/network_heartbeat_ext.gd
+00:20:08   INFO ModLoader:ScriptExtension: Installing script extension: res://mods-unpacked/six666-BrotatoOnline/scripts/session_manager.gd <- res://mods-unpacked/CoopPlus-OnlineExtendedCoop/extensions/bo/session_manager_ext.gd
+00:20:08   INFO ModLoader:ScriptExtension: Installing script extension: res://mods-unpacked/six666-BrotatoOnline/scripts/steam_transport.gd <- res://mods-unpacked/CoopPlus-OnlineExtendedCoop/extensions/bo/steam_transport_ext.gd
+00:20:08   INFO ModLoader:ScriptExtension: Installing script extension: res://singletons/coop_service.gd <- res://mods-unpacked/CoopPlus-OnlineExtendedCoop/extensions/vanilla/coop_service_ext.gd
+00:20:08   INFO ModLoader:ScriptExtension: Installing script extension: res://singletons/input_service.gd <- res://mods-unpacked/CoopPlus-OnlineExtendedCoop/extensions/vanilla/input_service_ext.gd
+00:20:08   INFO ModLoader:ScriptExtension: Installing script extension: res://singletons/utils.gd <- res://mods-unpacked/CoopPlus-OnlineExtendedCoop/extensions/vanilla/utils_ext.gd
+00:20:10   INFO ModLoader:ScriptExtension: Installing script extension: res://mods-unpacked/six666-BrotatoOnline/scripts/online_player_slot_manager.gd <- res://mods-unpacked/CoopPlus-OnlineExtendedCoop/extensions/bo/online_player_slot_manager_ext.gd
+00:20:10   INFO CoopPlus-OnlineExtendedCoop: installed 1 of 1 enter_tree extensions
+00:20:11   INFO CoopPlus-OnlineExtendedCoop: player colours extended to 8

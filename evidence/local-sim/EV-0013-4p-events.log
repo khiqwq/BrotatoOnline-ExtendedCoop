@@ -1,0 +1,9 @@
+{"detail":{"players":4,"seed":1,"wave_seconds":20},"event":"local_sim._ready","frame":0,"t":3186}
+{"detail":{"scene":"res://pause.tscn"},"event":"local_sim.scene","frame":0,"t":4171}
+{"detail":{"scene":"res://ui/menus/title_screen/title_screen.tscn"},"event":"local_sim.scene","frame":867,"t":7705}
+{"detail":{"devices":[7,16,17,18],"players":4},"event":"local_sim.start_run","frame":867,"t":7710}
+{"detail":{"scene":"res://main.tscn"},"event":"local_sim.scene","frame":868,"t":8113}
+{"detail":{"t":20},"event":"local_sim.wave_over","frame":6791,"t":28858}
+{"detail":{"scene":"res://ui/menus/shop/coop_shop.tscn"},"event":"local_sim.scene","frame":7502,"t":31552}
+{"detail":{"scene":"res://ui/menus/shop/coop_shop.tscn"},"event":"local_sim.left_battle","frame":7502,"t":31552}
+{"detail":{"moved":4,"reason":"reached:coop_shop.tscn","spawned":4},"event":"local_sim.finished","frame":8961,"t":36414}

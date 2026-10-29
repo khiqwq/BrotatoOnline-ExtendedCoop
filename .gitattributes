@@ -1,0 +1,6 @@
+# LF everywhere: tools/check.ps1 rejects CRLF in GDScript, and core.autocrlf
+# would otherwise convert files on checkout.
+* text=auto eol=lf
+*.png binary
+*.zip binary
+*.pck binary

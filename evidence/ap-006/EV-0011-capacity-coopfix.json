@@ -1,0 +1,635 @@
+{
+	"mode": "vanilla",
+	"gate": {
+		"capacity": 4,
+		"extended": false,
+		"max_remote_players": 3,
+		"virtual_device_ids": [
+
+		],
+		"reasons": [
+			"unsupported_mod:CoopFix-OnlineMouseUI"
+		],
+		"install_extensions": true,
+		"details": {
+			"compatibility": "ok",
+			"game_version": "1.1.15.4",
+			"engine_version": "3.7.dev.custom_build.74e86be54",
+			"mod_loader_version": "6.3.0",
+			"upstream": {
+				"six666-BrotatoOnline": {
+					"loader": "running",
+					"actual": "17443875",
+					"file_count": 42,
+					"expected": "17443875",
+					"result": "match"
+				}
+			},
+			"unsupported_running": [
+				"CoopFix-OnlineMouseUI"
+			]
+		}
+	},
+	"block_reasons": [
+		"unsupported_mod:CoopFix-OnlineMouseUI"
+	],
+	"capacity": 4,
+	"max_remote_players": 3,
+	"virtual_device_ids": [
+
+	],
+	"scene": "res://ui/menus/title_screen/title_screen.tscn",
+	"connected_joypads": [
+
+	],
+	"t_msec": 10943,
+	"chains": {
+		"slot_manager": [
+			"res://mods-unpacked/CoopPlus-OnlineExtendedCoop/extensions/bo/online_player_slot_manager_ext.gd",
+			"res://mods-unpacked/six666-BrotatoOnline/scripts/online_player_slot_manager.gd"
+		],
+		"coop_service": [
+			"res://mods-unpacked/CoopPlus-OnlineExtendedCoop/extensions/vanilla/coop_service_ext.gd",
+			"res://singletons/coop_service.gd"
+		],
+		"input_service": [
+			"res://mods-unpacked/CoopPlus-OnlineExtendedCoop/extensions/vanilla/input_service_ext.gd",
+			"res://singletons/input_service.gd"
+		]
+	},
+	"steps": {
+		"baseline": {
+			"players": [
+
+			],
+			"remote": [
+
+			],
+			"remote_keys": [
+
+			],
+			"run_data_player_count": 1,
+			"is_coop_run": false,
+			"play_mode": 0,
+			"listening_for_inputs": false
+		},
+		"joined": {
+			"players": [
+				[
+					7,
+					0
+				],
+				[
+					1,
+					1
+				],
+				[
+					2,
+					1
+				],
+				[
+					3,
+					1
+				]
+			],
+			"remote": [
+				false,
+				true,
+				true,
+				true
+			],
+			"remote_keys": [
+				"",
+				"lan:coopplus-capacity-probe-1",
+				"lan:coopplus-capacity-probe-2",
+				"lan:coopplus-capacity-probe-3"
+			],
+			"run_data_player_count": 4,
+			"is_coop_run": true,
+			"play_mode": 1,
+			"listening_for_inputs": true
+		},
+		"held": {
+			"players": [
+				[
+					7,
+					0
+				],
+				[
+					1,
+					1
+				],
+				[
+					2,
+					1
+				],
+				[
+					3,
+					1
+				]
+			],
+			"remote": [
+				false,
+				true,
+				true,
+				true
+			],
+			"remote_keys": [
+				"",
+				"lan:coopplus-capacity-probe-1",
+				"lan:coopplus-capacity-probe-2",
+				"lan:coopplus-capacity-probe-3"
+			],
+			"run_data_player_count": 4,
+			"is_coop_run": true,
+			"play_mode": 1,
+			"listening_for_inputs": true
+		},
+		"ninth_sync": {
+			"players": [
+				[
+					7,
+					0
+				],
+				[
+					1,
+					1
+				],
+				[
+					2,
+					1
+				],
+				[
+					3,
+					1
+				]
+			],
+			"remote": [
+				false,
+				true,
+				true,
+				true
+			],
+			"remote_keys": [
+				"",
+				"lan:coopplus-capacity-probe-1",
+				"lan:coopplus-capacity-probe-2",
+				"lan:coopplus-capacity-probe-3"
+			],
+			"run_data_player_count": 4,
+			"is_coop_run": true,
+			"play_mode": 1,
+			"listening_for_inputs": true
+		},
+		"ninth_direct": {
+			"players": [
+				[
+					7,
+					0
+				],
+				[
+					1,
+					1
+				],
+				[
+					2,
+					1
+				],
+				[
+					3,
+					1
+				]
+			],
+			"remote": [
+				false,
+				true,
+				true,
+				true
+			],
+			"remote_keys": [
+				"",
+				"lan:coopplus-capacity-probe-1",
+				"lan:coopplus-capacity-probe-2",
+				"lan:coopplus-capacity-probe-3"
+			],
+			"run_data_player_count": 4,
+			"is_coop_run": true,
+			"play_mode": 1,
+			"listening_for_inputs": true
+		},
+		"removed": {
+			"players": [
+				[
+					7,
+					0
+				]
+			],
+			"remote": [
+				false
+			],
+			"remote_keys": [
+				""
+			],
+			"run_data_player_count": 1,
+			"is_coop_run": true,
+			"play_mode": 1,
+			"listening_for_inputs": true
+		},
+		"reset": {
+			"players": [
+
+			],
+			"remote": [
+
+			],
+			"remote_keys": [
+
+			],
+			"run_data_player_count": 1,
+			"is_coop_run": false,
+			"play_mode": 0,
+			"listening_for_inputs": false
+		}
+	},
+	"input_map": {
+		"base_count": 32,
+		"ids": {
+
+		},
+		"unexpected": [
+
+		]
+	},
+	"isolation": {
+		"prefix": "button_move_",
+		"pressed": "button_move_left_1",
+		"own_strength": 1,
+		"other_strengths": {
+			"7": 0,
+			"2": 0,
+			"3": 0,
+			"0": 0,
+			"4": 0,
+			"5": 0,
+			"6": 0
+		},
+		"plain_strength": 0,
+		"vector_pressed": "(-1, 0)",
+		"vector_other": "(0, 0)",
+		"after_release": 0
+	},
+	"bo_injection": {
+		"remote_players": 3,
+		"devices": {
+			"7": {
+				"expected": "(0, 0)",
+				"actual": "(0, 0)"
+			},
+			"1": {
+				"expected": "(1, 0)",
+				"actual": "(1, 0)"
+			},
+			"2": {
+				"expected": "(0.707107, 0.707107)",
+				"actual": "(0.707107, 0.707107)"
+			},
+			"3": {
+				"expected": "(-0, 1)",
+				"actual": "(0, 1)"
+			},
+			"0": {
+				"expected": "(0, 0)",
+				"actual": "(0, 0)"
+			},
+			"4": {
+				"expected": "(0, 0)",
+				"actual": "(0, 0)"
+			},
+			"5": {
+				"expected": "(0, 0)",
+				"actual": "(0, 0)"
+			},
+			"6": {
+				"expected": "(0, 0)",
+				"actual": "(0, 0)"
+			}
+		}
+	},
+	"baseline_restored_by_upstream": true,
+	"error": "",
+	"checks": {
+		"gate.mode": {
+			"ok": true,
+			"expected": "vanilla",
+			"actual": "vanilla"
+		},
+		"coop_service.max_players_unchanged": {
+			"ok": true,
+			"expected": 4,
+			"actual": 4
+		},
+		"joined.player_count": {
+			"ok": true,
+			"expected": 4,
+			"actual": 4
+		},
+		"joined.run_data_player_count": {
+			"ok": true,
+			"expected": 4,
+			"actual": 4
+		},
+		"joined.coop_run": {
+			"ok": true,
+			"expected": true,
+			"actual": true
+		},
+		"joined.host_local_p1": {
+			"ok": true,
+			"expected": false,
+			"actual": false
+		},
+		"joined.remote_keys_in_order": {
+			"ok": true,
+			"expected": [
+				"lan:coopplus-capacity-probe-1",
+				"lan:coopplus-capacity-probe-2",
+				"lan:coopplus-capacity-probe-3"
+			],
+			"actual": [
+				"lan:coopplus-capacity-probe-1",
+				"lan:coopplus-capacity-probe-2",
+				"lan:coopplus-capacity-probe-3"
+			]
+		},
+		"joined.devices_unique": {
+			"ok": true,
+			"expected": 4,
+			"actual": 4
+		},
+		"joined.host_device_not_virtual": {
+			"ok": true,
+			"expected": false,
+			"actual": false
+		},
+		"joined.remote_devices_not_virtual": {
+			"ok": true,
+			"expected": [
+
+			],
+			"actual": [
+
+			]
+		},
+		"held.layout_unchanged": {
+			"ok": true,
+			"expected": [
+				[
+					7,
+					0
+				],
+				[
+					1,
+					1
+				],
+				[
+					2,
+					1
+				],
+				[
+					3,
+					1
+				]
+			],
+			"actual": [
+				[
+					7,
+					0
+				],
+				[
+					1,
+					1
+				],
+				[
+					2,
+					1
+				],
+				[
+					3,
+					1
+				]
+			]
+		},
+		"held.run_data_player_count": {
+			"ok": true,
+			"expected": 4,
+			"actual": 4
+		},
+		"input_map.bases_found": {
+			"ok": true,
+			"expected": true,
+			"actual": true
+		},
+		"input_map.no_virtual_actions": {
+			"ok": true,
+			"expected": [
+
+			],
+			"actual": [
+
+			]
+		},
+		"isolation.own_strength": {
+			"ok": true,
+			"expected": 1,
+			"actual": 1
+		},
+		"isolation.no_leak": {
+			"ok": true,
+			"expected": [
+
+			],
+			"actual": [
+
+			]
+		},
+		"isolation.plain_action_idle": {
+			"ok": true,
+			"expected": 0,
+			"actual": 0
+		},
+		"isolation.pressed_device_moves_left": {
+			"ok": true,
+			"expected": true,
+			"actual": true
+		},
+		"isolation.other_device_still": {
+			"ok": true,
+			"expected": true,
+			"actual": true
+		},
+		"isolation.released": {
+			"ok": true,
+			"expected": 0,
+			"actual": 0
+		},
+		"bo_injection.remote_players": {
+			"ok": true,
+			"expected": 3,
+			"actual": 3
+		},
+		"bo_injection.each_device_own_movement": {
+			"ok": true,
+			"expected": [
+
+			],
+			"actual": [
+
+			]
+		},
+		"bo_injection.released": {
+			"ok": true,
+			"expected": [
+
+			],
+			"actual": [
+
+			]
+		},
+		"ninth.sync_layout_unchanged": {
+			"ok": true,
+			"expected": [
+				[
+					7,
+					0
+				],
+				[
+					1,
+					1
+				],
+				[
+					2,
+					1
+				],
+				[
+					3,
+					1
+				]
+			],
+			"actual": [
+				[
+					7,
+					0
+				],
+				[
+					1,
+					1
+				],
+				[
+					2,
+					1
+				],
+				[
+					3,
+					1
+				]
+			]
+		},
+		"ninth.sync_not_seated": {
+			"ok": true,
+			"expected": -1,
+			"actual": -1
+		},
+		"ninth.direct_add_refused": {
+			"ok": true,
+			"expected": -1,
+			"actual": -1
+		},
+		"ninth.direct_layout_unchanged": {
+			"ok": true,
+			"expected": [
+				[
+					7,
+					0
+				],
+				[
+					1,
+					1
+				],
+				[
+					2,
+					1
+				],
+				[
+					3,
+					1
+				]
+			],
+			"actual": [
+				[
+					7,
+					0
+				],
+				[
+					1,
+					1
+				],
+				[
+					2,
+					1
+				],
+				[
+					3,
+					1
+				]
+			]
+		},
+		"ninth.run_data_player_count": {
+			"ok": true,
+			"expected": 4,
+			"actual": 4
+		},
+		"removed.one_player": {
+			"ok": true,
+			"expected": 1,
+			"actual": 1
+		},
+		"removed.only_local": {
+			"ok": true,
+			"expected": [
+				false
+			],
+			"actual": [
+				false
+			]
+		},
+		"removed.host_kept": {
+			"ok": true,
+			"expected": [
+				7,
+				0
+			],
+			"actual": [
+				7,
+				0
+			]
+		},
+		"removed.run_data_player_count": {
+			"ok": true,
+			"expected": 1,
+			"actual": 1
+		},
+		"reset.players_match_baseline": {
+			"ok": true,
+			"expected": [
+
+			],
+			"actual": [
+
+			]
+		}
+	},
+	"failed_checks": [
+
+	],
+	"result": "done"
+}

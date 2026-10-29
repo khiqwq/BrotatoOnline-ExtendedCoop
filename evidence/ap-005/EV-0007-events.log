@@ -1,0 +1,16 @@
+{"detail":{"bo_session_manager_cached":false,"coop_service_cached":false,"main_loop_set":false},"event":"coopplus.mod_main._init","frame":0,"t":602}
+{"detail":{"path":"debug/probe_extensions/coop_service_probe.gd"},"event":"coopplus.install_script_extension","frame":0,"t":603}
+{"detail":{"path":"debug/probe_extensions/entity_spawner_probe.gd"},"event":"coopplus.install_script_extension","frame":0,"t":604}
+{"detail":{"path":"debug/probe_extensions/session_manager_probe.gd"},"event":"coopplus.install_script_extension","frame":0,"t":604}
+{"detail":{"path":"debug/probe_extensions/menu_sync_probe.gd"},"event":"coopplus.install_script_extension","frame":0,"t":605}
+{"detail":{},"event":"coop_service_probe._init","frame":0,"t":4587}
+{"detail":{"bo_slot_manager_cached":false,"coop_service_in_tree":true,"mod_loader_initializing":false},"event":"coopplus.mod_main._enter_tree","frame":0,"t":4633}
+{"detail":{"path":"debug/probe_extensions/slot_manager_probe.gd","stage":"enter_tree"},"event":"coopplus.install_script_extension","frame":0,"t":4634}
+{"detail":{},"event":"session_manager_probe._init","frame":0,"t":4649}
+{"detail":{"path":"/root/ModLoader/six666-BrotatoOnline/BrotatoOnlineSessionManager"},"event":"session_manager_probe._ready","frame":0,"t":4651}
+{"detail":{"can_instance":true,"gamepad_xbox":1,"placeholder_type":1},"event":"slot_manager_probe._ready","frame":0,"t":4665}
+{"detail":{"path":"/root/ModLoader/six666-BrotatoOnline/BrotatoOnlineMenuSyncManager"},"event":"menu_sync_probe._ready","frame":0,"t":4675}
+{"detail":{"path":"/root/ModLoader/CoopPlus-OnlineExtendedCoop"},"event":"coopplus.mod_main._ready","frame":0,"t":4722}
+{"detail":{},"event":"lifecycle_probe._ready","frame":0,"t":4725}
+{"detail":{},"event":"coop_service_probe._ready","frame":0,"t":5690}
+{"detail":{},"event":"lifecycle_probe.settled","frame":3404,"t":18759}

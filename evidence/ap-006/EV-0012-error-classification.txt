@@ -1,0 +1,77 @@
+# ERROR/WARNING lines per run (count, line); Steam ids replaced
+
+## BO only, clean quit by WM_CLOSE (baseline)
+1 ERROR: Cannot load source code from file 'res://dlcs/dlc_1/projectiles/bullet_harpoon/bullet_harpoon.gd'.
+2 ERROR: Cannot load source code from file 'res://tests/partial_doubles/pd_player.gd'.
+1 ERROR: Condition "_first != nullptr" is true.
+3 ERROR: Condition "err" is true. Returned: err
+1 ERROR: CrashReporter: Failed to find engine logs in E:/GitHub/BrotatoOnline-ExtendedCoop/.local/userdata/instance-boq/Brotato/logs
+1 ERROR: Failed loading resource: res://dlcs/dlc_1/projectiles/bullet_harpoon/bullet_harpoon.gd. Make sure resources have been imported by opening the project in the editor at least once.
+2 ERROR: Failed loading resource: res://tests/partial_doubles/pd_player.gd. Make sure resources have been imported by opening the project in the editor at least once.
+1 ERROR: Resources still in use at exit (run with --verbose for details).
+1 ERROR: Signal "idle_frame" from "[SceneTree:1295]" is already connected to given method "run_callbacks" in "[Steam:157]".
+1 ERROR: There are still MemoryPool allocs in use at exit!
+1 WARNING: ObjectDB instances leaked at exit (run with --verbose for details).
+
+## EV-0008 extended capacity probe
+1 ERROR: Cannot load source code from file 'res://dlcs/dlc_1/projectiles/bullet_harpoon/bullet_harpoon.gd'.
+2 ERROR: Cannot load source code from file 'res://tests/partial_doubles/pd_player.gd'.
+1 ERROR: Condition "_first != nullptr" is true.
+3 ERROR: Condition "err" is true. Returned: err
+1 ERROR: CrashReporter: Failed to find engine logs in E:/GitHub/BrotatoOnline-ExtendedCoop/.local/userdata/instance-cap/Brotato/logs
+1 ERROR: Failed loading resource: res://dlcs/dlc_1/projectiles/bullet_harpoon/bullet_harpoon.gd. Make sure resources have been imported by opening the project in the editor at least once.
+2 ERROR: Failed loading resource: res://tests/partial_doubles/pd_player.gd. Make sure resources have been imported by opening the project in the editor at least once.
+1 ERROR: Resources still in use at exit (run with --verbose for details).
+1 ERROR: Signal "idle_frame" from "[SceneTree:1295]" is already connected to given method "run_callbacks" in "[Steam:157]".
+1 ERROR: There are still MemoryPool allocs in use at exit!
+1 WARNING CoopPlus-OnlineExtendedCoop: remote seat refused (remote_player_limit): remote 7/7, players 8/8
+1 WARNING: ObjectDB instances leaked at exit (run with --verbose for details).
+1 WARNING: remote seat refused (remote_player_limit): remote 7/7, players 8/8
+
+## EV-0009 observe 30 s (passive probe)
+1 ERROR: Cannot load source code from file 'res://dlcs/dlc_1/projectiles/bullet_harpoon/bullet_harpoon.gd'.
+2 ERROR: Cannot load source code from file 'res://tests/partial_doubles/pd_player.gd'.
+1 ERROR: Condition "_first != nullptr" is true.
+3 ERROR: Condition "err" is true. Returned: err
+1 ERROR: CrashReporter: Failed to find engine logs in E:/GitHub/BrotatoOnline-ExtendedCoop/.local/userdata/instance-cap/Brotato/logs
+1 ERROR: Failed loading resource: res://dlcs/dlc_1/projectiles/bullet_harpoon/bullet_harpoon.gd. Make sure resources have been imported by opening the project in the editor at least once.
+2 ERROR: Failed loading resource: res://tests/partial_doubles/pd_player.gd. Make sure resources have been imported by opening the project in the editor at least once.
+1 ERROR: Resources still in use at exit (run with --verbose for details).
+1 ERROR: Signal "idle_frame" from "[SceneTree:1295]" is already connected to given method "run_callbacks" in "[Steam:157]".
+1 ERROR: There are still MemoryPool allocs in use at exit!
+1 WARNING: ObjectDB instances leaked at exit (run with --verbose for details).
+
+## EV-0009 no probe flag, killed after 30 s
+1 ERROR: Cannot load source code from file 'res://dlcs/dlc_1/projectiles/bullet_harpoon/bullet_harpoon.gd'.
+2 ERROR: Cannot load source code from file 'res://tests/partial_doubles/pd_player.gd'.
+3 ERROR: Condition "err" is true. Returned: err
+1 ERROR: CrashReporter: Failed to find engine logs in E:/GitHub/BrotatoOnline-ExtendedCoop/.local/userdata/instance-cap/Brotato/logs
+1 ERROR: Failed loading resource: res://dlcs/dlc_1/projectiles/bullet_harpoon/bullet_harpoon.gd. Make sure resources have been imported by opening the project in the editor at least once.
+2 ERROR: Failed loading resource: res://tests/partial_doubles/pd_player.gd. Make sure resources have been imported by opening the project in the editor at least once.
+1 ERROR: Signal "idle_frame" from "[SceneTree:1295]" is already connected to given method "run_callbacks" in "[Steam:157]".
+
+## EV-0010 --coopplus-vanilla capacity probe
+1 ERROR: Cannot load source code from file 'res://dlcs/dlc_1/projectiles/bullet_harpoon/bullet_harpoon.gd'.
+2 ERROR: Cannot load source code from file 'res://tests/partial_doubles/pd_player.gd'.
+1 ERROR: Condition "_first != nullptr" is true.
+3 ERROR: Condition "err" is true. Returned: err
+1 ERROR: CrashReporter: Failed to find engine logs in E:/GitHub/BrotatoOnline-ExtendedCoop/.local/userdata/instance-cap/Brotato/logs
+1 ERROR: Failed loading resource: res://dlcs/dlc_1/projectiles/bullet_harpoon/bullet_harpoon.gd. Make sure resources have been imported by opening the project in the editor at least once.
+2 ERROR: Failed loading resource: res://tests/partial_doubles/pd_player.gd. Make sure resources have been imported by opening the project in the editor at least once.
+1 ERROR: Resources still in use at exit (run with --verbose for details).
+1 ERROR: Signal "idle_frame" from "[SceneTree:1295]" is already connected to given method "run_callbacks" in "[Steam:157]".
+1 ERROR: There are still MemoryPool allocs in use at exit!
+1 WARNING: ObjectDB instances leaked at exit (run with --verbose for details).
+
+## EV-0011 with CoopFix-OnlineMouseUI capacity probe
+1 ERROR: Cannot load source code from file 'res://dlcs/dlc_1/projectiles/bullet_harpoon/bullet_harpoon.gd'.
+2 ERROR: Cannot load source code from file 'res://tests/partial_doubles/pd_player.gd'.
+1 ERROR: Condition "_first != nullptr" is true.
+3 ERROR: Condition "err" is true. Returned: err
+1 ERROR: CrashReporter: Failed to find engine logs in E:/GitHub/BrotatoOnline-ExtendedCoop/.local/userdata/instance-capm/Brotato/logs
+1 ERROR: Failed loading resource: res://dlcs/dlc_1/projectiles/bullet_harpoon/bullet_harpoon.gd. Make sure resources have been imported by opening the project in the editor at least once.
+2 ERROR: Failed loading resource: res://tests/partial_doubles/pd_player.gd. Make sure resources have been imported by opening the project in the editor at least once.
+1 ERROR: Resources still in use at exit (run with --verbose for details).
+1 ERROR: Signal "idle_frame" from "[SceneTree:1295]" is already connected to given method "run_callbacks" in "[Steam:157]".
+1 ERROR: There are still MemoryPool allocs in use at exit!
+1 WARNING: ObjectDB instances leaked at exit (run with --verbose for details).

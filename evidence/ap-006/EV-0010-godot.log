@@ -1,0 +1,136 @@
+Godot Engine v3.7.dev.custom_build.74e86be54 - https://godotengine.org
+OpenGL ES 3.0 Renderer: NVIDIA GeForce RTX 5070 Laptop GPU/PCIe/SSE2
+Async. shader compilation: OFF
+ 
+Brotato v1.1.15.4
+ERROR: CrashReporter: Failed to find engine logs in E:/GitHub/BrotatoOnline-ExtendedCoop/.local/userdata/instance-cap/Brotato/logs
+   at: call (modules/gdscript/gdscript_functions.cpp:775) - CrashReporter: Failed to find engine logs in E:/GitHub/BrotatoOnline-ExtendedCoop/.local/userdata/instance-cap/Brotato/logs
+Steam initialization: {status:0, verbal:}
+steam_is_online: True
+steam_id: <steam-id>
+steam_is_owned: True
+INFO ModLoader:Store: Options override feature tag "editor". does not apply, skipping.
+INFO ModLoader:Store: Options override feature tag "epic". does not apply, skipping.
+INFO ModLoader:Store: Options override feature tag "gog". does not apply, skipping.
+INFO ModLoader:Store: Applying options override with feature tag "steam".
+INFO ModLoader:Loader: game_install_directory: E:/GitHub/BrotatoOnline-ExtendedCoop/.local/instances/cap/steamapps/common/Brotato/
+INFO ModLoader:ThirdParty:Steam: Checking workshop items, with path: "E:/GitHub/BrotatoOnline-ExtendedCoop/.local/instances/cap/steamapps/workshop/content/1942280"
+INFO ModLoader:ThirdParty:Steam: Checking workshop item path: "E:/GitHub/BrotatoOnline-ExtendedCoop/.local/instances/cap/steamapps/workshop/content/1942280/3741034628"
+SUCCESS ModLoader:File: CoopPlus-OnlineExtendedCoop.zip loaded.
+SUCCESS ModLoader:File: six666-BrotatoOnline.zip loaded.
+INFO ModLoader:ThirdParty:Steam: Checking workshop item path: "E:/GitHub/BrotatoOnline-ExtendedCoop/.local/instances/cap/steamapps/workshop/content/1942280/"
+SUCCESS ModLoader:Loader: DONE: Loaded 2 mod files into the virtual filesystem
+SUCCESS ModLoader:Loader: DONE: Setup 2 mods
+INFO ModLoader:UserProfile: There is no current user profile. The "default" profile will be created.
+INFO ModLoader:ModData: Loading mod_manifest (manifest.json) for -> CoopPlus-OnlineExtendedCoop
+INFO ModLoader:ModData: Loading mod_manifest (manifest.json) for -> six666-BrotatoOnline
+SUCCESS ModLoader:Loader: DONE: Loaded all meta data
+INFO ModLoader:Loader: mod_load_order -> 1) six666-BrotatoOnline
+INFO ModLoader:Loader: mod_load_order -> 2) CoopPlus-OnlineExtendedCoop
+INFO ModLoader:Loader: Initializing -> six666-BrotatoOnline
+INFO ModLoader:Loader: Initializing -> CoopPlus-OnlineExtendedCoop
+INFO CoopPlus-OnlineExtendedCoop: runtime gate: vanilla capacity=4 reasons=disabled six666-BrotatoOnline=17443875(match, expected 17443875)
+INFO CoopPlus-OnlineExtendedCoop: queued 10 of 10 extensions
+SUCCESS ModLoader:Loader: DONE: Completely finished loading mods
+INFO ModLoader:ScriptExtension: Installing script extension: res://entities/units/player/player.gd <- res://mods-unpacked/six666-BrotatoOnline/extensions/player_local_outline.gd
+ERROR: Condition "err" is true. Returned: err
+   at: load_source_code (modules/gdscript/gdscript.cpp:821) - Condition "err" is true. Returned: err
+ERROR: Cannot load source code from file 'res://tests/partial_doubles/pd_player.gd'.
+   at: load (modules/gdscript/gdscript.cpp:2239) - Condition "err != OK" is true. Returned: RES()
+ERROR: Failed loading resource: res://tests/partial_doubles/pd_player.gd. Make sure resources have been imported by opening the project in the editor at least once.
+   at: _load (core/io/resource_loader.cpp:283) - Condition "found" is true. Returned: RES()
+INFO ModLoader:ScriptExtension: Installing script extension: res://entities/units/player/player.gd <- res://mods-unpacked/six666-BrotatoOnline/extensions/player_safe_room_cleanup.gd
+ERROR: Condition "err" is true. Returned: err
+   at: load_source_code (modules/gdscript/gdscript.cpp:821) - Condition "err" is true. Returned: err
+ERROR: Cannot load source code from file 'res://tests/partial_doubles/pd_player.gd'.
+   at: load (modules/gdscript/gdscript.cpp:2239) - Condition "err != OK" is true. Returned: RES()
+ERROR: Failed loading resource: res://tests/partial_doubles/pd_player.gd. Make sure resources have been imported by opening the project in the editor at least once.
+   at: _load (core/io/resource_loader.cpp:283) - Condition "found" is true. Returned: RES()
+INFO ModLoader:ScriptExtension: Installing script extension: res://entities/units/movement_behaviors/follow_target_movement_behavior.gd <- res://mods-unpacked/six666-BrotatoOnline/extensions/follow_target_movement_safe_parent.gd
+INFO ModLoader:ScriptExtension: Installing script extension: res://global/entity_spawner.gd <- res://mods-unpacked/six666-BrotatoOnline/extensions/entity_spawner_online_player_count_guard.gd
+INFO ModLoader:ScriptExtension: Installing script extension: res://global/entity_spawner.gd <- res://mods-unpacked/CoopPlus-OnlineExtendedCoop/extensions/vanilla/entity_spawner_ext.gd
+INFO ModLoader:ScriptExtension: Installing script extension: res://global/stats_manager.gd <- res://mods-unpacked/six666-BrotatoOnline/extensions/stats_manager_safe_queues.gd
+INFO ModLoader:ScriptExtension: Installing script extension: res://main.gd <- res://mods-unpacked/six666-BrotatoOnline/extensions/main_safe_pool_exit.gd
+INFO ModLoader:ScriptExtension: Installing script extension: res://main.gd <- res://mods-unpacked/CoopPlus-OnlineExtendedCoop/extensions/vanilla/main_ext.gd
+INFO ModLoader:ScriptExtension: Installing script extension: res://mods-unpacked/six666-BrotatoOnline/scripts/lan_transport.gd <- res://mods-unpacked/CoopPlus-OnlineExtendedCoop/extensions/bo/lan_transport_ext.gd
+INFO ModLoader:ScriptExtension: Installing script extension: res://mods-unpacked/six666-BrotatoOnline/scripts/menu_sync_manager.gd <- res://mods-unpacked/CoopPlus-OnlineExtendedCoop/extensions/bo/menu_sync_manager_ext.gd
+INFO ModLoader:ScriptExtension: Installing script extension: res://mods-unpacked/six666-BrotatoOnline/scripts/network_heartbeat.gd <- res://mods-unpacked/CoopPlus-OnlineExtendedCoop/extensions/bo/network_heartbeat_ext.gd
+INFO ModLoader:ScriptExtension: Installing script extension: res://mods-unpacked/six666-BrotatoOnline/scripts/session_manager.gd <- res://mods-unpacked/CoopPlus-OnlineExtendedCoop/extensions/bo/session_manager_ext.gd
+INFO ModLoader:ScriptExtension: Installing script extension: res://mods-unpacked/six666-BrotatoOnline/scripts/steam_transport.gd <- res://mods-unpacked/CoopPlus-OnlineExtendedCoop/extensions/bo/steam_transport_ext.gd
+INFO ModLoader:ScriptExtension: Installing script extension: res://projectiles/player_projectile.gd <- res://mods-unpacked/six666-BrotatoOnline/extensions/player_projectile_safe_speed.gd
+ERROR: Condition "err" is true. Returned: err
+   at: load_source_code (modules/gdscript/gdscript.cpp:821) - Condition "err" is true. Returned: err
+ERROR: Cannot load source code from file 'res://dlcs/dlc_1/projectiles/bullet_harpoon/bullet_harpoon.gd'.
+   at: load (modules/gdscript/gdscript.cpp:2239) - Condition "err != OK" is true. Returned: RES()
+ERROR: Failed loading resource: res://dlcs/dlc_1/projectiles/bullet_harpoon/bullet_harpoon.gd. Make sure resources have been imported by opening the project in the editor at least once.
+   at: _load (core/io/resource_loader.cpp:283) - Condition "found" is true. Returned: RES()
+INFO ModLoader:ScriptExtension: Installing script extension: res://singletons/coop_service.gd <- res://mods-unpacked/CoopPlus-OnlineExtendedCoop/extensions/vanilla/coop_service_ext.gd
+INFO ModLoader:ScriptExtension: Installing script extension: res://singletons/input_service.gd <- res://mods-unpacked/CoopPlus-OnlineExtendedCoop/extensions/vanilla/input_service_ext.gd
+INFO ModLoader:ScriptExtension: Installing script extension: res://singletons/progress_data.gd <- res://mods-unpacked/six666-BrotatoOnline/extensions/progress_data_removed_players.gd
+INFO ModLoader:ScriptExtension: Installing script extension: res://singletons/utils.gd <- res://mods-unpacked/six666-BrotatoOnline/extensions/utils_online_manual_aim.gd
+INFO ModLoader:ScriptExtension: Installing script extension: res://singletons/utils.gd <- res://mods-unpacked/CoopPlus-OnlineExtendedCoop/extensions/vanilla/utils_ext.gd
+INFO ModLoader:ScriptExtension: Installing script extension: res://ui/menus/global/focus_emulator.gd <- res://mods-unpacked/six666-BrotatoOnline/extensions/focus_emulator_safe_disconnect.gd
+INFO ModLoader:ScriptExtension: Installing script extension: res://ui/menus/ingame/pause_menu.gd <- res://mods-unpacked/six666-BrotatoOnline/extensions/pause_menu_focus_safe.gd
+INFO ModLoader:ScriptExtension: Installing script extension: res://ui/menus/shop/shop_item.gd <- res://mods-unpacked/six666-BrotatoOnline/extensions/shop_item_lock_event.gd
+SUCCESS ModLoader:Loader: DONE: Installed all script extensions
+INFO ModLoader:ScriptExtension: Installing script extension: res://mods-unpacked/six666-BrotatoOnline/scripts/online_player_slot_manager.gd <- res://mods-unpacked/CoopPlus-OnlineExtendedCoop/extensions/bo/online_player_slot_manager_ext.gd
+INFO CoopPlus-OnlineExtendedCoop: installed 1 of 1 enter_tree extensions
+[BrotatoOnlineI18n] marker=i18n-table-retry-v2 reason=reload locale=en language=en entries={en:175, zh:175} paths={en:res://mods-unpacked/six666-BrotatoOnline/translations/brotato_online_en.txt, zh:res://mods-unpacked/six666-BrotatoOnline/translations/brotato_online_zh.txt}
+[BrotatoOnlineI18n] marker=i18n-table-retry-v2 reason=ready locale=en language=en entries={en:175, zh:175} paths={en:res://mods-unpacked/six666-BrotatoOnline/translations/brotato_online_en.txt, zh:res://mods-unpacked/six666-BrotatoOnline/translations/brotato_online_zh.txt}
+ERROR: Signal "idle_frame" from "[SceneTree:1295]" is already connected to given method "run_callbacks" in "[Steam:157]".
+   at: connect (core/object.cpp:1485) - Method failed. Returning: ERR_INVALID_PARAMETER
+COOPPLUS_CAPACITY_PROBE waiting for the title screen
+ProgressDataLoaderV3: Save path: user://<steam-id>/save_v3_0.json
+LOG_PATH: user://<steam-id>/log.txt
+ProgressData: Could not read user://<steam-id>/settings.json.
+ProgressData: Saved current profile id 0 to user://<steam-id>/settings.json.
+ProgressData: Set current profile id to 0.
+--- Load game file ---
+Try to load save v3
+ProgressDataLoaderV3: Save path: user://<steam-id>/save_v3_0.json
+ProgressDataLoaderV3: Loading user://<steam-id>/save_v3_0.json
+ProgressDataLoaderV3: No v3 save found
+No save v3. Try to load save v2
+ProgressDataLoaderV2: Save path: user://<steam-id>/save_v2.json
+ProgressDataLoaderV2: Loading user://<steam-id>/save_v2.json
+ProgressDataLoaderV2: No v2 save found
+No save v2. Try to load save v1
+ProgressDataLoaderV1: Save path: user://<steam-id>/save.json
+ProgressDataLoaderV1: Loading user://<steam-id>/save.json
+ProgressDataLoaderV1: No v1 save found
+No save found, trying to copy from fallback
+--- Load game file ---
+Try to load save v3
+ProgressDataLoaderV3: Save path: user://<steam-id>/save_v3_0.json
+ProgressDataLoaderV3: Loading user://<steam-id>/save_v3_0.json
+ProgressDataLoaderV3: No v3 save found
+No save v3. Try to load save v2
+ProgressDataLoaderV2: Save path: user://<steam-id>/save_v2.json
+ProgressDataLoaderV2: Loading user://<steam-id>/save_v2.json
+ProgressDataLoaderV2: No v2 save found
+No save v2. Try to load save v1
+ProgressDataLoaderV1: Save path: user://<steam-id>/save.json
+ProgressDataLoaderV1: Loading user://<steam-id>/save.json
+ProgressDataLoaderV1: No v1 save found
+No save found, creating new save
+ProgressData: Saved current profile id 0 to user://<steam-id>/settings.json.
+ProgressDataLoaderV3: Save path: user://<steam-id>/save_v3_0.json
+ProgressDataLoaderV3: Writing save to backup path user://<steam-id>/save_v3_0_00.json.bak
+ProgressDataLoaderV3: Writing save to main save path user://<steam-id>/save_v3_0.json
+ProgressDataLoaderV3: Writing save to backup path user://<steam-id>/run_v3_0_00.json.bak
+ProgressDataLoaderV3: Writing save to main save path user://<steam-id>/run_v3_0.json
+adding player device 1 at place 1
+adding player device 2 at place 2
+adding player device 3 at place 3
+removing player 1
+removing player 1
+removing player 1
+COOPPLUS_CAPACITY_PROBE done kind=capacity mode=vanilla capacity=4 checks=33
+ERROR: Condition "_first != nullptr" is true.
+   at: ~List (./core/self_list.h:108) - Condition "_first != nullptr" is true.
+WARNING: ObjectDB instances leaked at exit (run with --verbose for details).
+   at: cleanup (core/object.cpp:2079) - ObjectDB instances leaked at exit (run with --verbose for details).
+ERROR: Resources still in use at exit (run with --verbose for details).
+   at: clear (core/resource.cpp:418) - Resources still in use at exit (run with --verbose for details).
+ERROR: There are still MemoryPool allocs in use at exit!
+   at: cleanup (core/pool_vector.cpp:63) - Condition "allocs_used > 0" is true.

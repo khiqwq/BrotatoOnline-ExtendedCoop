@@ -1,0 +1,30 @@
+{
+  "schema": 1,
+  "extension_id": "CoopPlus-OnlineExtendedCoop",
+  "extension_version": "0.1.0",
+  "network_capability_version": 1,
+  "save_schema_version": 1,
+  "game_versions": [
+    "1.1.15.4"
+  ],
+  "engine_versions": [
+    "3.7.dev.custom_build.74e86be54"
+  ],
+  "mod_loader_versions": [
+    "6.3.0"
+  ],
+  "upstream": [
+    {
+      "id": "six666-BrotatoOnline",
+      "version": "6.6.6",
+      "normalized_fingerprint": "17443875f52fd7659af33d0f0deb9fb495b0d46110aaeba08d0fc419d439b819",
+      "role": "required"
+    },
+    {
+      "id": "CoopFix-OnlineMouseUI",
+      "version": "1.0.1",
+      "normalized_fingerprint": "811ebfa7aeeb9fb9c86d7aaf224fe314c3af7cec1abd870e7e650561ab1bee54",
+      "role": "optional"
+    }
+  ]
+}
