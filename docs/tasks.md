@@ -20,7 +20,7 @@
 | AP-014 | 制作原风格 UI 样例 | DEV/OWNER | DONE | 布局已定（D-010“本机面板放大”），OWNER 补充 D-011：状态条显示武器，商店/结算可选择玩家展开其面板、平分左侧。8 人截图见 EV-0025、EV-0028（另含战斗 HUD：EV-0020）；OWNER 已确认 D-011 截图（2026-10-28） |
 | AP-015 | 完成全部扩展 UI | DEV | IN_PROGRESS | 升级界面、战斗 HUD、合作商店、合作结算界面支持 P5～P8，并按 D-010 排布（`ui/local_focus_layout.gd`、`ui/player_status_strip.gd`），可切换为 D-012 四人视图（`ui/panel_view_controller.gd`，EV-0030）；5～8 人可连续多波并走完阵亡→结算（EV-0019～0025）。角色/武器/难度选择界面支持 P5～P8（UI-05/07/08、UI-M02/M05、MENU-M03），角色与武器页同样两种显示模式（`ui/selection_view_controller.gd`）；本地模拟可从角色选择一路走进战斗（EV-0031）。角色选择的运行选项里有房间类型（D-008，ADR-005） |
 | AP-016 | 实现隔离检查点 | DEV | IN_PROGRESS | 写入路径完成（[ADR-004](adr/ADR-004-extended-run-checkpoint.md)）：`extensions/vanilla/progress_data_ext.gd` 把 5～8 人局内状态写入 `checkpoint_store`（`coopplus_runs/profile_<档位>/`），原版存档只写无进行中局的占位。修复前打开存档时 5 人进入第一个商店即崩溃（EV-0026），修复后 5/8 人带存档连续多波通过（EV-0027）。继续游戏已实现：读检查点、校验与明确拒绝、反序列化（含第 5 人起商店）、身份存入同一检查点（EV-0034）。待：联机继续实测 |
-| AP-017 | 完成断线/继续/移除 | DEV | IN_PROGRESS | 继续：BO 身份管理器在继续界面运行时调整（超过 4 槽的登记表、面板加高、4 人以上禁用离线继续，`scripts/bo/resume_identity_patch.gd`）。待：断线重连、移除成员后的全量重映射与联机实测 |
+| AP-017 | 完成断线/继续/移除 | DEV | VERIFY | 继续：BO 身份管理器在继续界面运行时调整（超过 4 槽的登记表、面板加高、4 人以上禁用离线继续，`scripts/bo/resume_identity_patch.gd`）。移除：客户端重建名单后补齐逐玩家数组（GAP1-02、SAVE-13、DATA-15，`extensions/bo/player_removal_manager_ext.gd`）；房主端压缩保持数组长度、身份表 compact 支持任意人数，单机重放 8→7、6→5 通过（EV-0037）。断线重连：沿用 BO 保留断线者槽位与身份校验（R11）；与人数有关的部分已处理——准入只对新成员按房间容量限制（`_remote_connection_rejection_reason`）、客户端显示全部断线者（CAP-16）、LAN 留重连余量（CAP-05）、回来的玩家拿回原虚拟设备（F03）。BO 自身与人数无关的行为未改：开局/重试屏障等待断线者（NET-13、GAP2-04）、LAN 新连接与旧连接并存时判 duplicate_identity（CAP-M01）、移除后客户端 tracked_item_effects 不左移（GAP1-03）。待：多机联机实测（M1） |
 | AP-018 | 跑完 18 类故障 | QA | TODO | |
 | AP-019 | 验证内容与 Mod 组合 | QA | TODO | |
 | AP-020 | 分析八人性能 | DEV | TODO | |

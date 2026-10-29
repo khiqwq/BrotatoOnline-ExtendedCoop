@@ -56,6 +56,7 @@ const EXTENSIONS_INIT := [
 	"extensions/bo/lan_transport_ext.gd",
 	"extensions/bo/network_heartbeat_ext.gd",
 	"extensions/bo/menu_sync_manager_ext.gd",
+	"extensions/bo/player_removal_manager_ext.gd",
 ]
 # Parent declares const REMOTE_PLACEHOLDER_PLAYER_TYPE = CoopService.PlayerType...
 # (INP-M02), which cannot compile while ModLoader._init runs.

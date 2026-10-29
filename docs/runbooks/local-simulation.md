@@ -135,6 +135,16 @@ pwsh ./tools/instance.ps1 -Action Start -Name sim -StopAfterSec 240 -ExtraArgs "
 
 每次模拟在第一波结束后 0.4 s 和 1.5 s 各截一张战斗画面（`wave_end_1/2_<N>p.png`），同时记录 `local_sim.hud_layout`：每名玩家 HUD 块与待处理图标容器的屏幕矩形、材料袋的矩形与所在块、材料飞向的屏幕坐标。检查：P5～P8 的块与 P1～P4 不重叠；每人的图标容器与自己的块顶边（上方角落）或底边（下方角落）对齐；5 人以上材料袋在 `LifeContainerP5`，4 人在 `LifeContainerP1`。
 
+### 移除玩家（证据 EV-0037）
+
+`--coopplus-local-sim-remove=<玩家编号>`：第一次进商店约 1 s 后，按 Brotato Online 的顺序重放一次移除——先用 BO 自己的 `_dispose_current_scene` 释放商店，再用它的 `_select_array`、`RUN_ARRAYS`、`SAVE_ARRAYS` 压缩 RunData 与开波快照（房主端），从 CoopService 去掉该玩家，然后做客户端重建名单时的重置并把商店锁定列表写成 4 项（`player_removal_manager.gd:423-432`），最后按新人数补齐（客户端修复）并重建商店。`--coopplus-local-sim-remove-nofix` 不做补齐，用来复现崩溃。事件 `local_sim.removal`（移除前的玩家与商店）与 `local_sim.removal.shop`（重建后的）应满足：其余玩家的角色、材料、商店按原顺序保留。真实联机里 BO 还会广播名单提交、重建身份表，这些不在重放范围内。
+
+| 运行 | 结果 |
+| ---- | ---- |
+| 8 人去掉 P5，不带修复 | 重建商店时引擎崩溃 |
+| 8 人去掉 P5 | 7 人，角色/材料/商店按序保留，再打两波 |
+| 6 人去掉 P2 | 5 人，同上 |
+
 实例窗口：`tools/instance.ps1` 默认加 `--no-window --coopplus-no-fullscreen --resolution 1920x1080`。新档默认全屏，以前启动时游戏会把隐藏窗口切成全屏、盖住桌面；现在扩展遇到 `--coopplus-no-fullscreen` 就跳过这一步（引擎会吞掉 `--no-window`，脚本看不到它），窗口一直隐藏，截图为 1920x1080。需要看窗口时用 `-ShowWindow`。
 
 测试环境注意：实例窗口隐藏时，桌面上任何焦点切换都会让游戏收到“失去焦点”并打开暂停菜单（`input_service.gd:91-96`），波次停止。战斗场景和合作商店（`coop_shop.gd:38`）各自连接这个信号，商店里打开的暂停会带进下一波。探针在两处都断开连接，并在采样中记录 `paused`；看到全体同时静止时先查这个字段。模拟运行期间不要再启动其他游戏实例（新窗口会抢焦点）。

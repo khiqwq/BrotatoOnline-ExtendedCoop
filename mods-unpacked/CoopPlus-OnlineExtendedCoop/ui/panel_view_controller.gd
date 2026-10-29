@@ -73,6 +73,8 @@ var _edge_font: Font = null
 var _notice: Control = null
 var _notice_label: Label = null
 var _notice_left := 0.0
+# player index -> global rect of that player's focused control at the last redraw
+var _frame_rects := {}
 
 
 # panels: every player's panel in player order; holder/strip: the focus-mode
@@ -144,6 +146,7 @@ static func save_mode(mode: String) -> void:
 
 
 func _process(delta: float) -> void:
+	_refresh_focus_frames()
 	if _cooldown > 0.0:
 		_cooldown -= delta
 	if _notice_left > 0.0:
@@ -151,6 +154,30 @@ func _process(delta: float) -> void:
 		_notice.modulate.a = clamp(_notice_left / NOTICE_FADE_SEC, 0.0, 1.0)
 		if _notice_left <= 0.0:
 			_notice.visible = false
+
+
+# FocusEmulator draws the stacked cursor frames of players sharing a control
+# once, at the control's global rect at that moment, and redraws only when
+# focus changes (focus_emulator.gd _draw). Players seated before the screen
+# opens all focus the first cell before the layout settles, and this layout
+# moves controls again (strip, hidden panels, edge columns), so the frames
+# stayed half a cell above the cell (character selection, 8 players). Every
+# emulator whose focused control moved redraws. The same happens with four
+# players in the game itself, which this leaves alone (R08).
+func _refresh_focus_frames() -> void:
+	if not is_instance_valid(_screen):
+		return
+	for i in _count:
+		var emulator = _screen.get_node_or_null("FocusEmulator%d" % (i + 1))
+		if emulator == null:
+			continue
+		var control = emulator.get("focused_control")
+		if control == null or not is_instance_valid(control) or not control is Control:
+			continue
+		var rect: Rect2 = control.get_global_rect()
+		if not _frame_rects.has(i) or _frame_rects[i] != rect:
+			_frame_rects[i] = rect
+			emulator.update()
 
 
 func _input(event: InputEvent) -> void:

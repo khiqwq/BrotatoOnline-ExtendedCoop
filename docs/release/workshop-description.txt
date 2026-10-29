@@ -1,0 +1,62 @@
+标题：
+超四人联机合作扩展 | 5-8 Player Co-op for Brotato Online
+
+说明（粘贴到创意工坊页面“编辑标题和描述”，支持 BBCode）：
+
+[h1]超四人联机合作扩展[/h1]
+让 [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3741034628]Brotato Online[/url] 支持 5～8 人联机合作，每台电脑一人。
+
+[b]测试版 0.1.0：[/b]已在单机模拟中走通 5～8 人的完整流程（选人、战斗、升级、商店、结算、退出后继续），尚未在多台电脑真实联机中验证。遇到问题请到下方源代码页面反馈。
+
+[h2]需要[/h2]
+[list]
+[*]Brotato 1.1.15.4（内置 Mod Loader 6.3.0）
+[*]订阅并启用 Brotato Online 6.6.6
+[*]扩展房间里的每个人都要订阅本扩展
+[/list]
+
+[h2]用法[/h2]
+[list]
+[*]房主在角色选择界面的运行选项里选房间类型：
+[list]
+[*][b]标准房间（4 人，原版兼容）[/b]：没装本扩展的玩家也能加入，一切与原版相同。
+[*][b]扩展房间（5～8 人）[/b]：所有成员都要装本扩展；没装的玩家会看到“版本不兼容”而无法加入。
+[/list]
+[*]商店、升级、结算界面：本机面板放大，旁边是其他玩家的状态条（武器、选购状态）；用手柄选中某个玩家可以展开他的商店、武器和道具。鼠标点击需要同时启用 CoopFix-OnlineMouseUI。
+[*]按 V 或手柄 Back 键切换到原版式的四人视图，用左右方向键、右摇杆或十字键左右滑动查看其他玩家；再按一次切回。
+[*]5～8 人局退出游戏后，可以从标题界面“继续”。
+[/list]
+
+[h2]兼容性[/h2]
+[list]
+[*]不修改 Brotato Online 的任何文件。
+[*]只认 Brotato Online 6.6.6（锁定文件指纹）。Brotato Online 或游戏更新后，本扩展会自动关闭超四人功能，Brotato Online 照常以 4 人运行，等本扩展更新后再恢复。
+[*]已验证组合：Brotato 1.1.15.4 + Abyssal Terrors DLC，Mod Loader 6.3.0，Brotato Online 6.6.6，可选 CoopFix-OnlineMouseUI 1.0.1。
+[*]每台电脑一名玩家；本地（同屏）合作仍最多 4 人。
+[/list]
+
+[h2]已知限制[/h2]
+[list]
+[*]尚未在多台电脑联机中测试。
+[*]房主移除玩家后，其余玩家按原顺序重新分配（单机模拟验证）；断线后可回到原来的位置（沿用 Brotato Online 的流程）。两者都还没有在多台电脑上实测。
+[*]5～8 人局不能用“离线继续”。
+[/list]
+
+[h2]源代码与许可证[/h2]
+GPL-3.0。源代码与问题反馈：[url=https://github.com/khiqwq/BrotatoOnline-ExtendedCoop]github.com/khiqwq/BrotatoOnline-ExtendedCoop[/url]
+
+[hr][/hr]
+
+[h1]5-8 Player Co-op for Brotato Online[/h1]
+Extends [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3741034628]Brotato Online[/url] co-op to 5-8 players, one player per PC.
+
+[b]Test release 0.1.0:[/b] the full 5-8 player flow (character selection, waves, upgrades, shop, end of run, continue after quitting) works in local simulation; it has not yet been tested online across several PCs.
+
+[list]
+[*]Requires Brotato 1.1.15.4 (Mod Loader 6.3.0) and Brotato Online 6.6.6. Everyone in an extended room needs this mod.
+[*]Pick the room type in the run options on character selection: Standard (4, vanilla-compatible) or Extended (5-8).
+[*]Shop / upgrades / end of run: your panel is large, the others are shown as status rows; select a player to open their panel. Press V or gamepad Back for the vanilla-style four-panel view and slide with the arrow keys, right stick or D-pad.
+[*]Brotato Online files are not modified. If Brotato Online or the game updates, the mod switches its 5-8 player features off and Brotato Online runs unchanged until this mod is updated.
+[*]Removing a player re-seats the others in order (verified in local simulation); a disconnected player can return to their seat (Brotato Online's own flow). Neither has been tested across several PCs yet.
+[/list]
+GPL-3.0. Source and issues: [url=https://github.com/khiqwq/BrotatoOnline-ExtendedCoop]github.com/khiqwq/BrotatoOnline-ExtendedCoop[/url]

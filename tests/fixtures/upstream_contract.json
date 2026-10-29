@@ -227,6 +227,18 @@
         "_on_lan_lobby_found": 1
       },
       "constants": {}
+    },
+    "res://mods-unpacked/six666-BrotatoOnline/scripts/player_removal_manager.gd": {
+      "methods": {
+        "_apply_client_roster": 2
+      },
+      "constants": {}
+    },
+    "res://main.gd": {
+      "methods": {
+        "_ready": 0
+      },
+      "constants": {}
     }
   }
 }

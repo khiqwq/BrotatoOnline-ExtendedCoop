@@ -106,10 +106,28 @@ func _coopplus_add_room_button() -> void:
 	for i in COOPPLUS_ROOM_CHOICES.size():
 		if COOPPLUS_ROOM_CHOICES[i][0] == pref.type and COOPPLUS_ROOM_CHOICES[i][1] == pref.capacity:
 			button.select(i)
+	if _zone_selection_button != null:
+		# Same look as the zone dropdown above it (its font and styles are scene overrides).
+		_coopplus_copy_overrides(_zone_selection_button, button)
+		_coopplus_copy_overrides(_zone_selection_button.get_popup(), button.get_popup())
+		button.rect_min_size = _zone_selection_button.rect_min_size
+		button.size_flags_horizontal = _zone_selection_button.size_flags_horizontal
 	var _e = button.connect("item_selected", self, "_coopplus_on_room_selected")
 	_run_options_panel_content.add_child(button)
 	_coopplus_room_button = button
 	_coopplus_room_button.disabled = RuntimeGate.room_capacity() > 0
+
+
+static func _coopplus_copy_overrides(source: Control, target: Control) -> void:
+	if source.theme != null:
+		target.theme = source.theme
+	for prop in source.get_property_list():
+		var key: String = prop.name
+		if key.begins_with("custom_fonts/") or key.begins_with("custom_styles/") \
+				or key.begins_with("custom_colors/") or key.begins_with("custom_constants/"):
+			var value = source.get(key)
+			if value != null:
+				target.set(key, value)
 
 
 func _coopplus_on_room_selected(index: int) -> void:

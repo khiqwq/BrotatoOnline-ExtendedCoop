@@ -69,6 +69,12 @@ const SCREENSHOT_AT_SEC := 10.0
 # After the first wave ends: battle screenshots and HUD rectangles while the
 # pending-upgrade icons show and leftover materials fly to the bag.
 const WAVE_END_SHOTS := [0.4, 1.5]
+# --coopplus-local-sim-remove=<player number>: at the first shop, replay a
+# Brotato Online player removal on the run data (host compaction and the
+# client's roster rebuild, player_removal_manager.gd:273-283, 423-432) and
+# rebuild the shop with one player fewer; -nofix leaves out the client fix
+# (extensions/bo/player_removal_manager_ext.gd) to show the failure.
+const REMOVAL_MANAGER_PATH := "/root/ModLoader/six666-BrotatoOnline/BrotatoOnlinePlayerRemovalManager"
 # First wave only: hold the accepts until the co-op upgrade screen has been
 # shown this long and captured, or give up after UPGRADES_SHOT_WAIT_SEC.
 const UPGRADES_SHOT_AFTER_SEC := 0.8
@@ -146,6 +152,11 @@ var _menu_shot := false
 var _menus_time := 0.0
 var _wave_end_at := -1.0
 var _wave_end_shots_done := 0
+var _remove_player := 0
+var _remove_fix := true
+var _removal_done := false
+var _removal_scene_id := 0
+var _removal_logged := false
 
 
 func _ready() -> void:
@@ -161,6 +172,8 @@ func _ready() -> void:
 			_on_loss = arg.substr("--coopplus-local-sim-on-loss=".length())
 		elif arg.begins_with("--coopplus-local-sim-waves="):
 			_waves_wanted = int(clamp(int(arg.substr("--coopplus-local-sim-waves=".length())), 1, 20))
+		elif arg.begins_with("--coopplus-local-sim-remove="):
+			_remove_player = int(arg.substr("--coopplus-local-sim-remove=".length()))
 		elif arg.begins_with("--coopplus-local-sim-seed="):
 			seed_value = int(arg.substr("--coopplus-local-sim-seed=".length()))
 	_quit_after = "--coopplus-probe-quit" in OS.get_cmdline_args()
@@ -169,6 +182,7 @@ func _ready() -> void:
 	_save = "--coopplus-local-sim-save" in OS.get_cmdline_args()
 	_menus = "--coopplus-local-sim-menus" in OS.get_cmdline_args()
 	_continue = "--coopplus-local-sim-continue" in OS.get_cmdline_args()
+	_remove_fix = not "--coopplus-local-sim-remove-nofix" in OS.get_cmdline_args()
 	_players_wanted = int(clamp(_players_wanted, 1, 8))
 	_rng.seed = seed_value
 	ProbeLog.event("local_sim._ready", {"players": _players_wanted, "wave_seconds": _wave_seconds, "seed": seed_value, "save": _save})
@@ -291,6 +305,17 @@ func _process(delta: float) -> void:
 		"in_shop":
 			_guard_focus_pause(scene)
 			_shop_left -= delta
+			if _remove_player > 0 and _waves_done == 1:
+				if not _removal_done and _shop_left <= SHOP_WAIT_SEC - 1.0:
+					_removal_done = true
+					_simulate_removal(scene)
+					_shop_left = SHOP_WAIT_SEC + 2.0
+					return
+				if _removal_done and not _removal_logged and scene != null \
+						and scene.get_instance_id() != _removal_scene_id and scene_file.get_file() == SHOP_SCENE_FILE:
+					_removal_logged = true
+					ProbeLog.event("local_sim.removal.shop", {"players": _player_data(), "shop": _shop_snapshot(scene),
+							"locked_size": RunData.locked_shop_items.size(), "count": RunData.get_player_count()})
 			if not _shop_pressed and _shop_left <= 0.0:
 				if _waves_done == 1 and _run_view_check(scene, "shop", delta):
 					return
@@ -714,6 +739,59 @@ func _save_screenshot(file_name: String) -> void:
 	var _mk = dir.make_dir_recursive(REPORT_DIR)
 	var err := image.save_png(REPORT_DIR.plus_file(file_name))
 	ProbeLog.event("local_sim.screenshot", {"file": file_name, "error": err, "size": [image.get_width(), image.get_height()]})
+
+
+func _simulate_removal(scene) -> void:
+	var manager = get_node_or_null(REMOVAL_MANAGER_PATH)
+	var count: int = RunData.get_player_count()
+	var removed: int = _remove_player - 1
+	if manager == null or scene == null or removed < 1 or removed >= count or not scene.has_method("get_player_shop_items"):
+		ProbeLog.event("local_sim.removal.skipped", {"removed": _remove_player, "count": count, "manager": manager != null})
+		return
+	var kept := []
+	for i in count:
+		if i != removed:
+			kept.append(i)
+	var before := {"players": _player_data(), "shop": _shop_snapshot(scene)}
+	var shop_save: Dictionary = ProgressData.get_run_state(scene.get("_shop_items"), scene.get("_reroll_count"),
+			scene.get("_paid_reroll_count"), scene.get("_initial_free_rerolls"), scene.get("_free_rerolls"), scene.get("_item_steals"))
+	var run_arrays: Array = manager.get("RUN_ARRAYS")
+	var save_arrays: Array = manager.get("SAVE_ARRAYS")
+	var path: String = scene.filename
+	_removal_scene_id = scene.get_instance_id()
+	# Brotato Online frees the old scene before compacting (:271), with its
+	# exit hook disconnected; the same call here.
+	manager._dispose_current_scene()
+	# Host compaction (player_removal_manager.gd:273-283).
+	RunData.players_data = manager._select_array(RunData.players_data, kept)
+	for property in run_arrays:
+		var value = RunData.get(property)
+		if typeof(value) == TYPE_ARRAY:
+			RunData.set(property, manager._select_array(value, kept, true))
+	for key in save_arrays:
+		var wave_value = RunData.start_wave_state.get(key, null)
+		if typeof(wave_value) == TYPE_ARRAY:
+			RunData.start_wave_state[key] = manager._select_array(wave_value, kept, key != "players_data")
+		# The host then gives the rebuilt shop the kept players' shop states
+		# (:322-332); compacting the saved shop arrays gives the same shops.
+		var save_value = shop_save.get(key, null)
+		if typeof(save_value) == TYPE_ARRAY:
+			shop_save[key] = manager._select_array(save_value, kept, key != "players_data")
+	var device: int = CoopService.connected_players[removed][0]
+	CoopService._remove_player(device)
+	# Client roster rebuild (:423 caches, :432 shop locks), then the fix.
+	RunData.reset_run_caches()
+	TempStats.reset()
+	LinkedStats.reset()
+	RunData.locked_shop_items = [[], [], [], []]
+	if _remove_fix:
+		RunData.call("coopplus_fit_per_player_arrays")
+	ProgressData.saved_run_state = shop_save
+	RunData.resumed_from_state_in_shop = true
+	ProbeLog.event("local_sim.removal", {"removed": _remove_player, "kept": kept, "fix": _remove_fix, "before": before,
+			"manager_script": str(manager.get_script().resource_path),
+			"locked_size": RunData.locked_shop_items.size(), "count": RunData.get_player_count()})
+	var _e = get_tree().change_scene_to(load(path))
 
 
 func _hud_layout(scene) -> Dictionary:

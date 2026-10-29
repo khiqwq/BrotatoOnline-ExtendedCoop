@@ -4,6 +4,8 @@
 
 当前状态：M0/M1 之间。容量与虚拟输入原型（AP-006）已在单个隔离实例中验证：容量 8、1 本地 + 7 名模拟远程玩家各自独立输入、第 9 人被拒、移除后恢复。单机本地模拟（模拟控制器）中，5～8 人可以连续多波完成战斗、升级、商店与结算：战斗 HUD、升级、商店、结算界面支持 P5～P8，5～8 人时每台电脑只放大显示本机玩家的面板、其余玩家收进状态条（显示武器；在商店和结算界面可用手柄或鼠标选择某人，展开其面板与本机面板平分左侧，鼠标需 CoopFix-OnlineMouseUI 1.0.1，现可与超四人共存），也可按 V / 手柄 Back 键切换为原版式的四人视图并左右逐个切换玩家；打开存档时 5～8 人局写入独立检查点，不写坏原版存档。角色、武器、难度选择界面也支持 5～8 人（本地模拟可从选人一路进入战斗）。房主可选标准房间（4 人，原版兼容）或扩展房间（5～8 人），5～8 人局退出后可以继续。尚未用真实客户端联机测试，**还不能安装给玩家使用**。执行计划见 [docs/plan/ACTION_PLAN.md](docs/plan/ACTION_PLAN.md)，任务状态见 [docs/tasks.md](docs/tasks.md)。
 
+创意工坊（测试版，目前仅好友可见）：https://steamcommunity.com/sharedfiles/filedetails/?id=3829355835 。发布步骤见 [workshop-release.md](docs/runbooks/workshop-release.md)。
+
 ## 目录
 
 | 路径 | 内容 |
@@ -13,7 +15,7 @@
 | `tests/unit/` | 纯规则测试，只需引擎即可运行 |
 | `tests/integration/` | 依赖还原游戏工程与上游 Mod 的契约测试 |
 | `tests/scenarios/` | 实机用例 Txx 与证据模板 |
-| `tools/` | setup / check / test 入口；`tools/recovery/` 为本机审计用的脚本还原工具 |
+| `tools/` | setup / check / test 入口；`tools/recovery/` 为本机审计用的脚本还原工具；`tools/workshop_upload.py` 上传创意工坊 |
 | `docs/` | 需求、兼容记录、限制审计、ADR、runbook |
 | `evidence/` | 证据索引（原始日志/录像放 `evidence/raw/`，不入库） |
 | `.local/` | 本机忽略目录：引擎副本、还原的游戏脚本、隔离用户数据、报告 |
