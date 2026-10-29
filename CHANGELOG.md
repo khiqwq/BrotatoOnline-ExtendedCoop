@@ -4,6 +4,9 @@
 
 ## [Unreleased]
 
+### Fixed
+- 5～8 人战斗 HUD：P5～P8 的升级土豆（待处理升级/箱子图标）原来按屏幕高度分行摆放，离自己的 HUD 块有距离（屏幕比例不是 16:9 时更远）；现在与 P1～P4 一样贴着自己的块（上方角落对齐顶边，下方角落对齐底边）。每波结束收集剩余材料的袋子和飞向它的材料原来压在 P5 的血条、经验条上，现在移到 P5 块下方（左上 HUD 的最下面，与原版位置关系相同）。P5 块与 P1 块原来重叠 12 像素，现在按 P1～P4 块的实际高度留 16 像素间距。1～4 人不变（EV-0035）。`ui/extra_player_hud.gd`、`ui/extra_hud_layer.gd`、`extensions/vanilla/main_ext.gd`。
+
 ### Changed
 - 运行时门控：CoopFix-OnlineMouseUI 1.0.1 由“超四人阻止”改为可选共存（R07、D-011）。文件指纹与锁定一致时超四人照常，其他版本仍阻止超四人开局；compatibility.json 新增角色 `optional`。
 

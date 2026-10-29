@@ -2,8 +2,8 @@
   "name": "OnlineExtendedCoop",
   "namespace": "CoopPlus",
   "version_number": "0.1.0",
-  "description": "超四人联机合作扩展：让 Brotato Online 支持 5～8 人（每台电脑一人）。开发版，超四人功能尚未在游戏内验证。",
-  "website_url": "",
+  "description": "超四人联机合作扩展：让 Brotato Online 支持 5～8 人（每台电脑一人）。测试版：已在单机模拟中验证，尚未在多台电脑联机中验证。",
+  "website_url": "https://github.com/khiqwq/BrotatoOnline-ExtendedCoop",
   "dependencies": [
     "six666-BrotatoOnline"
   ],
@@ -25,7 +25,7 @@
         "6.3.0"
       ],
       "config_schema": {},
-      "description_rich": "超四人联机合作扩展（CoopPlus-OnlineExtendedCoop）\n需要同时启用工坊版 Brotato Online（six666-BrotatoOnline 6.6.6）。不修改 Brotato Online 文件。许可证：GPL-3.0。\n\nExtends Brotato Online co-op beyond four players (one player per PC). Requires six666-BrotatoOnline 6.6.6. License: GPL-3.0."
+      "description_rich": "超四人联机合作扩展（CoopPlus-OnlineExtendedCoop）\n需要同时启用工坊版 Brotato Online（six666-BrotatoOnline 6.6.6）。不修改 Brotato Online 文件。许可证：GPL-3.0，源代码：https://github.com/khiqwq/BrotatoOnline-ExtendedCoop\n\nExtends Brotato Online co-op beyond four players (one player per PC). Requires six666-BrotatoOnline 6.6.6. License: GPL-3.0."
     }
   }
 }

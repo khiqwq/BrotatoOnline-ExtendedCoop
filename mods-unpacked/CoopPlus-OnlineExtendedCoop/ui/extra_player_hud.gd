@@ -8,18 +8,25 @@ extends Reference
 # every player, so the release engine crashed on P5 (EV-0017). build() clones
 # the P1..P4 nodes for P5..P8 (P5 from P1, P6 from P2, ...) and registers the
 # clones as unique names of the battle scene, so vanilla finds them unchanged.
-# Placement (functional; the final 5..8 layout follows the OWNER-confirmed
-# sample, AP-014): P5..P8 HUD blocks sit in a second margin layer just inside
-# the P1..P4 corners, and their pending-icon rows sit between the vanilla rows.
-# Called from main_ext.gd _enter_tree, before any _ready of the scene runs.
+# Placement: P5..P8 HUD blocks sit in a second margin layer just inside the
+# P1..P4 corners (ui/extra_hud_layer.gd). Their pending-icon containers sit in
+# a copy of the vanilla icon layer inside that same layer, so each lines up
+# with its own block the way P1..P4's do (top edge for the top corners,
+# bottom edge for the bottom ones); they used to be extra rows of the vanilla
+# icon layer, spread over the screen height and away from their blocks. The
+# team bag of leftover materials leaves P1's block for P5's
+# (attach_team_widgets), since P5's block covers the place below P1's.
+# build() is called from main_ext.gd _enter_tree, before any _ready of the
+# scene runs.
 
 const VANILLA_SLOTS := 4
 const HUD_PATH := "UI/HUD"
 const WORLD_UI_PATH := "WorldUI"
-const THINGS_VBOX_PATH := "UI/HUD/ThingsToProcessMarginContainer/VBoxContainer"
+const THINGS_LAYER_PATH := "UI/HUD/ThingsToProcessMarginContainer"
+const THINGS_PREFIX := "UIThingsToProcessPlayerContainer"
 const EXTRA_HUD_NAME := "CoopPlusHUDP5ToP8"
-const MIN_BLOCK_HEIGHT := 140.0
-const BLOCK_GAP := 16.0
+const EXTRA_THINGS_NAME := "CoopPlusThingsToProcessP5ToP8"
+const ExtraHudLayer = preload("res://mods-unpacked/CoopPlus-OnlineExtendedCoop/ui/extra_hud_layer.gd")
 # Per-player children of a HUD block. P1's block also holds the team-wide
 # UIBonusGold and FPSLabel, which must not be cloned.
 const BLOCK_CHILD_PREFIXES := ["UILifeBarP", "UIXPBarP", "UIGoldP", "UIHitProtection"]
@@ -33,34 +40,46 @@ static func build(main: Node, player_count: int) -> Dictionary:
 		return result
 	var hud = main.get_node_or_null(HUD_PATH)
 	var world_ui = main.get_node_or_null(WORLD_UI_PATH)
-	var things_vbox = main.get_node_or_null(THINGS_VBOX_PATH)
-	if hud == null or world_ui == null or things_vbox == null or things_vbox.get_child_count() < 2:
+	var things_layer = main.get_node_or_null(THINGS_LAYER_PATH)
+	if hud == null or world_ui == null or things_layer == null:
 		result.reason = "battle_scene_layout_changed"
 		return result
 	for t in range(1, VANILLA_SLOTS + 1):
-		for path in ["%%PlayerLifeBarContainerP%d" % t, "%%LifeContainerP%d" % t, "%%UIThingsToProcessPlayerContainer%d" % t]:
+		for path in ["%%PlayerLifeBarContainerP%d" % t, "%%LifeContainerP%d" % t, "%%%s%d" % [THINGS_PREFIX, t]]:
 			if main.get_node_or_null(path) == null:
 				result.reason = "missing_template:" + path
 				return result
 
-	var extra_hud := MarginContainer.new()
+	# Copy of the icon layer, taken before anything is added to the scene: its
+	# P1..P4 containers become P5..P8 (P5 from P1, ...), unused ones go.
+	var extra_things = things_layer.duplicate()
+	extra_things.name = EXTRA_THINGS_NAME
+	for t in range(1, VANILLA_SLOTS + 1):
+		var container = _find_named(extra_things, "%s%d" % [THINGS_PREFIX, t])
+		if container == null:
+			extra_things.free()
+			result.reason = "missing_template:%s%d" % [THINGS_PREFIX, t]
+			return result
+		if t + VANILLA_SLOTS <= player_count:
+			container.name = "%s%d" % [THINGS_PREFIX, t + VANILLA_SLOTS]
+			container.hide()
+			result.things.append(container)
+		else:
+			container.get_parent().remove_child(container)
+			container.free()
+	_drop_unique_names(extra_things)
+
+	var extra_hud = ExtraHudLayer.new()
 	extra_hud.name = EXTRA_HUD_NAME
 	extra_hud.anchor_right = 1.0
 	extra_hud.anchor_bottom = 1.0
 	extra_hud.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	var offset := _block_height(main.get_node("%LifeContainerP1")) + BLOCK_GAP
-	for side in ["left", "right", "top", "bottom"]:
-		var base := int(hud.get("custom_constants/margin_" + side))
-		var extra := int(offset) if side == "top" or side == "bottom" else 0
-		extra_hud.add_constant_override("margin_" + side, base + extra)
 	var ui_layer = hud.get_parent()
 	ui_layer.add_child(extra_hud)
 	ui_layer.move_child(extra_hud, hud.get_index() + 1)
 	extra_hud.owner = main
-
-	# Pending-icon rows: P5/P6 under the P1/P2 row, P7/P8 above the P3/P4 row.
-	var row_top = things_vbox.get_child(0)
-	var rows := {}
+	extra_hud.add_child(extra_things)
+	_adopt(extra_things, main)
 
 	for player_index in range(VANILLA_SLOTS, player_count):
 		var n := player_index + 1
@@ -77,26 +96,32 @@ static func build(main: Node, player_count: int) -> Dictionary:
 		extra_hud.add_child(block)
 		_adopt(block, main)
 
-		var row_key := 0 if t <= 2 else 1
-		if not rows.has(row_key):
-			var row := HBoxContainer.new()
-			row.name = "CoopPlusThingsRow%d" % (row_key + 1)
-			row.mouse_filter = Control.MOUSE_FILTER_IGNORE
-			row.size_flags_vertical = row_top.size_flags_vertical
-			things_vbox.add_child(row)
-			# Order: vanilla top row, P5/P6, P7/P8, vanilla bottom row.
-			things_vbox.move_child(row, 1 + row_key)
-			row.owner = main
-			rows[row_key] = row
-		var things = main.get_node("%%UIThingsToProcessPlayerContainer%d" % t).duplicate()
-		things.name = "UIThingsToProcessPlayerContainer%d" % n
-		rows[row_key].add_child(things)
-		_adopt(things, main)
-		things.hide()
-		result.things.append(things)
-
+	extra_hud.setup(hud,
+			[main.get_node("%LifeContainerP1"), main.get_node("%LifeContainerP2")],
+			[main.get_node("%LifeContainerP3"), main.get_node("%LifeContainerP4")])
 	result.ok = true
 	return result
+
+
+# The team-wide children of P1's block, the bag of leftover materials
+# (UIBonusGold: wave-end materials fly to it, main.gd get_gold_bag_pos) and
+# the FPS label, sit below P1's own rows, where P5's block now starts: the
+# bag and the flying materials were drawn inside P5's bars. They move to the
+# end of P5's block, still the bottom of the top-left HUD stack as in
+# vanilla. Called after Main._ready: its onready references to them follow
+# the nodes.
+static func attach_team_widgets(main: Node) -> bool:
+	var source = main.get_node_or_null("%LifeContainerP1")
+	var target = main.get_node_or_null("%%LifeContainerP%d" % (VANILLA_SLOTS + 1))
+	if source == null or target == null:
+		return false
+	for child in source.get_children():
+		if _is_block_child(child):
+			continue
+		source.remove_child(child)
+		target.add_child(child)
+		_adopt(child, main)
+	return true
 
 
 # Vanilla set_hud_position only knows corners 0..3; P5..P8 reuse P1..P4's.
@@ -106,21 +131,40 @@ static func place_player_huds(players_ui: Array) -> void:
 			players_ui[i].set_hud_position((i - VANILLA_SLOTS) % VANILLA_SLOTS)
 
 
-static func _block_height(block: Control) -> float:
-	if block == null:
-		return MIN_BLOCK_HEIGHT
-	return max(MIN_BLOCK_HEIGHT, block.get_combined_minimum_size().y)
-
-
 static func _strip_shared_children(block: Node) -> void:
 	for child in block.get_children():
-		var keep := false
-		for prefix in BLOCK_CHILD_PREFIXES:
-			if child.name.begins_with(prefix):
-				keep = true
-		if not keep:
+		if not _is_block_child(child):
 			block.remove_child(child)
 			child.free()
+
+
+static func _is_block_child(child: Node) -> bool:
+	for prefix in BLOCK_CHILD_PREFIXES:
+		if child.name.begins_with(prefix):
+			return true
+	return false
+
+
+# find_node only searches owned nodes, and a fresh duplicate has no owner.
+static func _find_named(node: Node, wanted: String) -> Node:
+	for child in node.get_children():
+		if child.name == wanted:
+			return child
+		var found := _find_named(child, wanted)
+		if found != null:
+			return found
+	return null
+
+
+# The copied layer keeps the unique-name flags of its template nodes
+# (ThingsToProcessMarginContainer itself, ...); only the renamed P5..P8
+# containers are looked up by unique name.
+static func _drop_unique_names(node: Node) -> void:
+	if node.unique_name_in_owner and not node.name.begins_with(THINGS_PREFIX):
+		node.unique_name_in_owner = false
+	for child in node.get_children():
+		if child.owner == null:
+			_drop_unique_names(child)
 
 
 # Scene-level nodes of a duplicate have no owner yet (the nodes inside

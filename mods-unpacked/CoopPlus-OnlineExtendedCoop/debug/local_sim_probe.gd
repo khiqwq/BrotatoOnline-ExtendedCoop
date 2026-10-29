@@ -66,6 +66,9 @@ const SHOP_SCENE_FILE := "coop_shop.tscn"
 const SHOP_WAIT_SEC := 3.0
 const SHOP_TIMEOUT_SEC := 20.0
 const SCREENSHOT_AT_SEC := 10.0
+# After the first wave ends: battle screenshots and HUD rectangles while the
+# pending-upgrade icons show and leftover materials fly to the bag.
+const WAVE_END_SHOTS := [0.4, 1.5]
 # First wave only: hold the accepts until the co-op upgrade screen has been
 # shown this long and captured, or give up after UPGRADES_SHOT_WAIT_SEC.
 const UPGRADES_SHOT_AFTER_SEC := 0.8
@@ -141,6 +144,8 @@ var _menu_scene := ""
 var _menu_scene_time := 0.0
 var _menu_shot := false
 var _menus_time := 0.0
+var _wave_end_at := -1.0
+var _wave_end_shots_done := 0
 
 
 func _ready() -> void:
@@ -209,6 +214,8 @@ func _process(delta: float) -> void:
 				_menu_entered_at = _elapsed
 				_release_all()
 				ProbeLog.event("local_sim.wave_over", {"t": stepify(_elapsed, 0.01)})
+				if _waves_done == 0:
+					_wave_end_at = _elapsed
 				_write_report("wave_over")
 			if not _loss_handled and _retry_dialog_visible(scene):
 				_answer_retry_dialog(scene)
@@ -235,6 +242,10 @@ func _process(delta: float) -> void:
 			if not _screenshot_done and _elapsed > SCREENSHOT_AT_SEC:
 				_screenshot_done = true
 				_save_screenshot("battle_%dp.png" % _players_wanted)
+			if _wave_end_at >= 0.0 and _wave_end_shots_done < WAVE_END_SHOTS.size() 					and _elapsed - _wave_end_at >= WAVE_END_SHOTS[_wave_end_shots_done]:
+				_wave_end_shots_done += 1
+				_save_screenshot("wave_end_%d_%dp.png" % [_wave_end_shots_done, _players_wanted])
+				ProbeLog.event("local_sim.hud_layout", _hud_layout(scene))
 			if _wave_elapsed > _wave_seconds + EXTRA_TIMEOUT_SEC:
 				_finish("timeout_wave_%d" % (_waves_done + 1))
 		"in_resume":
@@ -703,6 +714,35 @@ func _save_screenshot(file_name: String) -> void:
 	var _mk = dir.make_dir_recursive(REPORT_DIR)
 	var err := image.save_png(REPORT_DIR.plus_file(file_name))
 	ProbeLog.event("local_sim.screenshot", {"file": file_name, "error": err, "size": [image.get_width(), image.get_height()]})
+
+
+func _hud_layout(scene) -> Dictionary:
+	var out := {"players": []}
+	if scene == null:
+		return out
+	for i in RunData.get_player_count():
+		var n: int = i + 1
+		var entry := {"player": n}
+		var block = scene.get_node_or_null("%%LifeContainerP%d" % n)
+		if block is Control:
+			entry["block"] = _rect_info(block)
+		var things = scene.get_node_or_null("%%UIThingsToProcessPlayerContainer%d" % n)
+		if things is Control:
+			entry["things"] = _rect_info(things)
+		out.players.append(entry)
+	var bonus = scene.get("_ui_bonus_gold")
+	if bonus is Control and is_instance_valid(bonus):
+		out["bonus_gold_parent"] = str(bonus.get_parent().name)
+		out["bonus_gold"] = _rect_info(bonus)
+	if "_gold_bag" in scene and is_instance_valid(scene._gold_bag):
+		var bag: Vector2 = scene.get_viewport().get_canvas_transform().xform(scene._gold_bag.global_position)
+		out["gold_bag_screen"] = [int(bag.x), int(bag.y)]
+	return out
+
+
+func _rect_info(control: Control) -> Dictionary:
+	var r := control.get_global_rect()
+	return {"visible": control.is_visible_in_tree(), "x": int(r.position.x), "y": int(r.position.y), "w": int(r.size.x), "h": int(r.size.y)}
 
 
 # Durable breadcrumb (probe_log appends and closes per event): survives a hard crash.

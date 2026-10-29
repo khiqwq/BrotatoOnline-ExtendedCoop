@@ -35,7 +35,8 @@ extends "res://main.gd"
 #     life bars, HUD blocks and pending-icon containers in _enter_tree; the
 #     pending containers join _things_to_process_player_containers right
 #     before players_spawned uses them, and the P5..P8 blocks are placed in
-#     the P1..P4 corners afterwards (layout pending the AP-014 sample)
+#     the P1..P4 corners afterwards; in _ready the team bag of leftover
+#     materials moves from P1's block to P5's
 # Left for later: camera
 # targets (BAT-M08), log_run_info defaults (BAT-10) and the RunData
 # per-player arrays other than _players_die_args (DATA-01/02, BAT-M04).
@@ -84,6 +85,15 @@ func _enter_tree() -> void:
 		if not bool(built.ok):
 			ModLoaderLog.error("main: no P5+ battle HUD (%s)" % built.reason, COOPPLUS_MOD_ID)
 		_coopplus_extra_things = built.things
+
+
+# Runs after every parent _ready (ADR-001 rule 1: not called here). Main's
+# onready references to the team bag and FPS label (main.gd:90-91, 106) are
+# set by now and follow the nodes when they move to P5's block.
+func _ready() -> void:
+	if RuntimeGate.is_extended() and not _coopplus_extra_things.empty():
+		if not ExtraPlayerHud.attach_team_widgets(self):
+			ModLoaderLog.warning("main: team bag stays in P1's HUD block (no P5 block)", COOPPLUS_MOD_ID)
 
 
 # Parent: main_safe_pool_exit.gd:162, which ends in vanilla main.gd:1361. Vanilla
