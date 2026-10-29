@@ -9,6 +9,7 @@
 
 ### Added
 - 5～8 人时商店、升级、结算界面采用“本机面板放大”布局（D-010）：本机玩家的面板加宽，其余玩家收进状态条（玩家色、角色、P 编号与状态）；隐藏玩家的道具/属性弹窗不再显示。1～4 人或本机多名本地玩家时保持原版整行。`ui/local_focus_layout.gd`、`ui/player_status_strip.gd`。
+- 角色、武器、难度选择界面支持 P5～P8：补齐逐玩家数组、面板、武器栏与 FocusEmulator（此前第 5 人在角色选择界面没有光标、无法选择，流程卡住）；角色与武器页同样提供“本机放大 / 四人视图”两种显示（D-012）。CoopFix 的武器选择钩子按武器数读数组的问题（UI-M05）一并解决。`extensions/vanilla/{character,weapon,difficulty}_selection_ext.gd`、`ui/selection_view_controller.gd`。
 - 5～8 人面板界面新增“四人视图”（D-012）：和原版一样显示四个面板，右摇杆、←/→ 或十字键左右逐个切换玩家（←/→ 与十字键只在光标到边时切换），两端标出未显示的玩家；V 键 / 手柄 Back 键在“本机放大”和“四人视图”间切换，每台电脑记住选择，默认本机放大。`ui/panel_view_controller.gd`。
 - 状态条显示每名玩家的武器（原版品质底色）；商店与结算界面可用手柄/键盘或鼠标（需 CoopFix-OnlineMouseUI）选择一名玩家，展开其原版面板查看商店、武器与道具，与本机面板平分左侧，再次选择收起（D-011）。
 - 5～8 人局内存档隔离（AP-016 写入部分）：5 人以上的局内状态写入独立检查点 `coopplus_runs/profile_<档位>/`，原版存档只写“无进行中局”的占位，不再写坏原版存档。暂不支持退出后继续这类局。`extensions/vanilla/progress_data_ext.gd`、`scripts/persistence/extended_run_state.gd`。

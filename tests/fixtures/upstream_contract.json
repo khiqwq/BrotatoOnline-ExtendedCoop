@@ -179,6 +179,27 @@
         "_get_current_run_state": 0
       },
       "constants": {}
+    },
+    "res://ui/menus/run/character_selection.gd": {
+      "methods": {
+        "_get_locked_panels": 0,
+        "_setup_zone": 1,
+        "_on_ZoneSelectionButton_item_selected": 1
+      },
+      "constants": {}
+    },
+    "res://ui/menus/run/difficulty_selection/difficulty_selection.gd": {
+      "methods": {
+        "_ready": 0
+      },
+      "constants": {}
+    },
+    "res://ui/menus/run/base_selection.gd": {
+      "methods": {
+        "_get_panels": 0,
+        "_get_inventory_containers": 0
+      },
+      "constants": {}
     }
   }
 }

@@ -107,7 +107,10 @@ switch ($Action) {
         $psi.Environment['APPDATA'] = (Resolve-Path $userData).Path
         $psi.Environment.Remove('XDG_CONFIG_HOME') | Out-Null
         $argv = @('--main-pack', (Join-Path $cfg.game_path 'Brotato.pck'))
-        if (-not $ShowWindow) { $argv += '--no-window' }
+        # --coopplus-no-fullscreen: the extension then skips the game's fullscreen switch
+        # at boot, which would show the hidden window over the desktop.
+        # --resolution: screenshots at the game's 1920x1080 logical size.
+        if (-not $ShowWindow) { $argv += '--no-window'; $argv += '--coopplus-no-fullscreen'; $argv += '--resolution'; $argv += '1920x1080' }
         foreach ($a in $argv + $ExtraArgs) { $psi.ArgumentList.Add($a) }
         $p = [System.Diagnostics.Process]::Start($psi)
         Set-Content $pidFile $p.Id

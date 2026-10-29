@@ -88,6 +88,65 @@ static func clone(screen: Node, size: int, row_path: String, panel_prefix: Strin
 	return result
 
 
+# The selection screens (character, weapon) have no stat popups and several
+# per-player nodes per parent. specs: [[parent_path, prefix], ...]; clones
+# "<prefix>4" under each parent for players 5..size, placing each clone right
+# after the previous player's node of the same parent, and (with_emulators)
+# FocusEmulator4 with its focus data rebased from every template name to the
+# clone's ("Inventory4" -> "Inventory5"; paths to shared nodes stay). Returns
+# {"ok", "reason", "nodes": {prefix: []}, "emulators": []}; index 0 belongs to
+# player_index 4.
+static func clone_named(screen: Node, size: int, specs: Array, with_emulators: bool = true) -> Dictionary:
+	var result := {"ok": false, "reason": "", "nodes": {}, "emulators": []}
+	if size <= VANILLA_SLOTS:
+		result.ok = true
+		return result
+	var templates := []
+	var anchors := {}
+	for spec in specs:
+		var parent = screen.get_node_or_null(spec[0])
+		var template = parent.get_node_or_null("%s%d" % [spec[1], VANILLA_SLOTS]) if parent != null else null
+		if template == null:
+			result.reason = "screen_layout_changed:" + str(spec[1])
+			return result
+		templates.append({"parent": parent, "template": template, "prefix": spec[1]})
+		result.nodes[spec[1]] = []
+		if not anchors.has(parent) or template.get_index() > anchors[parent].get_index():
+			anchors[parent] = template
+	var emulator_template = screen.get_node_or_null("%s%d" % [EMULATOR_PREFIX, VANILLA_SLOTS])
+	if with_emulators and emulator_template == null:
+		result.reason = "screen_layout_changed:" + EMULATOR_PREFIX
+		return result
+	for player_index in range(VANILLA_SLOTS, size):
+		var number := player_index + 1
+		for t in templates:
+			var node = t.template.duplicate()
+			node.name = "%s%d" % [t.prefix, number]
+			node.unique_name_in_owner = false
+			if "player_index" in node:
+				node.player_index = player_index
+			t.parent.add_child(node)
+			t.parent.move_child(node, anchors[t.parent].get_index() + 1)
+			anchors[t.parent] = node
+			result.nodes[t.prefix].append(node)
+		if not with_emulators:
+			continue
+		var emulator = emulator_template.duplicate()
+		emulator.name = "%s%d" % [EMULATOR_PREFIX, number]
+		var rebased := []
+		for data in emulator_template.focus_base_data:
+			var copy = data
+			for t in templates:
+				copy = _rebase_focus_data(copy, t.template.name, "%s%d" % [t.prefix, number])
+			rebased.append(copy)
+		emulator.focus_base_data = rebased
+		screen.add_child(emulator)
+		emulator.player_index = player_index
+		result.emulators.append(emulator)
+	result.ok = true
+	return result
+
+
 static func _rebase_focus_data(data: Resource, old_name: String, new_name: String) -> Resource:
 	var copy = data.duplicate()
 	copy.path = _rebase_path(copy.path, old_name, new_name)

@@ -102,6 +102,18 @@ pwsh ./tools/instance.ps1 -Action Start -Name sim -StopAfterSec 150 -ExtraArgs "
 | 8 人可阵亡，带 CoopFix | 三个界面两种模式往返；商店边缘规则 0→1→2→1→0；第 5 波进入结算 |
 | 4/5/8 人 × 2 波，无 CoopFix | 5 人窗口 0↔1、到端不动；8 人同上；4 人不启用 |
 
+### 走完选人菜单（证据 EV-0031）
+
+`--coopplus-local-sim-menus`：玩家入座后，以“从武器页返回”的方式（`RunData.menu_selection_back`，保留已入座的玩家）进入角色选择，而不是直接构造一局。每个界面先截图，再走显示模式检查（角色、武器页与上面相同的 `key_v`/`stick_*` 步骤），然后所有玩家每 0.6 s 按一次确认：角色与武器都选“随机”，P1 确认难度后进入战斗，之后与普通模拟相同。卡在菜单超过 90 s 记为 `stuck_in_menus:<界面>`。
+
+| 运行 | 结果 |
+| ---- | ---- |
+| 5 人，去掉三个选人扩展（基线） | 卡在角色选择：P5 没有 FocusEmulator，没有光标，无法选择 |
+| 4/5/8 人 × 2 波（无 CoopFix） | 三个选人界面 → 战斗 → 升级 → 商店，0 个脚本错误；4 人与原版相同 |
+| 8 人可阵亡（带 CoopFix） | 选人 → 第 3 波阵亡进入结算，0 个脚本错误 |
+
+实例窗口：`tools/instance.ps1` 默认加 `--no-window --coopplus-no-fullscreen --resolution 1920x1080`。新档默认全屏，以前启动时游戏会把隐藏窗口切成全屏、盖住桌面；现在扩展遇到 `--coopplus-no-fullscreen` 就跳过这一步（引擎会吞掉 `--no-window`，脚本看不到它），窗口一直隐藏，截图为 1920x1080。需要看窗口时用 `-ShowWindow`。
+
 测试环境注意：实例窗口隐藏时，桌面上任何焦点切换都会让游戏收到“失去焦点”并打开暂停菜单（`input_service.gd:91-96`），波次停止。战斗场景和合作商店（`coop_shop.gd:38`）各自连接这个信号，商店里打开的暂停会带进下一波。探针在两处都断开连接，并在采样中记录 `paused`；看到全体同时静止时先查这个字段。模拟运行期间不要再启动其他游戏实例（新窗口会抢焦点）。
 
 修复内容：`scripts/core/per_player_arrays.gd`（按 max(4, 人数) 只增不减地扩容）、`extensions/vanilla/run_data_ext.gd`（RunData/TempStats/LinkedStats/Utils 数组，含 RunData 三个重置函数之后）、`utils_ext.gd`（Utils 两个重置函数之后）、`popup_manager_ext.gd`（弹窗管理器五个数组）、`upgrades_ui_ext.gd`（合作升级界面补建 P5～P8 面板、属性弹窗、FocusEmulator 与界面数组；5～8 人的最终布局待 AP-014 样例确认）。

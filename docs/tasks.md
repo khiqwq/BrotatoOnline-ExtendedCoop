@@ -18,7 +18,7 @@
 | AP-012 | 实现场景与阶段守卫 | DEV | IN_PROGRESS | 规则模块 `flow_guard`/`ready_barrier` 完成；待接入场景切换与就绪屏障 |
 | AP-013 | 补齐战斗与合作机制 | DEV | IN_PROGRESS | 已修：P5～P8 出生点（BAT-06）、每波运行日志（BAT-10）、RunData/TempStats/LinkedStats/Utils 固定 4 格的逐玩家数组（`run_data_ext.gd`、`utils_ext.gd`、`per_player_arrays.gd`；EV-0017 中 5/8 人数据设置通过）。待：存档加载路径的数组（AP-016）、战斗内归属等；D-006：重写 `main_ext.gd` 中改写自原版的部分。复测见 [local-simulation.md](runbooks/local-simulation.md) |
 | AP-014 | 制作原风格 UI 样例 | DEV/OWNER | DONE | 布局已定（D-010“本机面板放大”），OWNER 补充 D-011：状态条显示武器，商店/结算可选择玩家展开其面板、平分左侧。8 人截图见 EV-0025、EV-0028（另含战斗 HUD：EV-0020）；OWNER 已确认 D-011 截图（2026-10-28） |
-| AP-015 | 完成全部扩展 UI | DEV | IN_PROGRESS | 升级界面、战斗 HUD、合作商店、合作结算界面支持 P5～P8，并按 D-010 排布（`ui/local_focus_layout.gd`、`ui/player_status_strip.gd`），可切换为 D-012 四人视图（`ui/panel_view_controller.gd`，EV-0030）；5～8 人可连续多波并走完阵亡→结算（EV-0019～0025）。未完成：角色/武器/难度选择界面（本地模拟目前跳过菜单；含 CoopFix 武器选择钩子 UI-M05，R07 改为可选共存后必须处理）、建房界面的房间类型（D-008） |
+| AP-015 | 完成全部扩展 UI | DEV | IN_PROGRESS | 升级界面、战斗 HUD、合作商店、合作结算界面支持 P5～P8，并按 D-010 排布（`ui/local_focus_layout.gd`、`ui/player_status_strip.gd`），可切换为 D-012 四人视图（`ui/panel_view_controller.gd`，EV-0030）；5～8 人可连续多波并走完阵亡→结算（EV-0019～0025）。角色/武器/难度选择界面支持 P5～P8（UI-05/07/08、UI-M02/M05、MENU-M03），角色与武器页同样两种显示模式（`ui/selection_view_controller.gd`）；本地模拟可从角色选择一路走进战斗（EV-0031）。未完成：建房界面的房间类型（D-008） |
 | AP-016 | 实现隔离检查点 | DEV | IN_PROGRESS | 写入路径完成（[ADR-004](adr/ADR-004-extended-run-checkpoint.md)）：`extensions/vanilla/progress_data_ext.gd` 把 5～8 人局内状态写入 `checkpoint_store`（`coopplus_runs/profile_<档位>/`），原版存档只写无进行中局的占位。修复前打开存档时 5 人进入第一个商店即崩溃（EV-0026），修复后 5/8 人带存档连续多波通过（EV-0027）。待：继续游戏（读档恢复、schema 校验与明确拒绝）、身份与状态同一检查点（SAVE-08～12，与 AP-017 一起） |
 | AP-017 | 完成断线/继续/移除 | DEV | TODO | |
 | AP-018 | 跑完 18 类故障 | QA | TODO | |

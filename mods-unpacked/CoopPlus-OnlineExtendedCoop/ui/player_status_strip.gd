@@ -7,6 +7,9 @@ extends VBoxContainer
 #   shop     gold and whether the player pressed GO
 #   upgrades whether the player is still choosing
 #   end_run  level, weapon and item counts
+#   character, weapon (selection screens, D-012) one compact line: the
+#            character/weapon the player has picked or is pointing at, and
+#            whether they have picked; no weapon list
 # On the shop and end-run screens the rows can be selected (D-011, enable_view):
 # each row holds a button inside the local player's FocusEmulator area
 # (local_focus_layout.gd), so the gamepad/keyboard reaches it by moving right
@@ -28,6 +31,10 @@ const PanelPopups = preload("res://mods-unpacked/CoopPlus-OnlineExtendedCoop/ui/
 const MODE_SHOP := "shop"
 const MODE_UPGRADES := "upgrades"
 const MODE_END_RUN := "end_run"
+const MODE_CHARACTER := "character"
+const MODE_WEAPON := "weapon"
+const SELECTION_MODES := [MODE_CHARACTER, MODE_WEAPON]
+const COMPACT_ICON_SIZE := Vector2(40, 40)
 const REFRESH_SEC := 0.25
 const ICON_SIZE := Vector2(56, 56)
 const WEAPON_SIZE := Vector2(52, 52)
@@ -41,8 +48,8 @@ const SELECTED_BORDER := 6
 const ROW_MIN_BG_ALPHA := 0.95
 
 const TEXT := {
-	"zh": {"ready": "已准备", "shopping": "选购中", "choosing": "选择中", "done": "已完成", "level": "等级 %d", "weapons": "武器 %d", "items": "道具 %d", "hint": "选择玩家可展开或收起其面板", "toggle": "V / 手柄 Back 键：四人视图"},
-	"en": {"ready": "Ready", "shopping": "Shopping", "choosing": "Choosing", "done": "Done", "level": "LV.%d", "weapons": "Weapons %d", "items": "Items %d", "hint": "Select a player to show or hide their panel", "toggle": "V / gamepad Back: four-panel view"},
+	"zh": {"ready": "已准备", "shopping": "选购中", "choosing": "选择中", "done": "已完成", "level": "等级 %d", "weapons": "武器 %d", "items": "道具 %d", "hint": "选择玩家可展开或收起其面板", "toggle": "V / 手柄 Back 键：四人视图", "selected": "已选择"},
+	"en": {"ready": "Ready", "shopping": "Shopping", "choosing": "Choosing", "done": "Done", "level": "LV.%d", "weapons": "Weapons %d", "items": "Items %d", "hint": "Select a player to show or hide their panel", "toggle": "V / gamepad Back: four-panel view", "selected": "Picked"},
 }
 
 var _screen: Node = null
@@ -64,7 +71,7 @@ func setup(screen: Node, mode: String, player_indices: Array) -> void:
 	size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	size_flags_vertical = Control.SIZE_FILL
 	alignment = BoxContainer.ALIGN_CENTER
-	add_constant_override("separation", 12)
+	add_constant_override("separation", 8 if _compact() else 12)
 	for player_index in player_indices:
 		_rows[player_index] = _build_row(player_index)
 	_hint = Label.new()
@@ -149,16 +156,19 @@ func _build_row(player_index: int) -> Dictionary:
 	panel.add_child(row)
 
 	var icon := TextureRect.new()
-	icon.rect_min_size = ICON_SIZE
+	icon.rect_min_size = COMPACT_ICON_SIZE if _compact() else ICON_SIZE
 	icon.expand = true
 	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	var character = RunData.get_player_character(player_index)
+	var character = null if _compact() else RunData.get_player_character(player_index)
 	if character != null:
 		icon.texture = character.icon
 	row.add_child(icon)
 
-	var texts := VBoxContainer.new()
+	var texts: BoxContainer = HBoxContainer.new() if _compact() else VBoxContainer.new()
 	texts.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	if _compact():
+		texts.alignment = BoxContainer.ALIGN_BEGIN
+		texts.add_constant_override("separation", 24)
 	row.add_child(texts)
 	var title := Label.new()
 	title.text = "P%d  %s" % [player_index + 1, tr(character.name) if character != null else ""]
@@ -173,7 +183,7 @@ func _build_row(player_index: int) -> Dictionary:
 	weapons.add_constant_override("hseparation", 6)
 	weapons.add_constant_override("vseparation", 6)
 	row.add_child(weapons)
-	return {"panel": panel, "texts": texts, "title": title, "status": status, "weapons": weapons, "weapons_key": null,
+	return {"panel": panel, "icon": icon, "texts": texts, "title": title, "status": status, "weapons": weapons, "weapons_key": null,
 			"style": style, "selected_style": selected_style, "button": null}
 
 
@@ -271,6 +281,10 @@ func _set_row_selected(player_index: int, selected: bool) -> void:
 
 
 func _refresh() -> void:
+	if _compact():
+		for player_index in _rows:
+			_refresh_selection_row(_rows[player_index], player_index)
+		return
 	var text_width := 0.0
 	for player_index in _rows:
 		var entry: Dictionary = _rows[player_index]
@@ -325,6 +339,42 @@ func _weapon_cell(weapon: Resource) -> Control:
 	icon.texture = weapon.get_icon()
 	cell.add_child(icon)
 	return cell
+
+
+func _compact() -> bool:
+	return _mode in SELECTION_MODES
+
+
+# Picked item if the player has picked, else the element they point at
+# (base_selection.gd _latest_focused_element; the random element shows its
+# own icon).
+func _refresh_selection_row(entry: Dictionary, player_index: int) -> void:
+	var t := _texts()
+	var picked := false
+	var item = null
+	var icon: Texture = null
+	var item_name := ""
+	if is_instance_valid(_screen):
+		var flags = _screen.get("_has_player_selected")
+		picked = flags is Array and player_index < flags.size() and bool(flags[player_index])
+		var chosen = _screen.get("_player_characters" if _mode == MODE_CHARACTER else "_player_weapons")
+		if picked and chosen is Array and player_index < chosen.size():
+			item = chosen[player_index]
+		if item == null:
+			var focused = _screen.get("_latest_focused_element")
+			var element = focused[player_index] if focused is Array and player_index < focused.size() else null
+			if is_instance_valid(element):
+				if bool(element.get("is_random")) and element.has_method("get_inventory_icon"):
+					icon = element.get_inventory_icon()
+					item_name = tr("RANDOM")
+				else:
+					item = element.get("item")
+	if item != null:
+		icon = item.get_icon() if item.has_method("get_icon") else item.get("icon")
+		item_name = tr(str(item.get("name")))
+	entry.icon.texture = icon
+	entry.title.text = "P%d  %s" % [player_index + 1, item_name]
+	entry.status.text = t.selected if picked else t.choosing
 
 
 func _texts() -> Dictionary:

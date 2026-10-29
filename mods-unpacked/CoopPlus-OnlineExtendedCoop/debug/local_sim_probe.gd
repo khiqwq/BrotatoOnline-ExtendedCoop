@@ -13,6 +13,14 @@ extends Node
 #   --coopplus-local-sim-save         let the game save as in normal play (shop
 #                                     checkpoint, progress); by default saving is
 #                                     off. Only in an isolated instance (AP-016)
+#   --coopplus-local-sim-menus        go through character, weapon and difficulty
+#                                     selection instead of building the run: the
+#                                     seated players enter character selection the
+#                                     way they come back from weapon selection
+#                                     (RunData.menu_selection_back keeps them) and
+#                                     every player keeps pressing ui_accept, which
+#                                     picks the random character and weapon; P1
+#                                     then confirms the difficulty
 #   --coopplus-local-sim-pad          exploration only: keep padding the vanilla
 #                                     per-player arrays fixed at 4 entries (DATA-01,
 #                                     BAT-03/04 ...) to 8 every frame, to find the
@@ -53,6 +61,11 @@ const SCREENSHOT_AT_SEC := 10.0
 # shown this long and captured, or give up after UPGRADES_SHOT_WAIT_SEC.
 const UPGRADES_SHOT_AFTER_SEC := 0.8
 const UPGRADES_SHOT_WAIT_SEC := 6.0
+# Selection screens (--coopplus-local-sim-menus): screenshot after
+# MENU_SHOT_SEC, accepts from MENU_ACCEPT_SEC, give up after MENU_TIMEOUT_SEC.
+const MENU_SHOT_SEC := 1.5
+const MENU_ACCEPT_SEC := 2.5
+const MENU_TIMEOUT_SEC := 90.0
 # Display checks on the first upgrade screen, the first shop and the
 # end-of-run screen (D-011 row selection, D-012 display modes): one step every
 # VIEW_STEP_SEC. "pad_*" sends ui_<dir>_<device> for P1 (the local player),
@@ -63,6 +76,8 @@ const UPGRADES_SHOT_WAIT_SEC := 6.0
 const VIEW_STEP_SEC := 0.8
 const VIEW_STEPS := {
 	"upgrades": ["key_v", "shot_pages", "stick_right", "shot_pages_slid", "stick_left", "key_v", "check"],
+	"character_selection": ["key_v", "shot_pages", "stick_right", "shot_pages_slid", "stick_left", "key_v", "check"],
+	"weapon_selection": ["key_v", "shot_pages", "stick_right", "shot_pages_slid", "stick_left", "key_v", "check"],
 	"shop": ["shot", "pad_right", "pad_down", "pad_accept", "shot_view_pad", "click_last", "shot_view_click", "click_last", "check",
 			"key_v", "shot_pages", "pad_right", "stick_right", "shot_pages_slid", "pad_left", "stick_left", "pad_left", "key_v", "check"],
 	"coop_end_run": ["click_first", "shot_view_click", "click_first", "check",
@@ -110,6 +125,11 @@ var _upgrades_shot := false
 var _upgrades_visible_for := 0.0
 var _pad_counts := {}
 var _view_checks := {}
+var _menus := false
+var _menu_scene := ""
+var _menu_scene_time := 0.0
+var _menu_shot := false
+var _menus_time := 0.0
 
 
 func _ready() -> void:
@@ -131,6 +151,7 @@ func _ready() -> void:
 	_pad = "--coopplus-local-sim-pad" in OS.get_cmdline_args()
 	_mortal = "--coopplus-local-sim-mortal" in OS.get_cmdline_args()
 	_save = "--coopplus-local-sim-save" in OS.get_cmdline_args()
+	_menus = "--coopplus-local-sim-menus" in OS.get_cmdline_args()
 	_players_wanted = int(clamp(_players_wanted, 1, 8))
 	_rng.seed = seed_value
 	ProbeLog.event("local_sim._ready", {"players": _players_wanted, "wave_seconds": _wave_seconds, "seed": seed_value, "save": _save})
@@ -201,6 +222,33 @@ func _process(delta: float) -> void:
 				_save_screenshot("battle_%dp.png" % _players_wanted)
 			if _wave_elapsed > _wave_seconds + EXTRA_TIMEOUT_SEC:
 				_finish("timeout_wave_%d" % (_waves_done + 1))
+		"in_menus":
+			_menus_time += delta
+			if scene_file == MenuData.game_scene:
+				_setup["players"] = _player_data()
+				ProbeLog.event("local_sim.menus_done", {"seconds": stepify(_menus_time, 0.01), "players": _setup["players"]})
+				_state = "in_run"
+				_wave_elapsed = 0.0
+				return
+			if scene_file != _menu_scene:
+				_menu_scene = scene_file
+				_menu_scene_time = 0.0
+				_menu_shot = false
+				_accept_timer = 0.0
+			_menu_scene_time += delta
+			if not _menu_shot and _menu_scene_time > MENU_SHOT_SEC:
+				_menu_shot = true
+				_save_screenshot("%s_%dp.png" % [scene_file.get_file().get_basename(), _players_wanted])
+			var menu_name := scene_file.get_file().get_basename()
+			if _menu_shot and VIEW_STEPS.has(menu_name) and _run_view_check(scene, menu_name, delta):
+				return
+			if _menu_shot and _menu_scene_time > MENU_ACCEPT_SEC:
+				_accept_timer -= delta
+				if _accept_timer <= 0.0:
+					_accept_timer = ACCEPT_INTERVAL
+					_send_accepts()
+			if _menus_time > MENU_TIMEOUT_SEC:
+				_finish("stuck_in_menus:%s" % scene_file.get_file())
 		"in_shop":
 			_guard_focus_pause(scene)
 			_shop_left -= delta
@@ -265,6 +313,13 @@ func _start_run() -> void:
 	RunData.invulnerable = not _mortal
 	_step("set_player_count")
 	RunData.set_player_count(_players_wanted, true)
+	if _menus:
+		RunData.play_mode = RunData.PlayMode.COOP if _players_wanted > 1 else RunData.PlayMode.SOLO
+		RunData.menu_selection_back = true
+		ProbeLog.event("local_sim.start_menus", {"players": _players_wanted, "devices": _devices})
+		_state = "in_menus"
+		_setup["change_scene_error"] = get_tree().change_scene(MenuData.character_selection_scene)
+		return
 	var characters := _pick_characters(_players_wanted)
 	var chosen := []
 	for player_index in range(_players_wanted):

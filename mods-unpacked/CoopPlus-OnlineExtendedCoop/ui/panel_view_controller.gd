@@ -18,6 +18,10 @@ extends Node
 # Added as the screen's last child so its _input runs before the
 # FocusEmulators' (Godot calls _input in reverse tree order). Layout only: it
 # never changes game state; hidden panels stay in the scene as in D-010.
+# ui/selection_view_controller.gd reuses the input handling and the modes for
+# the character and weapon selection screens; _begin, _apply_focus,
+# _apply_pages, _order_row, _local_shown and _rescue_local_focus are its
+# override points.
 
 const PanelPopups = preload("res://mods-unpacked/CoopPlus-OnlineExtendedCoop/ui/panel_popups.gd")
 const RuntimeGate = preload("res://mods-unpacked/CoopPlus-OnlineExtendedCoop/scripts/compatibility/runtime_gate.gd")
@@ -60,6 +64,7 @@ var _strip = null
 var _muted := {}
 var _focus_stretch := 1.5
 var _mode := MODE_FOCUS
+var _count := 0
 var _start := 0
 var _cooldown := 0.0
 var _stick_dir := 0
@@ -74,16 +79,22 @@ var _notice_left := 0.0
 # status strip (local_focus_layout.gd); muted: PanelPopups.mute() record of the
 # other players; focus_stretch: the local panel's ratio in focus mode.
 func setup(screen: Node, row: Container, panels: Array, local: int, holder: Control, strip, muted: Dictionary, focus_stretch: float) -> void:
+	_panels = panels
+	_muted = muted
+	_focus_stretch = focus_stretch
+	_begin(screen, row, panels.size(), local, holder, strip)
+
+
+# row: where the edge columns go; count: players on the screen.
+func _begin(screen: Node, row: Container, count: int, local: int, holder: Control, strip) -> void:
 	name = "CoopPlusPanelViewController"
 	_screen = screen
 	_row = row
-	_panels = panels
+	_count = count
 	_local = local
 	_holder = holder
 	_strip = strip
-	_muted = muted
-	_focus_stretch = focus_stretch
-	_start = int(clamp(local - (PAGE_SIZE - 1), 0, max(0, panels.size() - PAGE_SIZE)))
+	_start = int(clamp(local - (PAGE_SIZE - 1), 0, max(0, count - PAGE_SIZE)))
 	_build_edges()
 	_build_notice()
 	_set_mode(load_mode(), false)
@@ -109,7 +120,7 @@ func toggle_mode() -> void:
 func slide(dir: int) -> bool:
 	if _mode != MODE_PAGES:
 		return false
-	var start := int(clamp(_start + dir, 0, max(0, _panels.size() - PAGE_SIZE)))
+	var start := int(clamp(_start + dir, 0, max(0, _count - PAGE_SIZE)))
 	if start == _start:
 		return false
 	_start = start
@@ -215,7 +226,7 @@ func _apply_pages() -> void:
 func _rescue_local_focus() -> void:
 	var emulator = _local_emulator()
 	var panel = _panels[_local]
-	if emulator == null or not is_instance_valid(panel) or not panel.is_visible_in_tree():
+	if emulator == null or not _local_shown():
 		return
 	var focused = emulator.focused_control
 	if is_instance_valid(focused) and focused.is_visible_in_tree():
@@ -279,7 +290,7 @@ func _build_edges() -> void:
 
 func _update_edges() -> void:
 	var hidden_left := range(0, _start)
-	var hidden_right := range(_start + PAGE_SIZE, _panels.size())
+	var hidden_right := range(_start + PAGE_SIZE, _count)
 	_fill_edge(_edges[0], hidden_left, "◀", true)
 	_fill_edge(_edges[1], hidden_right, "▶", false)
 
@@ -395,8 +406,7 @@ func _edge_direction(event: InputEvent) -> int:
 	if dir == 0:
 		return 0
 	var emulator = _local_emulator()
-	var panel = _panels[_local]
-	if emulator == null or not is_instance_valid(panel) or not panel.is_visible_in_tree():
+	if emulator == null or not _local_shown():
 		return dir
 	var focused = emulator.focused_control
 	if not is_instance_valid(focused) or not focused.is_visible_in_tree() or not emulator.has_method("_get_focus_neighbour_for_event"):
@@ -405,6 +415,11 @@ func _edge_direction(event: InputEvent) -> int:
 	if result.control == null or result.control == focused:
 		return dir
 	return 0
+
+
+# Whether the local player's panel is on screen.
+func _local_shown() -> bool:
+	return is_instance_valid(_panels[_local]) and _panels[_local].is_visible_in_tree()
 
 
 func _local_emulator():
