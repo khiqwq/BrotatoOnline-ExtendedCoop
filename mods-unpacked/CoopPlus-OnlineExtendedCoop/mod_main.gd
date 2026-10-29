@@ -51,6 +51,7 @@ const EXTENSIONS_INIT := [
 	"extensions/vanilla/weapon_selection_ext.gd",
 	"extensions/vanilla/difficulty_selection_ext.gd",
 	"extensions/bo/session_manager_ext.gd",
+	"extensions/bo/public_lobby_browser_ext.gd",
 	"extensions/bo/steam_transport_ext.gd",
 	"extensions/bo/lan_transport_ext.gd",
 	"extensions/bo/network_heartbeat_ext.gd",
@@ -141,6 +142,11 @@ func _enter_tree() -> void:
 
 
 func _ready() -> void:
+	# Continuing 5..8 player runs online (scripts/bo/resume_identity_patch.gd);
+	# idle unless a resume scene with more than four players is current.
+	if RuntimeGate.decision().get("install_extensions", false):
+		var patch = load(MOD_DIR.plus_file("scripts/bo/resume_identity_patch.gd")).new()
+		add_child(patch)
 	if _probe_enabled:
 		_probe_log().event("coopplus.mod_main._ready", {"path": str(get_path())})
 		_add_probe_node("CoopPlusLifecycleProbe", "debug/lifecycle_probe.gd")

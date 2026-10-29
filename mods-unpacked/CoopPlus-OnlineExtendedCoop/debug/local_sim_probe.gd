@@ -21,6 +21,15 @@ extends Node
 #                                     every player keeps pressing ui_accept, which
 #                                     picks the random character and weapon; P1
 #                                     then confirms the difficulty
+#   --coopplus-local-sim-continue     continue the saved run instead of starting
+#                                     one (run after a --coopplus-local-sim-save
+#                                     run without clearing the instance user
+#                                     data): checks the title screen offers
+#                                     Continue, presses it, takes Brotato Online's
+#                                     offline resume path on the resume screen
+#                                     (no lobby is created; its session manager is
+#                                     paused there) and seats every player, then
+#                                     logs the restored shop and plays on
 #   --coopplus-local-sim-pad          exploration only: keep padding the vanilla
 #                                     per-player arrays fixed at 4 entries (DATA-01,
 #                                     BAT-03/04 ...) to 8 every frame, to find the
@@ -126,6 +135,8 @@ var _upgrades_visible_for := 0.0
 var _pad_counts := {}
 var _view_checks := {}
 var _menus := false
+var _continue := false
+var _resume_seeded := false
 var _menu_scene := ""
 var _menu_scene_time := 0.0
 var _menu_shot := false
@@ -152,6 +163,7 @@ func _ready() -> void:
 	_mortal = "--coopplus-local-sim-mortal" in OS.get_cmdline_args()
 	_save = "--coopplus-local-sim-save" in OS.get_cmdline_args()
 	_menus = "--coopplus-local-sim-menus" in OS.get_cmdline_args()
+	_continue = "--coopplus-local-sim-continue" in OS.get_cmdline_args()
 	_players_wanted = int(clamp(_players_wanted, 1, 8))
 	_rng.seed = seed_value
 	ProbeLog.event("local_sim._ready", {"players": _players_wanted, "wave_seconds": _wave_seconds, "seed": seed_value, "save": _save})
@@ -172,7 +184,10 @@ func _process(delta: float) -> void:
 	match _state:
 		"wait_title":
 			if scene_file == TITLE_SCENE and _elapsed > 3.0:
-				_start_run()
+				if _continue:
+					_start_continue(scene)
+				else:
+					_start_run()
 		"in_run":
 			_wave_elapsed += delta
 			_guard_focus_pause(scene)
@@ -222,6 +237,19 @@ func _process(delta: float) -> void:
 				_save_screenshot("battle_%dp.png" % _players_wanted)
 			if _wave_elapsed > _wave_seconds + EXTRA_TIMEOUT_SEC:
 				_finish("timeout_wave_%d" % (_waves_done + 1))
+		"in_resume":
+			_menus_time += delta
+			if scene_file.get_file() == "coop_resume.tscn" and not _resume_seeded:
+				_seed_resume()
+			elif scene_file.get_file() == SHOP_SCENE_FILE:
+				_resume_online(true)
+				ProbeLog.event("local_sim.continue.shop", {"players": _player_data(), "shop": _shop_snapshot(scene)})
+				_state = "in_shop"
+				_waves_done = 2
+				_shop_left = SHOP_WAIT_SEC
+				_shop_pressed = false
+			elif _menus_time > MENU_TIMEOUT_SEC:
+				_finish("stuck_in_resume:%s" % scene_file.get_file())
 		"in_menus":
 			_menus_time += delta
 			if scene_file == MenuData.game_scene:
@@ -268,6 +296,8 @@ func _process(delta: float) -> void:
 			_after_battle_left -= delta
 			if not _after_battle_shot and _after_battle_left < AFTER_BATTLE_SEC - 2.0:
 				_after_battle_shot = true
+				if scene_file.get_file() == SHOP_SCENE_FILE:
+					ProbeLog.event("local_sim.final_shop", {"players": _player_data(), "shop": _shop_snapshot(scene)})
 				_save_screenshot("%s_%dp.png" % [scene_file.get_file().get_basename(), _players_wanted])
 			if _after_battle_shot and scene_file.get_file() == "coop_end_run.tscn" and _run_view_check(scene, "coop_end_run", delta):
 				_after_battle_left = max(_after_battle_left, 0.5)
@@ -357,6 +387,76 @@ func _start_run() -> void:
 	_state = "in_run"
 	var err = get_tree().change_scene(MenuData.game_scene)
 	_setup["change_scene_error"] = err
+
+
+func _start_continue(scene) -> void:
+	_elapsed = 0.0
+	DebugService.invulnerable = not _mortal
+	DebugService.custom_wave_duration = _wave_seconds
+	DebugService.disable_saving = not _save
+	_devices = [KEYBOARD_DEVICE]
+	var virtual_ids: Array = RuntimeGate.virtual_device_ids()
+	for i in range(_players_wanted - 1):
+		if i < virtual_ids.size():
+			_devices.append(int(virtual_ids[i]))
+	var state: Dictionary = ProgressData.saved_run_state
+	var menu = scene.get("_main_menu") if scene != null else null
+	var button = menu.get("continue_button") if menu != null else null
+	var loaded: Dictionary = ProgressData.get("coopplus_loaded_checkpoint") if ProgressData.get("coopplus_loaded_checkpoint") is Dictionary else {}
+	var info := {
+		"has_run_state": bool(state.get("has_run_state", false)),
+		"players": state.get("players_data", []).size() if state.get("players_data") is Array else -1,
+		"shop_lists": state.get("shop_items", []).size() if state.get("shop_items") is Array else -1,
+		"continue_visible": button != null and button.visible,
+		"checkpoint_id": str(loaded.get("checkpoint_id", "")),
+		"identities": loaded.get("identities", {}).keys() if loaded.get("identities") is Dictionary else [],
+	}
+	ProbeLog.event("local_sim.continue.title", info)
+	_setup["continue_title"] = info
+	if not info.has_run_state or menu == null or not menu.has_method("_on_ContinueButton_pressed"):
+		_finish("continue_unavailable")
+		return
+	menu._on_ContinueButton_pressed()
+	RunData.invulnerable = not _mortal
+	_state = "in_resume"
+
+
+# Brotato Online's own offline switch (player_identity_manager.gd
+# wants_offline_resume) before its 300 ms auto-lobby; its session manager is
+# paused as well until the shop, so no lobby can be created from this test.
+func _seed_resume() -> void:
+	var identity = get_node_or_null("/root/ModLoader/six666-BrotatoOnline/BrotatoOnlinePlayerIdentityManager")
+	if identity != null:
+		identity.set("_offline_resume", true)
+	_resume_online(false)
+	_resume_seeded = true
+	CoopService._add_player(KEYBOARD_DEVICE, CoopService.PlayerType.KEYBOARD_AND_MOUSE)
+	for i in range(1, _devices.size()):
+		CoopService._add_player(_devices[i], CoopService.PlayerType.GAMEPAD_XBOX)
+	ProbeLog.event("local_sim.continue.seeded", {"devices": _devices, "connected": CoopService.connected_players.size()})
+
+
+func _resume_online(enabled: bool) -> void:
+	var session = get_node_or_null("/root/ModLoader/six666-BrotatoOnline/BrotatoOnlineSessionManager")
+	if session != null:
+		session.set_process(enabled)
+
+
+# Item ids in each player's shop (and locked items) for comparing a save with
+# its continue.
+func _shop_snapshot(scene) -> Array:
+	var out := []
+	if scene == null or not scene.has_method("_get_shop_items_container"):
+		return out
+	for i in RunData.get_player_count():
+		var ids := []
+		var container = scene._get_shop_items_container(i)
+		if container != null and "_shop_items" in container:
+			for shop_item in container._shop_items:
+				if is_instance_valid(shop_item) and shop_item.item_data != null:
+					ids.append(str(shop_item.item_data.my_id))
+		out.append(ids)
+	return out
 
 
 # Exploration aid only. Lists come from limits-audit DATA-01/02/04/05, BAT-03/04,

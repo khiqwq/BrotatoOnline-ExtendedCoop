@@ -8,11 +8,13 @@
 - 运行时门控：CoopFix-OnlineMouseUI 1.0.1 由“超四人阻止”改为可选共存（R07、D-011）。文件指纹与锁定一致时超四人照常，其他版本仍阻止超四人开局；compatibility.json 新增角色 `optional`。
 
 ### Added
+- 房间类型（D-008，ADR-005）：角色选择的运行选项里选“标准房间（4 人，原版兼容）”或“扩展房间 5～8 人”，每台电脑记住，房间开着时锁定。标准房间里所有扩展都按原版行为；扩展房间要求所有成员装同一能力版本的本扩展——未装的 Brotato Online 看到“协议或模组版本不兼容”而无法加入，本扩展玩家看到具体原因。`scripts/core/room_policy.gd`、`extensions/bo/session_manager_ext.gd`、`extensions/bo/public_lobby_browser_ext.gd`。
+- 退出后继续 5～8 人局（AP-016/AP-017）：标题界面照常出现“继续”，检查点经校验后恢复（含第 5 人起的商店），不合格的检查点明确拒绝；Brotato Online 的玩家身份存入同一检查点，继续界面可按身份分配 5～8 人；本地离线继续在 4 人以上禁用并说明原因。`extensions/vanilla/progress_data_ext.gd`、`scripts/bo/`。
 - 5～8 人时商店、升级、结算界面采用“本机面板放大”布局（D-010）：本机玩家的面板加宽，其余玩家收进状态条（玩家色、角色、P 编号与状态）；隐藏玩家的道具/属性弹窗不再显示。1～4 人或本机多名本地玩家时保持原版整行。`ui/local_focus_layout.gd`、`ui/player_status_strip.gd`。
 - 角色、武器、难度选择界面支持 P5～P8：补齐逐玩家数组、面板、武器栏与 FocusEmulator（此前第 5 人在角色选择界面没有光标、无法选择，流程卡住）；角色与武器页同样提供“本机放大 / 四人视图”两种显示（D-012）。CoopFix 的武器选择钩子按武器数读数组的问题（UI-M05）一并解决。`extensions/vanilla/{character,weapon,difficulty}_selection_ext.gd`、`ui/selection_view_controller.gd`。
 - 5～8 人面板界面新增“四人视图”（D-012）：和原版一样显示四个面板，右摇杆、←/→ 或十字键左右逐个切换玩家（←/→ 与十字键只在光标到边时切换），两端标出未显示的玩家；V 键 / 手柄 Back 键在“本机放大”和“四人视图”间切换，每台电脑记住选择，默认本机放大。`ui/panel_view_controller.gd`。
 - 状态条显示每名玩家的武器（原版品质底色）；商店与结算界面可用手柄/键盘或鼠标（需 CoopFix-OnlineMouseUI）选择一名玩家，展开其原版面板查看商店、武器与道具，与本机面板平分左侧，再次选择收起（D-011）。
-- 5～8 人局内存档隔离（AP-016 写入部分）：5 人以上的局内状态写入独立检查点 `coopplus_runs/profile_<档位>/`，原版存档只写“无进行中局”的占位，不再写坏原版存档。暂不支持退出后继续这类局。`extensions/vanilla/progress_data_ext.gd`、`scripts/persistence/extended_run_state.gd`。
+- 5～8 人局内存档隔离（AP-016 写入部分）：5 人以上的局内状态写入独立检查点 `coopplus_runs/profile_<档位>/`，原版存档只写“无进行中局”的占位，不再写坏原版存档。`extensions/vanilla/progress_data_ext.gd`、`scripts/persistence/extended_run_state.gd`。
 - 中文名「超四人联机合作扩展」；许可证 GPL-3.0（LICENSE 全文）。
 - AP-001 范围与需求草案（`docs/requirements.md`），含决策、性能与超时提议值。
 - AP-002 仓库结构、锁文件、`tools/setup.ps1`、`tools/check.ps1`、`tools/test.ps1`、最小 Godot 3 测试运行器。

@@ -134,3 +134,75 @@ func test_payload_records_schema_players_and_versions() -> void:
 	assert_eq(p.run_state.current_wave, 3)
 	versions.game = "x"
 	assert_eq(p.versions.game, "1.1.15.4", "payload keeps its own copy")
+
+
+func _valid_payload(players := 5) -> Dictionary:
+	var pd := []
+	var shops := []
+	for _i in players:
+		pd.append({})
+		shops.append([])
+	var state := {"has_run_state": true, "players_data": pd, "shop_items": shops, "locked_shop_items": shops.duplicate()}
+	return ExtendedRunState.payload(state, players, {"game_save": "1.1.15.4", "extension": "0.1.0"})
+
+
+func test_validate_payload_accepts_a_matching_checkpoint() -> void:
+	for n in [5, 8]:
+		var r = ExtendedRunState.validate_payload(_valid_payload(n), {"game_save": "1.1.15.4"})
+		assert_true(r.ok, "%d players: %s" % [n, r.reason])
+
+
+func test_validate_payload_refuses_explicitly() -> void:
+	var now := {"game_save": "1.1.15.4"}
+	assert_eq(ExtendedRunState.validate_payload("x", now).reason, ExtendedRunState.REFUSE_NOT_A_PAYLOAD)
+	var p = _valid_payload()
+	p.schema = 2
+	assert_eq(ExtendedRunState.validate_payload(p, now).reason, ExtendedRunState.REFUSE_SCHEMA)
+	p = _valid_payload()
+	p.players = 4
+	assert_eq(ExtendedRunState.validate_payload(p, now).reason, ExtendedRunState.REFUSE_PLAYER_COUNT, "1..4 players never use a checkpoint")
+	p = _valid_payload()
+	p.run_state.players_data.pop_back()
+	assert_eq(ExtendedRunState.validate_payload(p, now).reason, ExtendedRunState.REFUSE_STATE)
+	p = _valid_payload()
+	p.run_state.shop_items.pop_back()
+	assert_eq(ExtendedRunState.validate_payload(p, now).reason, ExtendedRunState.REFUSE_SHOP)
+	p = _valid_payload()
+	p.run_state.has_run_state = false
+	assert_eq(ExtendedRunState.validate_payload(p, now).reason, ExtendedRunState.REFUSE_STATE)
+	assert_eq(ExtendedRunState.validate_payload(_valid_payload(), {"game_save": "1.1.16.0"}).reason, ExtendedRunState.REFUSE_GAME_VERSION)
+	assert_eq(ExtendedRunState.validate_payload(_valid_payload(), {}).reason, ExtendedRunState.REFUSE_GAME_VERSION)
+
+
+func test_validate_payload_accepts_float_numbers() -> void:
+	var p = _valid_payload(6)
+	p.schema = 1.0
+	p.players = 6.0
+	assert_true(ExtendedRunState.validate_payload(p, {"game_save": "1.1.15.4"}).ok, "JSON numbers come back as floats")
+
+
+func test_validate_payload_accepts_padded_shop_lists_after_removal() -> void:
+	var p = _valid_payload(6)
+	p.run_state.shop_items.append([])
+	p.run_state.shop_items.append([])
+	assert_true(ExtendedRunState.validate_payload(p, {"game_save": "1.1.15.4"}).ok, "8 -> 6 removal keeps two empty lists")
+	p.run_state.shop_items[7] = [[{"my_id": "x"}, 3]]
+	assert_eq(ExtendedRunState.validate_payload(p, {"game_save": "1.1.15.4"}).reason, ExtendedRunState.REFUSE_SHOP, "a non-empty tail is refused")
+
+
+func test_checkpoint_sequence() -> void:
+	assert_eq(ExtendedRunState.checkpoint_sequence("00000012-ab12cd"), 12)
+	assert_eq(ExtendedRunState.checkpoint_sequence(""), -1)
+	assert_eq(ExtendedRunState.checkpoint_sequence("abc-def"), -1)
+	assert_eq(ExtendedRunState.checkpoint_sequence(null), -1)
+
+
+func test_extras_state_has_what_the_deserializer_reads() -> void:
+	var state = ExtendedRunState.extras_state({"shop_items": [[1], [2]], "locked_shop_items": [[]]})
+	assert_true(state.has_run_state)
+	assert_eq(state.players_data, [])
+	assert_eq(state.current_background, "")
+	assert_eq(state.challenges_completed_this_run, [])
+	assert_eq(state.shop_items.size(), 2)
+	assert_eq(state.locked_shop_items.size(), 1)
+	assert_eq(ExtendedRunState.extras_state({}).shop_items, [], "missing lists are empty")

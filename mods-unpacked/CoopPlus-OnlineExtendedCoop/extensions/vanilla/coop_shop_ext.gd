@@ -11,7 +11,10 @@ extends "res://ui/menus/shop/coop_shop.gd"
 # while the gate is extended and the run has more than four players; otherwise
 # every override is the parent's (R08). Callbacks never call their parent
 # versions (ADR-001 rule 1). With one local player the screen uses the "own
-# panel large" layout (ui/local_focus_layout.gd).
+# panel large" layout (ui/local_focus_layout.gd). On Continue, BaseShop._ready
+# replaces six of those arrays with the saved run's (base_shop.gd:105-111,
+# UI-M04); they are padded to the player count first in case a saved array
+# is shorter.
 
 const RuntimeGate = preload("res://mods-unpacked/CoopPlus-OnlineExtendedCoop/scripts/compatibility/runtime_gate.gd")
 const PerPlayerArrays = preload("res://mods-unpacked/CoopPlus-OnlineExtendedCoop/scripts/core/per_player_arrays.gd")
@@ -19,6 +22,14 @@ const ExtraPlayerPanels = preload("res://mods-unpacked/CoopPlus-OnlineExtendedCo
 const LocalFocusLayout = preload("res://mods-unpacked/CoopPlus-OnlineExtendedCoop/ui/local_focus_layout.gd")
 
 const COOPPLUS_MOD_ID := "CoopPlus-OnlineExtendedCoop"
+const COOPPLUS_RESUMED_FIELDS := [
+	["shop_items", PerPlayerArrays.KIND_ARRAY],
+	["reroll_count", PerPlayerArrays.KIND_VALUE, 0],
+	["paid_reroll_count", PerPlayerArrays.KIND_VALUE, 0],
+	["initial_free_rerolls", PerPlayerArrays.KIND_VALUE, 0],
+	["free_rerolls", PerPlayerArrays.KIND_VALUE, 0],
+	["item_steals", PerPlayerArrays.KIND_VALUE, 0],
+]
 const COOPPLUS_BASE_SHOP_FIELDS := [
 	["_shop_items", PerPlayerArrays.KIND_ARRAY],
 	["_focused_shop_item", PerPlayerArrays.KIND_VALUE, null],
@@ -46,6 +57,8 @@ func _enter_tree() -> void:
 	if size <= PerPlayerArrays.VANILLA_SLOTS:
 		return
 	var grown: Dictionary = PerPlayerArrays.grow_fields(self, COOPPLUS_BASE_SHOP_FIELDS, size)
+	if RunData.resumed_from_state_in_shop:
+		_coopplus_pad_resumed_state(size)
 	if not grown.skipped.empty():
 		ModLoaderLog.warning("shop: per-player arrays missing (%s)" % ",".join(PoolStringArray(grown.skipped)), COOPPLUS_MOD_ID)
 	var cloned: Dictionary = ExtraPlayerPanels.clone(self, size, "Content/HBoxContainer2", "CoopShopPlayerContainer", "Content")
@@ -64,6 +77,14 @@ func _ready() -> void:
 	for i in RunData.get_player_count():
 		panels.append(_get_coop_player_container(i))
 	var _strip = LocalFocusLayout.apply(self, get_node("Content/HBoxContainer2"), panels, "shop")
+
+
+func _coopplus_pad_resumed_state(size: int) -> void:
+	var state: Dictionary = ProgressData.saved_run_state
+	for field in COOPPLUS_RESUMED_FIELDS:
+		var values = state.get(field)
+		if values is Array:
+			var _added := PerPlayerArrays.grow(values, size, field[1], field[2] if field.size() > 2 else null)
 
 
 # Parent: coop_shop.gd:102 (four-entry literal indexed by player).

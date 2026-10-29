@@ -12,15 +12,15 @@
 | AP-006 | 容量与输入原型 | DEV | VERIFY | 运行时开关 `scripts/compatibility/runtime_gate.gd`、11 个扩展（`extensions/`）、容量探针 `debug/capacity_probe.gd`。隔离实例验证 EV-0008～EV-0012：容量 8，1 本地 + 7 远程在虚拟设备 16..22，第 9 人被拒，7 个远程输入通道经 BO 注入路径互不串扰，移除后回到 1 人；`--coopplus-vanilla` 与 CoopFix-OnlineMouseUI 时容量 4（R07）；标题画面无新增错误。**BLOCKED 部分（需真实客户端）**：真实 Steam/LAN 会话的准入与人数上限（CAP-02、大厅 `member_limit`、LAN `create_server`）、满员通知（CAP-M03）、LAN 旧连接释放（CAP-M01）、真实 `battle_input` 包、第 5 人进入角色选择/战斗（AP-007）。已知未实现、会阻断 5+ 人对局：BAT-07 HUD、DATA-04/05 Utils 缓存、DATA-01/02 RunData 数组（AP-013～015）。待 OWNER：`main_ext.gd` 含游戏代码改写的许可（THIRD_PARTY_NOTICES）；继续游戏时按快照截断玩家（BAT-21，AP-012/017） |
 | AP-007 | 执行 M1 验证 | DEV/QA | TODO | 需要 5 个真实客户端；8 实例 LAN 受同账号身份冲突限制（见 runbook） |
 | AP-008 | 建状态测试与故障入口 | DEV | VERIFY | 可重放事件格式与回放 `tests/support/event_replay.gd`、应用层故障注入 `debug/fault_injection.gd`（正式包排除）、诊断/脱敏 `scripts/diagnostics/`；固定种子同摘要，重复/旧代次/伪造归属均被检出（26 个回放用例，变异测试 21/21 检出）。传输层丢包不在此模拟 |
-| AP-009 | 固化版本适配与能力协商 | DEV | IN_PROGRESS | 已完成：运行时闸门 `runtime_gate.gd`（版本/指纹不符时不安装扩展）、能力协商规则 `capability.gd`（48 个用例）。待：接入 Brotato Online 握手（CAP-13 方案选择） |
+| AP-009 | 固化版本适配与能力协商 | DEV | VERIFY | 运行时闸门 `runtime_gate.gd`、能力协商规则 `capability.gd`；房间类型（D-008，ADR-005）：房间容量进入闸门、运行选项下拉框、扩展房间的 mod_version 标记（CAP-13 方案 C）、LAN 能力消息与拒绝、hello 能力字段、公开大厅列表适配。待：真实 Steam/LAN 会话实测（M1） |
 | AP-010 | 实现稳定槽位与输入 | DEV | IN_PROGRESS | 规则模块 `slot_registry`/`virtual_device_pool` 完成（55 个用例，复核修复 7 个缺陷）；AP-006 的槽位扩展已使用设备池。待：身份↔槽位映射接入 BO 身份管理器、ADR-002 |
 | AP-011 | 实现菜单操作提交 | DEV | IN_PROGRESS | 规则模块 `action_ledger`/`payload_guard` 完成；待接入 BO 菜单同步 |
 | AP-012 | 实现场景与阶段守卫 | DEV | IN_PROGRESS | 规则模块 `flow_guard`/`ready_barrier` 完成；待接入场景切换与就绪屏障 |
 | AP-013 | 补齐战斗与合作机制 | DEV | IN_PROGRESS | 已修：P5～P8 出生点（BAT-06）、每波运行日志（BAT-10）、RunData/TempStats/LinkedStats/Utils 固定 4 格的逐玩家数组（`run_data_ext.gd`、`utils_ext.gd`、`per_player_arrays.gd`；EV-0017 中 5/8 人数据设置通过）。待：存档加载路径的数组（AP-016）、战斗内归属等；D-006 已解决：金币拾取不再复述游戏代码（EV-0032）。复测见 [local-simulation.md](runbooks/local-simulation.md) |
 | AP-014 | 制作原风格 UI 样例 | DEV/OWNER | DONE | 布局已定（D-010“本机面板放大”），OWNER 补充 D-011：状态条显示武器，商店/结算可选择玩家展开其面板、平分左侧。8 人截图见 EV-0025、EV-0028（另含战斗 HUD：EV-0020）；OWNER 已确认 D-011 截图（2026-10-28） |
-| AP-015 | 完成全部扩展 UI | DEV | IN_PROGRESS | 升级界面、战斗 HUD、合作商店、合作结算界面支持 P5～P8，并按 D-010 排布（`ui/local_focus_layout.gd`、`ui/player_status_strip.gd`），可切换为 D-012 四人视图（`ui/panel_view_controller.gd`，EV-0030）；5～8 人可连续多波并走完阵亡→结算（EV-0019～0025）。角色/武器/难度选择界面支持 P5～P8（UI-05/07/08、UI-M02/M05、MENU-M03），角色与武器页同样两种显示模式（`ui/selection_view_controller.gd`）；本地模拟可从角色选择一路走进战斗（EV-0031）。未完成：建房界面的房间类型（D-008） |
-| AP-016 | 实现隔离检查点 | DEV | IN_PROGRESS | 写入路径完成（[ADR-004](adr/ADR-004-extended-run-checkpoint.md)）：`extensions/vanilla/progress_data_ext.gd` 把 5～8 人局内状态写入 `checkpoint_store`（`coopplus_runs/profile_<档位>/`），原版存档只写无进行中局的占位。修复前打开存档时 5 人进入第一个商店即崩溃（EV-0026），修复后 5/8 人带存档连续多波通过（EV-0027）。待：继续游戏（读档恢复、schema 校验与明确拒绝）、身份与状态同一检查点（SAVE-08～12，与 AP-017 一起） |
-| AP-017 | 完成断线/继续/移除 | DEV | TODO | |
+| AP-015 | 完成全部扩展 UI | DEV | IN_PROGRESS | 升级界面、战斗 HUD、合作商店、合作结算界面支持 P5～P8，并按 D-010 排布（`ui/local_focus_layout.gd`、`ui/player_status_strip.gd`），可切换为 D-012 四人视图（`ui/panel_view_controller.gd`，EV-0030）；5～8 人可连续多波并走完阵亡→结算（EV-0019～0025）。角色/武器/难度选择界面支持 P5～P8（UI-05/07/08、UI-M02/M05、MENU-M03），角色与武器页同样两种显示模式（`ui/selection_view_controller.gd`）；本地模拟可从角色选择一路走进战斗（EV-0031）。角色选择的运行选项里有房间类型（D-008，ADR-005） |
+| AP-016 | 实现隔离检查点 | DEV | IN_PROGRESS | 写入路径完成（[ADR-004](adr/ADR-004-extended-run-checkpoint.md)）：`extensions/vanilla/progress_data_ext.gd` 把 5～8 人局内状态写入 `checkpoint_store`（`coopplus_runs/profile_<档位>/`），原版存档只写无进行中局的占位。修复前打开存档时 5 人进入第一个商店即崩溃（EV-0026），修复后 5/8 人带存档连续多波通过（EV-0027）。继续游戏已实现：读检查点、校验与明确拒绝、反序列化（含第 5 人起商店）、身份存入同一检查点（EV-0034）。待：联机继续实测 |
+| AP-017 | 完成断线/继续/移除 | DEV | IN_PROGRESS | 继续：BO 身份管理器在继续界面运行时调整（超过 4 槽的登记表、面板加高、4 人以上禁用离线继续，`scripts/bo/resume_identity_patch.gd`）。待：断线重连、移除成员后的全量重映射与联机实测 |
 | AP-018 | 跑完 18 类故障 | QA | TODO | |
 | AP-019 | 验证内容与 Mod 组合 | QA | TODO | |
 | AP-020 | 分析八人性能 | DEV | TODO | |

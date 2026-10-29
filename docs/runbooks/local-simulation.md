@@ -112,6 +112,25 @@ pwsh ./tools/instance.ps1 -Action Start -Name sim -StopAfterSec 150 -ExtraArgs "
 | 4/5/8 人 × 2 波（无 CoopFix） | 三个选人界面 → 战斗 → 升级 → 商店，0 个脚本错误；4 人与原版相同 |
 | 8 人可阵亡（带 CoopFix） | 选人 → 第 3 波阵亡进入结算，0 个脚本错误 |
 
+### 退出后继续（证据 EV-0033、EV-0034）
+
+`--coopplus-local-sim-continue`：不入座、不开新局，等标题界面出现后记录 `local_sim.continue.title`（“继续”是否可见、存档里的人数与商店数），再按“继续”。到 BO 的继续界面时，探针以离线继续的方式（管理器的 `_offline_resume`，会话管理器暂停）按存档人数入座，进入商店后记录 `local_sim.continue.shop`（每人数据与商店商品）。与 `--coopplus-local-sim-save` 一起用，两段共用同一份用户数据：
+
+```powershell
+pwsh ./tools/instance.ps1 -Action Start -Name sim -StopAfterSec 200 -ExtraArgs "--audio-driver,Dummy,--coopplus-local-sim=8,--coopplus-local-sim-seconds=20,--coopplus-local-sim-save,--coopplus-probe-quit,--coopplus-local-sim-waves=2"
+pwsh ./tools/instance.ps1 -Action Start -Name sim -StopAfterSec 240 -ExtraArgs "--audio-driver,Dummy,--coopplus-local-sim=8,--coopplus-local-sim-seconds=20,--coopplus-local-sim-save,--coopplus-probe-quit,--coopplus-local-sim-waves=3,--coopplus-local-sim-continue"
+```
+
+第二段之前不要删除 `.local/userdata/instance-sim`。比较第一段的 `local_sim.final_shop` 与第二段的 `local_sim.continue.shop`：每人的商店、材料、经验、等级、武器与道具应完全相同。
+
+| 运行 | 结果 |
+| ---- | ---- |
+| 8 人，扩展 BO 身份管理器的版本 | BO 的管理器无法编译（相对路径预加载，EV-0033），改为运行时调整 |
+| 8 人 | 检查点 `00000005` 恢复，“继续”可见，8 人逐项相同，再打 1 波（EV-0034） |
+| 4 人（原版路径） | 逐项相同（R08） |
+
+本地模拟里没有 BO 会话，继续界面的身份为空，身份面板与 5～8 槽登记表的路径要在联机中验证（M1）。
+
 实例窗口：`tools/instance.ps1` 默认加 `--no-window --coopplus-no-fullscreen --resolution 1920x1080`。新档默认全屏，以前启动时游戏会把隐藏窗口切成全屏、盖住桌面；现在扩展遇到 `--coopplus-no-fullscreen` 就跳过这一步（引擎会吞掉 `--no-window`，脚本看不到它），窗口一直隐藏，截图为 1920x1080。需要看窗口时用 `-ShowWindow`。
 
 测试环境注意：实例窗口隐藏时，桌面上任何焦点切换都会让游戏收到“失去焦点”并打开暂停菜单（`input_service.gd:91-96`），波次停止。战斗场景和合作商店（`coop_shop.gd:38`）各自连接这个信号，商店里打开的暂停会带进下一波。探针在两处都断开连接，并在采样中记录 `paused`；看到全体同时静止时先查这个字段。模拟运行期间不要再启动其他游戏实例（新窗口会抢焦点）。

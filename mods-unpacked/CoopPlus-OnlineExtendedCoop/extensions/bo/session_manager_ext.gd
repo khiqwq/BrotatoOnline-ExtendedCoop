@@ -24,6 +24,7 @@ extends "res://mods-unpacked/six666-BrotatoOnline/scripts/session_manager.gd"
 
 const RuntimeGate = preload("res://mods-unpacked/CoopPlus-OnlineExtendedCoop/scripts/compatibility/runtime_gate.gd")
 const CapacityPolicy = preload("res://mods-unpacked/CoopPlus-OnlineExtendedCoop/scripts/core/capacity_policy.gd")
+const RoomPolicy = preload("res://mods-unpacked/CoopPlus-OnlineExtendedCoop/scripts/core/room_policy.gd")
 
 const COOPPLUS_MOD_ID := "CoopPlus-OnlineExtendedCoop"
 # CAP-M03: _refresh_lobby_members re-evaluates every Steam member on each lobby
@@ -42,9 +43,35 @@ const COOPPLUS_LAN_STALE_REPLACE_INTERVAL_MSEC := 15000
 const COOPPLUS_LAN_STALE_SILENCE_MSEC := 4000
 # Bound of the per-peer rate tables; a Steam lobby holds at most 8 members.
 const COOPPLUS_MAX_TRACKED_PEERS := 64
+const COOPPLUS_ROOM_TEXT := {
+	"zh": {
+		"extended_room_unsupported": "这是超四人扩展房间，本机的超四人扩展未启用或版本未验证，无法加入。",
+		"capability_mismatch": "这是超四人扩展房间，双方的超四人扩展版本不同，无法加入。",
+		"extension_required": "这是超四人扩展房间，需要安装同一版本的超四人联机合作扩展才能加入。",
+	},
+	"en": {
+		"extended_room_unsupported": "This is an extended (5-8 player) room; the extension on this PC is off or unverified.",
+		"capability_mismatch": "This is an extended (5-8 player) room running a different extension version.",
+		"extension_required": "This is an extended (5-8 player) room; joining needs the same version of the extension.",
+	},
+}
+# Extension messages (all start with coopplus_, capability.gd MSG_PREFIX) and
+# the refusal reasons a host puts in Brotato Online's transport_welcome.
+const COOPPLUS_MSG_CAPABILITY := "coopplus_capability_hello"
+const COOPPLUS_MSG_ROOM := "coopplus_room"
+const COOPPLUS_REASON_PREFIX := "coopplus_"
+# Key of our refusal reason in a transport_welcome (the welcome itself carries
+# the room's mod_version marker, so a client without the extension shows
+# Brotato Online's "incompatible protocol or mod version").
+const COOPPLUS_WELCOME_REASON := "coopplus_reason"
 
 var _coopplus_capacity_notice_msec := {}
 var _coopplus_lan_replace_msec := {}
+# Room this machine opened or joined (D-008), {} outside a room.
+var _coopplus_room := {}
+# Host: capability version announced by each LAN connection
+# (_connection_lookup_key -> int), before its identity arrives.
+var _coopplus_lan_capability := {}
 
 
 # Single source of the capacity for this script, so AP-009 can switch it to
@@ -55,6 +82,138 @@ func _coopplus_capacity() -> int:
 
 func _coopplus_extended() -> bool:
 	return RuntimeGate.is_extended()
+
+
+# --- room type (D-008) -------------------------------------------------------
+
+# The host fixes its room before the parent creates the Steam lobby / LAN
+# host, so steam_transport_ext and lan_transport_ext already size them by the
+# room: a standard room has capacity 4 and every extension runs its parent
+# for its whole lifetime (R08).
+func create_session(open_steam_overlay: bool = false) -> void:
+	if not bool(_session_active) and RuntimeGate.verified_capacity() > CapacityPolicy.VANILLA_MAX_PLAYERS:
+		var preference: Dictionary = RoomPolicy.load_preference()
+		# Continuing a saved 5..8 player run (Brotato Online opens the room from
+		# the resume screen): an extended room for at least that many players,
+		# whatever the preference says.
+		var resumed: int = RunData.get_player_count() if _is_in_official_coop_resume_scene() else 0
+		if resumed > CapacityPolicy.VANILLA_MAX_PLAYERS:
+			var wanted := resumed
+			if str(preference.get("type", "")) == RoomPolicy.TYPE_EXTENDED:
+				wanted = int(max(wanted, int(preference.get("capacity", 0))))
+			preference = {"type": RoomPolicy.TYPE_EXTENDED, "capacity": wanted}
+		_coopplus_room = RoomPolicy.host_room(preference, RuntimeGate.verified_capacity())
+		RuntimeGate.set_room_capacity(_coopplus_room.capacity)
+	.create_session(open_steam_overlay)
+	if not bool(_session_active) and not bool(_lobby_toggle_pending_create):
+		_coopplus_leave_room("create_session_failed")
+
+
+func leave_lobby() -> void:
+	.leave_lobby()
+	_coopplus_leave_room("leave_lobby")
+
+
+func coopplus_get_room() -> Dictionary:
+	return _coopplus_room.duplicate()
+
+
+func _coopplus_leave_room(_reason: String) -> void:
+	_coopplus_room = {}
+	RuntimeGate.clear_room()
+
+
+# A client joining a Steam lobby reads the advertised room first (D-008): an
+# extended room it cannot take part in is left with a clear message before
+# anything else happens; otherwise it takes the room's capacity (4 for a
+# standard room or a host without the extension). The host's own join of its
+# lobby keeps the room it opened.
+func _on_lobby_joined(lobby_id = 0, permissions = 0, locked = false, response = 0) -> void:
+	var verdict := _coopplus_steam_room_verdict(lobby_id)
+	if not verdict.empty() and not bool(verdict.ok):
+		if _steam != null and _steam_has_method("leaveLobby"):
+			_steam.leaveLobby(lobby_id)
+		_clear_pending_join_request()
+		_show_join_failure(_coopplus_room_text(str(verdict.reason)))
+		return
+	._on_lobby_joined(lobby_id, permissions, locked, response)
+	if not verdict.empty() and bool(_session_active) and not _is_game_host():
+		_coopplus_enter_room(int(verdict.capacity), verdict.get("room", {}))
+
+
+# {} when the join is not ours to judge (failed join, our own lobby);
+# else room_policy.gd join_room plus the room read.
+func _coopplus_steam_room_verdict(lobby_id) -> Dictionary:
+	if int(lobby_id) == 0 or _steam == null or not _steam_has_method("getLobbyData"):
+		return {}
+	# Our own room (create_session set it) or one we are already in.
+	if not _coopplus_room.empty():
+		return {}
+	if _steam_has_method("getLobbyOwner") and _self_steam_id != "" and str(_steam.getLobbyOwner(lobby_id)) == _self_steam_id:
+		return {}
+	var meta := {}
+	for key in [RoomPolicy.META_TYPE, RoomPolicy.META_CAPACITY, RoomPolicy.META_CAPABILITY]:
+		meta[key] = str(_steam.getLobbyData(lobby_id, key))
+	var verdict: Dictionary = RoomPolicy.join_room(meta, RuntimeGate.verified_capacity(), RuntimeGate.capability_version())
+	verdict["room"] = RoomPolicy.from_metadata(meta)
+	return verdict
+
+
+# Lobbies of extended rooms advertise the marker instead of Brotato Online's
+# version; ours (and the host's own lobby, session_manager.gd:2073) accept it,
+# _on_lobby_joined above has already checked the room itself.
+func _is_lobby_protocol_compatible(lobby_id) -> bool:
+	if ._is_lobby_protocol_compatible(lobby_id):
+		return true
+	return _steam != null and str(_steam.getLobbyData(lobby_id, "mod_version")) == _coopplus_mod_version_marker()
+
+
+# Steam capability check (AP-009). Clients without the extension refuse an
+# extended room themselves (mod_version marker). Ours add their capability
+# version to the hello (content_capability, whose other keys Brotato Online
+# reads; menu_sync_manager.gd:9177 ignores this one), and the host refuses a
+# hello without a matching one in an extended room before the peer counts as
+# seen, the same way the parent refuses a protocol mismatch.
+func _build_client_content_capability_for_hello() -> Dictionary:
+	var capability: Dictionary = ._build_client_content_capability_for_hello()
+	capability["coopplus"] = {"capability_version": RuntimeGate.capability_version()}
+	return capability
+
+
+func _accept_client_protocol(peer_key: String, message: Dictionary) -> bool:
+	if not ._accept_client_protocol(peer_key, message):
+		return false
+	if not _coopplus_room_extended():
+		return true
+	var announced = message.get("content_capability", {})
+	announced = announced.get("coopplus", {}) if typeof(announced) == TYPE_DICTIONARY else {}
+	var version = announced.get("capability_version", 0) if typeof(announced) == TYPE_DICTIONARY else 0
+	if typeof(version) in [TYPE_INT, TYPE_REAL] and int(version) == RuntimeGate.capability_version():
+		return true
+	# Never the peer key: on Steam it is the player's Steam ID.
+	ModLoaderLog.info("extended room: refused a client (capability %s)" % str(version), COOPPLUS_MOD_ID)
+	detach_kicked_peer(peer_key)
+	_seen_client_hello_by_steam_id.erase(peer_key)
+	_sync_host_coop_slots_from_lobby()
+	return false
+
+
+func _coopplus_enter_room(capacity: int, room: Dictionary) -> void:
+	_coopplus_room = room.duplicate() if not room.empty() else RoomPolicy.normalize(RoomPolicy.TYPE_STANDARD, 0)
+	RuntimeGate.set_room_capacity(capacity)
+
+
+func _coopplus_room_text(reason: String) -> String:
+	var texts: Dictionary = COOPPLUS_ROOM_TEXT["zh"] if TranslationServer.get_locale().begins_with("zh") else COOPPLUS_ROOM_TEXT["en"]
+	return str(texts.get(reason, reason))
+
+
+# Keys a joining extension reads (room_policy.gd from_metadata); a standard
+# room publishes none, exactly like a host without the extension.
+func _coopplus_room_metadata() -> Dictionary:
+	if _coopplus_room.empty() or str(_coopplus_room.get("type", "")) != RoomPolicy.TYPE_EXTENDED:
+		return {}
+	return RoomPolicy.to_metadata(_coopplus_room, RuntimeGate.capability_version())
 
 
 # --- admission -------------------------------------------------------------
@@ -187,6 +346,9 @@ func _publish_session_metadata() -> void:
 	_set_lobby_metadata_if_changed("state", state)
 	_set_lobby_metadata_if_changed("resume_assignment_pending", "1" if _is_in_official_coop_resume_scene() else "0")
 	_set_lobby_metadata_if_changed("joinable", "1" if joinable else "0")
+	var room := _coopplus_room_metadata()
+	for key in room:
+		_set_lobby_metadata_if_changed(key, room[key])
 	_set_lobby_joinable_if_changed(joinable)
 
 
@@ -202,6 +364,12 @@ func _setup_lobby_data() -> void:
 	_set_lobby_joinable_if_changed(get_session_member_count() < capacity)
 	if _steam_has_method("setLobbyData"):
 		_set_lobby_metadata_if_changed("member_limit", str(capacity))
+		if _coopplus_room_extended():
+			# Written here, at creation, so a joiner never sees the room without them.
+			_set_lobby_metadata_if_changed("mod_version", _coopplus_mod_version_marker())
+			var room := _coopplus_room_metadata()
+			for key in room:
+				_set_lobby_metadata_if_changed(key, room[key])
 	_coopplus_apply_native_member_limit(capacity)
 
 
@@ -249,6 +417,11 @@ func get_lan_discovery_info() -> Dictionary:
 	var capacity := _coopplus_capacity()
 	info["member_limit"] = capacity
 	info["joinable"] = get_session_member_count() < capacity and (_is_host_at_character_selection_for_lobby() or _is_in_official_coop_resume_scene())
+	var room := _coopplus_room_metadata()
+	for key in room:
+		info[key] = room[key]
+	if _coopplus_room_extended():
+		info["mod_version"] = _coopplus_mod_version_marker()
 	return info
 
 
@@ -302,10 +475,100 @@ func _coopplus_status_member_limit(count: int) -> int:
 
 # --- LAN reconnect ---------------------------------------------------------
 
+# LAN capability check (D-008, AP-009). The client announces its capability
+# version right before its identity credential, on the same reliable channel,
+# so the host has it when the credential arrives. In an extended room a
+# connection without a matching announcement is refused with a
+# transport_welcome carrying the room's mod_version marker: a client without
+# the extension fails its version check and shows Brotato Online's
+# "incompatible protocol or mod version" (instead of "room full"); ours reads
+# coopplus_reason and shows the exact cause. It is closed like the parent
+# closes refused peers. Accepted clients are then told the room
+# (coopplus_room).
 func _handle_transport_identity(transport: Node, peer, message: Dictionary) -> void:
+	var msg_type := str(message.get("msg_type", ""))
+	if msg_type == "transport_identity_request" and transport == _lan_transport and not _is_game_host():
+		transport.send_packet(peer, to_json({"msg_type": COOPPLUS_MSG_CAPABILITY, "capability_version": RuntimeGate.capability_version()}).to_utf8(), P2P_CHANNEL_MENU, true)
+	if msg_type == "transport_identity" and transport == _lan_transport and _is_game_host() and _coopplus_room_extended():
+		var refusal := _coopplus_lan_capability_refusal(transport, peer)
+		if refusal != "":
+			transport.send_packet(peer, to_json({"msg_type": "transport_welcome", "accepted": false, "protocol_version": LAN_PROTOCOL_VERSION, "mod_version": _coopplus_mod_version_marker(), "reason": "protocol_mismatch", COOPPLUS_WELCOME_REASON: refusal}).to_utf8(), P2P_CHANNEL_MENU, true)
+			transport.close_peer(peer, false)
+			return
 	if _coopplus_extended():
 		_coopplus_release_stale_lan_peer(transport, peer, message)
 	._handle_transport_identity(transport, peer, message)
+	if msg_type == "transport_identity" and transport == _lan_transport and _is_game_host() and _peer_key_by_connection.has(_connection_lookup_key(transport, peer)):
+		var room := _coopplus_room_metadata()
+		room["msg_type"] = COOPPLUS_MSG_ROOM
+		transport.send_packet(peer, to_json(room).to_utf8(), P2P_CHANNEL_MENU, true)
+
+
+# mod_version an extended room advertises instead of Brotato Online's own
+# (CAP-12/CAP-13 option C): clients without the extension compare it exactly
+# and refuse themselves before joining; ours accept it
+# (_is_lobby_protocol_compatible) and check the room data.
+func _coopplus_mod_version_marker() -> String:
+	return "%s+coopplus" % NETWORK_PROTOCOL_VERSION
+
+
+func _coopplus_room_extended() -> bool:
+	return str(_coopplus_room.get("type", "")) == RoomPolicy.TYPE_EXTENDED
+
+
+# "" when the connection may join the extended room.
+func _coopplus_lan_capability_refusal(transport: Node, peer) -> String:
+	var lookup = _connection_lookup_key(transport, peer)
+	if not _coopplus_lan_capability.has(lookup):
+		return "extension_required"
+	if int(_coopplus_lan_capability[lookup]) != RuntimeGate.capability_version():
+		return "capability_mismatch"
+	return ""
+
+
+# Extension messages are taken out before the parent, which drops unknown
+# messages from connections that have no player yet.
+func _on_transport_packet_received(transport: Node, peer, data: PoolByteArray, channel: int) -> void:
+	if not data.empty() and data.size() < 4096:
+		var parsed = parse_json(data.get_string_from_utf8())
+		if typeof(parsed) == TYPE_DICTIONARY and str(parsed.get("msg_type", "")).begins_with(COOPPLUS_REASON_PREFIX):
+			_coopplus_handle_lan_message(transport, peer, parsed)
+			return
+	._on_transport_packet_received(transport, peer, data, channel)
+
+
+func _coopplus_handle_lan_message(transport: Node, peer, message: Dictionary) -> void:
+	if transport != _lan_transport:
+		return
+	var msg_type := str(message.get("msg_type", ""))
+	if msg_type == COOPPLUS_MSG_CAPABILITY and _is_game_host():
+		if _coopplus_lan_capability.size() >= COOPPLUS_MAX_TRACKED_PEERS:
+			_coopplus_lan_capability.clear()
+		var version = message.get("capability_version", 0)
+		_coopplus_lan_capability[_connection_lookup_key(transport, peer)] = int(version) if typeof(version) in [TYPE_INT, TYPE_REAL] else 0
+	elif msg_type == COOPPLUS_MSG_ROOM and not _is_game_host() and _online_role == "client":
+		_coopplus_enter_room(RoomPolicy.from_metadata(message).capacity, RoomPolicy.from_metadata(message))
+
+
+# A LAN client is in a standard room until the host says otherwise
+# (coopplus_room right after the accepting welcome).
+func _handle_transport_welcome(transport: Node, peer, welcome: Dictionary) -> void:
+	# Our host's refusal: the exact cause instead of the parent's version text.
+	if transport == _lan_transport and not _is_game_host() and welcome.has(COOPPLUS_WELCOME_REASON):
+		_fail_lan_handshake(transport, COOPPLUS_REASON_PREFIX + str(welcome.get(COOPPLUS_WELCOME_REASON, "")))
+		return
+	var was_client: bool = bool(_session_active) and str(_online_role) == "client"
+	._handle_transport_welcome(transport, peer, welcome)
+	if not was_client and bool(_session_active) and _online_role == "client" and transport == _lan_transport and _coopplus_room.empty():
+		_coopplus_enter_room(CapacityPolicy.VANILLA_MAX_PLAYERS, {})
+
+
+# Our refusal reasons through Brotato Online's own failure path
+# (_fail_lan_handshake -> _show_join_failure(_ui_text(key))).
+func _ui_text(key: String) -> String:
+	if key.begins_with(COOPPLUS_REASON_PREFIX):
+		return _coopplus_room_text(key.substr(COOPPLUS_REASON_PREFIX.length()))
+	return ._ui_text(key)
 
 
 # CAP-M01: a LAN client that reconnects before the host noticed its old ENet

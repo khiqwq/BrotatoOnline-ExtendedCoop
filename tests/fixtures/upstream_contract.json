@@ -16,7 +16,15 @@
         "_get_lobby_status_text": 0,
         "_ready": 0,
         "_bind_transports": 0,
-        "_register_remote_connection": 3
+        "_register_remote_connection": 3,
+        "leave_lobby": 0,
+        "_on_lobby_joined": 4,
+        "_is_lobby_protocol_compatible": 1,
+        "_build_client_content_capability_for_hello": 0,
+        "_accept_client_protocol": 2,
+        "_on_transport_packet_received": 4,
+        "_handle_transport_welcome": 3,
+        "_ui_text": 1
       },
       "constants": {
         "MAX_LOBBY_MEMBERS": "4",
@@ -128,7 +136,10 @@
         "_reset_per_wave_properties": 0,
         "reset": 1,
         "reset_run_caches": 0,
-        "get_player_count": 0
+        "get_player_count": 0,
+        "add_gold": 2,
+        "add_xp": 2,
+        "resume_from_state": 1
       },
       "constants": {}
     },
@@ -176,7 +187,8 @@
     "res://singletons/progress_data.gd": {
       "methods": {
         "reset_and_save_run_state": 1,
-        "_get_current_run_state": 0
+        "_get_current_run_state": 0,
+        "load_game_file": 1
       },
       "constants": {}
     },
@@ -184,7 +196,9 @@
       "methods": {
         "_get_locked_panels": 0,
         "_setup_zone": 1,
-        "_on_ZoneSelectionButton_item_selected": 1
+        "_on_ZoneSelectionButton_item_selected": 1,
+        "_ready": 0,
+        "_process": 1
       },
       "constants": {}
     },
@@ -198,6 +212,19 @@
       "methods": {
         "_get_panels": 0,
         "_get_inventory_containers": 0
+      },
+      "constants": {}
+    },
+    "res://ui/menus/run/weapon_selection.gd": {
+      "methods": {
+        "_ready": 0
+      },
+      "constants": {}
+    },
+    "res://mods-unpacked/six666-BrotatoOnline/scripts/public_lobby_browser.gd": {
+      "methods": {
+        "_read_lobby_entry": 1,
+        "_on_lan_lobby_found": 1
       },
       "constants": {}
     }

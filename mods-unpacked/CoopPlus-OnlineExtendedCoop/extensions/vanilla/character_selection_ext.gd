@@ -19,12 +19,24 @@ extends "res://ui/menus/run/character_selection.gd"
 # call their parent versions (ADR-001 rule 1). With more than four players and
 # one local player the panel row uses the two display modes of D-012
 # (ui/selection_view_controller.gd), rebuilt whenever the player set changes.
+# The run options get a room-type dropdown (D-008, scripts/core/room_policy.gd):
+# standard (4, vanilla compatible) or extended (5..8). It is shown whenever
+# extended mode is verified on this PC, saves the choice per PC and is locked
+# while an online room is open (the type is fixed per room).
 
 const RuntimeGate = preload("res://mods-unpacked/CoopPlus-OnlineExtendedCoop/scripts/compatibility/runtime_gate.gd")
 const PerPlayerArrays = preload("res://mods-unpacked/CoopPlus-OnlineExtendedCoop/scripts/core/per_player_arrays.gd")
 const ExtraPlayerPanels = preload("res://mods-unpacked/CoopPlus-OnlineExtendedCoop/ui/extra_player_panels.gd")
 const LocalFocusLayout = preload("res://mods-unpacked/CoopPlus-OnlineExtendedCoop/ui/local_focus_layout.gd")
 const SelectionView = preload("res://mods-unpacked/CoopPlus-OnlineExtendedCoop/ui/selection_view_controller.gd")
+const RoomPolicy = preload("res://mods-unpacked/CoopPlus-OnlineExtendedCoop/scripts/core/room_policy.gd")
+const COOPPLUS_ROOM_REFRESH_SEC := 0.5
+const COOPPLUS_ROOM_TEXT := {
+	"zh": {"standard": "标准房间（4 人，原版兼容）", "extended": "扩展房间（%d 人）"},
+	"en": {"standard": "Standard room (4, vanilla compatible)", "extended": "Extended room (%d players)"},
+}
+# Dropdown order: standard, then extended 5..8.
+const COOPPLUS_ROOM_CHOICES := [["standard", 4], ["extended", 5], ["extended", 6], ["extended", 7], ["extended", 8]]
 
 const COOPPLUS_MOD_ID := "CoopPlus-OnlineExtendedCoop"
 const COOPPLUS_ROW_PATH := "MarginContainer/VBoxContainer/DescriptionContainer/HBoxContainer"
@@ -41,6 +53,8 @@ var _coopplus_extra_panels := []
 var _coopplus_extra_locked_panels := []
 var _coopplus_view = null
 var _coopplus_view_key := ""
+var _coopplus_room_button: OptionButton = null
+var _coopplus_room_refresh := 0.0
 
 
 func _enter_tree() -> void:
@@ -65,8 +79,43 @@ func _enter_tree() -> void:
 func _ready() -> void:
 	if _coopplus_extra_panels.empty():
 		return
+	_coopplus_add_room_button()
 	var _e = CoopService.connect("connected_players_updated", self, "_coopplus_on_players_updated")
 	_coopplus_update_view()
+
+
+func _process(delta: float) -> void:
+	if _coopplus_room_button == null:
+		return
+	_coopplus_room_refresh -= delta
+	if _coopplus_room_refresh <= 0.0:
+		_coopplus_room_refresh = COOPPLUS_ROOM_REFRESH_SEC
+		_coopplus_room_button.disabled = RuntimeGate.room_capacity() > 0
+
+
+func _coopplus_add_room_button() -> void:
+	if _run_options_panel_content == null:
+		return
+	var texts: Dictionary = COOPPLUS_ROOM_TEXT["zh"] if TranslationServer.get_locale().begins_with("zh") else COOPPLUS_ROOM_TEXT["en"]
+	var button := OptionButton.new()
+	button.name = "CoopPlusRoomType"
+	button.focus_mode = Control.FOCUS_ALL
+	for choice in COOPPLUS_ROOM_CHOICES:
+		button.add_item(texts.standard if choice[0] == RoomPolicy.TYPE_STANDARD else texts.extended % choice[1])
+	var pref: Dictionary = RoomPolicy.load_preference()
+	for i in COOPPLUS_ROOM_CHOICES.size():
+		if COOPPLUS_ROOM_CHOICES[i][0] == pref.type and COOPPLUS_ROOM_CHOICES[i][1] == pref.capacity:
+			button.select(i)
+	var _e = button.connect("item_selected", self, "_coopplus_on_room_selected")
+	_run_options_panel_content.add_child(button)
+	_coopplus_room_button = button
+	_coopplus_room_button.disabled = RuntimeGate.room_capacity() > 0
+
+
+func _coopplus_on_room_selected(index: int) -> void:
+	if index < 0 or index >= COOPPLUS_ROOM_CHOICES.size() or RuntimeGate.room_capacity() > 0:
+		return
+	RoomPolicy.save_preference({"type": COOPPLUS_ROOM_CHOICES[index][0], "capacity": COOPPLUS_ROOM_CHOICES[index][1]})
 
 
 func _coopplus_on_players_updated(_players: Array) -> void:

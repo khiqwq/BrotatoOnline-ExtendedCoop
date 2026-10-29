@@ -135,10 +135,26 @@ func reset_run_caches() -> void:
 
 
 # Also called by utils_ext.gd after Utils rebuilds its arrays.
+# Parent: run_data.gd:1785 (Continue). It ends with LinkedStats.reset(),
+# which loops every player of the resumed state over LinkedStats/TempStats
+# arrays that are still four long right after launch, so they grow to the
+# state's player count first.
+func resume_from_state(state: Dictionary) -> void:
+	var players = state.get("players_data")
+	if RuntimeGate.is_extended() and players is Array and players.size() > PerPlayerArrays.VANILLA_SLOTS:
+		_coopplus_grow_per_player_arrays(players.size())
+	.resume_from_state(state)
+	coopplus_fit_per_player_arrays()
+
+
 func coopplus_fit_per_player_arrays() -> void:
 	if not RuntimeGate.is_extended():
 		return
-	var size := PerPlayerArrays.target_size(players_data.size(), RuntimeGate.capacity())
+	_coopplus_grow_per_player_arrays(players_data.size())
+
+
+func _coopplus_grow_per_player_arrays(player_count: int) -> void:
+	var size := PerPlayerArrays.target_size(player_count, RuntimeGate.capacity())
 	if size <= PerPlayerArrays.VANILLA_SLOTS:
 		return
 	var _r = PerPlayerArrays.grow_fields(self, COOPPLUS_RUN_DATA_FIELDS, size)

@@ -22,6 +22,8 @@
 | ---- | -------- | ---- |
 | `extensions/bo/session_manager_ext.gd` | `scripts/session_manager.gd`：`_remote_connection_rejection_reason`（:778-793，分支顺序）、`_publish_session_metadata`（:1146-1159）、`_get_lobby_status_text`（:8556-8580） | 人数上限取自运行时开关而非 `MAX_LOBBY_MEMBERS`；满员拒绝通知、LAN 旧连接释放 |
 | `extensions/bo/lan_transport_ext.gd` | `scripts/lan_transport.gd:39-52` `start_host` | ENet 服务器 peer 上限按容量加余量 |
+| `scripts/bo/resume_identity_patch.gd` | `scripts/player_identity_manager.gd:126-128` `prepare_resume_if_needed`（由槽位重建 `_lan_hashes` 的循环） | 运行时调整 BO 身份管理器：超过 4 槽的登记表、面板加高、4 人以上禁用离线继续 |
+| `extensions/bo/public_lobby_browser_ext.gd` | `scripts/public_lobby_browser.gd:1166-1186` `_read_lobby_entry`（joinable 的判断式） | 扩展房间的 mod_version 标记在本机可加入时视为兼容 |
 | `extensions/bo/network_heartbeat_ext.gd` | `scripts/network_heartbeat.gd:152-166` `_receive_host_disconnect_status` | 断线列表上限为容量 - 1 而非 3 |
 | `extensions/bo/menu_sync_manager_ext.gd` | `scripts/menu_sync_manager.gd:8007-8015` `_get_online_coop_layout_player_count`、`:5988-5996` `_set_node_array_value` | 人数按容量限制；补位使用中性值 |
 | `extensions/bo/online_player_slot_manager_ext.gd` | `scripts/online_player_slot_manager.gd:496-627` `apply_host_selection_layout`、`:745-769` `_add_remote_steam_id`、`:1175-1200` `_remove_untracked_remote_placeholder_slots` | 远程座位按容量分配到虚拟设备号；拒绝可查询；超容量布局整体拒绝 |

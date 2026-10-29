@@ -27,6 +27,8 @@ const UpstreamFingerprint = preload("res://mods-unpacked/CoopPlus-OnlineExtended
 
 const MOD_ID := "CoopPlus-OnlineExtendedCoop"
 const META_KEY := "coopplus_runtime_gate"
+# Capacity of the online room this machine is in (D-008), see set_room_capacity.
+const ROOM_META_KEY := "coopplus_room_capacity"
 const COMPATIBILITY_PATH := "res://mods-unpacked/CoopPlus-OnlineExtendedCoop/compatibility.json"
 const COMPATIBILITY_SCHEMA := 1
 const UNPACKED_ROOT := "res://mods-unpacked"
@@ -97,12 +99,52 @@ const UNVERIFIED_TARGET_REASONS := [
 
 # --- Getters (contract used by every extension) ---------------------------
 
-# Capacity for NEW sessions: 8 in extended mode, else 4.
+# Capacity: 8 in extended mode, else 4; inside an online room the room's
+# capacity (D-008: 4 in a standard room, so every extension behaves as
+# vanilla there), never above the decision's.
 static func capacity() -> int:
 	var state := _state()
 	if state.empty():
 		return VANILLA_CAPACITY
-	return int(state["capacity"])
+	var cap := int(state["capacity"])
+	var room := room_capacity()
+	if room > 0:
+		cap = int(min(cap, room))
+	return cap
+
+
+# Network capability version from compatibility.json (capability.gd hello,
+# room metadata); 0 when unknown.
+static func capability_version() -> int:
+	var details = _state().get("details", {})
+	return int(details.get("capability_version", 0)) if typeof(details) == TYPE_DICTIONARY else 0
+
+
+# What this machine supports regardless of the room: 8 when extended mode is
+# verified, else 4. A host picks its room within it (room_policy.gd).
+static func verified_capacity() -> int:
+	var state := _state()
+	return VANILLA_CAPACITY if state.empty() else int(state["capacity"])
+
+
+# Set when this machine opens or joins an online room, before any remote seat
+# exists, and kept for the whole room; cleared when it leaves. Without a room
+# (offline play) the decision's capacity applies.
+static func set_room_capacity(room_capacity: int) -> void:
+	Engine.set_meta(ROOM_META_KEY, int(clamp(room_capacity, 1, 64)))
+
+
+static func clear_room() -> void:
+	if Engine.has_meta(ROOM_META_KEY):
+		Engine.remove_meta(ROOM_META_KEY)
+
+
+# 0 when this machine is in no room.
+static func room_capacity() -> int:
+	if not Engine.has_meta(ROOM_META_KEY):
+		return 0
+	var value = Engine.get_meta(ROOM_META_KEY)
+	return int(value) if typeof(value) == TYPE_INT else 0
 
 
 static func is_extended() -> bool:
@@ -205,6 +247,8 @@ static func decide(inputs: Dictionary) -> Dictionary:
 			reasons.append(REASON_COMPAT_INVALID)
 			details["compatibility_problem"] = problem
 	details["compatibility"] = compat_state
+	if compat_usable:
+		details["capability_version"] = int(compat.get("network_capability_version", 0))
 
 	# 3. Locked game / engine / Mod Loader versions (R04). An unknown version is
 	# not a verified one.
@@ -405,6 +449,7 @@ static func _store(result: Dictionary) -> void:
 static func _reset() -> void:
 	if Engine.has_meta(META_KEY):
 		Engine.remove_meta(META_KEY)
+	clear_room()
 
 
 static func _read_compatibility() -> Dictionary:

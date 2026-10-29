@@ -322,6 +322,45 @@ func test_getters_follow_an_extended_decision() -> void:
 		assert_eq(RuntimeGate.is_virtual_device(device), device >= 16 and device <= 22, "device %d" % device)
 
 
+func test_room_capacity_limits_an_extended_decision() -> void:
+	RuntimeGate._store(RuntimeGate.decide(_good_inputs()))
+	RuntimeGate.set_room_capacity(4)
+	assert_eq(RuntimeGate.capacity(), 4, "standard room (D-008)")
+	assert_false(RuntimeGate.is_extended(), "every extension runs its parent in a standard room")
+	assert_eq(RuntimeGate.virtual_device_ids(), [])
+	assert_false(RuntimeGate.is_virtual_device(16))
+	RuntimeGate.set_room_capacity(6)
+	assert_eq(RuntimeGate.capacity(), 6)
+	assert_eq(RuntimeGate.virtual_device_ids(), [16, 17, 18, 19, 20])
+	assert_eq(RuntimeGate.room_capacity(), 6)
+	RuntimeGate.set_room_capacity(12)
+	assert_eq(RuntimeGate.capacity(), 8, "never above the decision")
+	RuntimeGate.clear_room()
+	assert_eq(RuntimeGate.room_capacity(), 0)
+	assert_eq(RuntimeGate.capacity(), 8, "offline: the decision's capacity")
+
+
+func test_capability_version_comes_from_compatibility() -> void:
+	RuntimeGate._store(RuntimeGate.decide(_good_inputs()))
+	assert_eq(RuntimeGate.capability_version(), 0, "not listed: unknown")
+	var inputs = _good_inputs()
+	inputs.compatibility["network_capability_version"] = 3.0
+	RuntimeGate._store(RuntimeGate.decide(inputs))
+	assert_eq(RuntimeGate.capability_version(), 3)
+	assert_eq(RuntimeGate.verified_capacity(), 8)
+	RuntimeGate.set_room_capacity(4)
+	assert_eq(RuntimeGate.verified_capacity(), 8, "the room never changes what the machine supports")
+
+
+func test_room_capacity_never_extends_a_vanilla_decision() -> void:
+	var inputs = _good_inputs()
+	inputs.cmdline_args = ["--coopplus-vanilla"]
+	RuntimeGate._store(RuntimeGate.decide(inputs))
+	RuntimeGate.set_room_capacity(8)
+	assert_eq(RuntimeGate.capacity(), 4)
+	assert_false(RuntimeGate.is_extended())
+
+
 func test_virtual_ids_avoid_every_vanilla_and_physical_id() -> void:
 	RuntimeGate._store(RuntimeGate.decide(_good_inputs()))
 	var ids = RuntimeGate.virtual_device_ids()
