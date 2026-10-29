@@ -93,6 +93,15 @@ pwsh ./tools/instance.ps1 -Action Start -Name sim -StopAfterSec 150 -ExtraArgs "
 | 4/5/8 人 × 2 波，无 CoopFix | 5/8 人同上；4 人无状态条（R08） |
 | 容量探针，带 CoopFix | extended、容量 8，37/37（EV-0029） |
 
+### 两种显示模式（D-012，证据 EV-0030）
+
+第一个升级界面、第一个商店和结算界面在上面的检查之后再走一遍四人视图：`key_v`（切换）→ 截图 → `stick_right`（右摇杆推到底再回中）→ 截图 → `stick_left` → `key_v`。商店另加 `pad_right`、`pad_left` 检查“光标到边才滑动”。每步记录 `mode`（focus/pages）与 `start`（窗口起点）。升级界面的检查在第一次接受之前进行（第一次接受就会结束整个升级界面）。选择保存在实例用户目录的 `coopplus_view.cfg`；`run_sims.ps1` 每轮删除用户目录，所以每轮从默认的本机放大开始。
+
+| 运行 | 结果 |
+| ---- | ---- |
+| 8 人可阵亡，带 CoopFix | 三个界面两种模式往返；商店边缘规则 0→1→2→1→0；第 5 波进入结算 |
+| 4/5/8 人 × 2 波，无 CoopFix | 5 人窗口 0↔1、到端不动；8 人同上；4 人不启用 |
+
 测试环境注意：实例窗口隐藏时，桌面上任何焦点切换都会让游戏收到“失去焦点”并打开暂停菜单（`input_service.gd:91-96`），波次停止。战斗场景和合作商店（`coop_shop.gd:38`）各自连接这个信号，商店里打开的暂停会带进下一波。探针在两处都断开连接，并在采样中记录 `paused`；看到全体同时静止时先查这个字段。模拟运行期间不要再启动其他游戏实例（新窗口会抢焦点）。
 
 修复内容：`scripts/core/per_player_arrays.gd`（按 max(4, 人数) 只增不减地扩容）、`extensions/vanilla/run_data_ext.gd`（RunData/TempStats/LinkedStats/Utils 数组，含 RunData 三个重置函数之后）、`utils_ext.gd`（Utils 两个重置函数之后）、`popup_manager_ext.gd`（弹窗管理器五个数组）、`upgrades_ui_ext.gd`（合作升级界面补建 P5～P8 面板、属性弹窗、FocusEmulator 与界面数组；5～8 人的最终布局待 AP-014 样例确认）。

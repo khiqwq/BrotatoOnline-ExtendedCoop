@@ -7,7 +7,9 @@ extends Reference
 # addressing them by player index (purchases, rerolls and ready state go
 # through the screen's methods, not through the panels' visibility; the
 # focus-restore helpers that check visibility only pick where to draw a remote
-# cursor). The hidden players' popups are un-registered as well (_mute_popups).
+# cursor). The hidden players' popups are un-registered as well
+# (ui/panel_popups.gd). ui/panel_view_controller.gd adds the four-panel display
+# mode and the key that switches between the two (D-012).
 # On the shop and end-run screens the strip's rows can be selected to show that
 # player's panel beside the local one (D-011); the strip joins the local
 # player's FocusEmulator area for that (_add_focus_base). The upgrade screen's
@@ -17,6 +19,8 @@ extends Reference
 # several local players (not a supported setup, R02) the full row stays.
 
 const PlayerStatusStrip = preload("res://mods-unpacked/CoopPlus-OnlineExtendedCoop/ui/player_status_strip.gd")
+const PanelViewController = preload("res://mods-unpacked/CoopPlus-OnlineExtendedCoop/ui/panel_view_controller.gd")
+const PanelPopups = preload("res://mods-unpacked/CoopPlus-OnlineExtendedCoop/ui/panel_popups.gd")
 const RuntimeGate = preload("res://mods-unpacked/CoopPlus-OnlineExtendedCoop/scripts/compatibility/runtime_gate.gd")
 
 const COOPPLUS_MOD_ID := "CoopPlus-OnlineExtendedCoop"
@@ -98,11 +102,15 @@ static func apply(screen: Node, row: Container, panels: Array, mode: String) -> 
 	var strip = PlayerStatusStrip.new()
 	holder.add_child(strip)
 	strip.setup(screen, mode, others)
-	var muted := _mute_popups(screen, others)
+	var muted := PanelPopups.mute(screen, others)
 	if mode in SELECTABLE_MODES:
 		strip.enable_view(row, panels, local, LOCAL_PANEL_STRETCH, muted)
 		if not _add_focus_base(screen, local, strip):
 			ModLoaderLog.warning("%s: player rows not reachable by focus (FocusEmulator%d layout changed)" % [mode, local + 1], COOPPLUS_MOD_ID)
+	# Last child of the screen: its _input runs before the FocusEmulators'.
+	var controller = PanelViewController.new()
+	screen.add_child(controller)
+	controller.setup(screen, row, panels, local, holder, strip, muted, LOCAL_PANEL_STRETCH)
 	return strip
 
 
@@ -136,30 +144,3 @@ static func _add_focus_base(screen: Node, player_index: int, base: Control) -> b
 	emulator.focus_base_data = new_datas
 	nodes.append(base)
 	return true
-
-
-# The screens register one item popup and one stat popup per player with
-# their PopupManager, which shows them when that player focuses an element
-# (popup_manager.gd); coop_end_run.gd _ready focuses every player's first
-# item, so the hidden players' popups appeared over the local panel (EV-0025).
-# PopupManager null-checks every entry before use and nothing else reads its
-# lists, so un-registering them keeps them hidden, including focus mirrored
-# from remote players later. The popup nodes stay in the scene. Returns
-# {field: {player_index: popup}} so the strip can register a player's popups
-# again while that player's panel is shown.
-static func _mute_popups(screen: Node, player_indices: Array) -> Dictionary:
-	var muted := {}
-	var manager = screen.get("_popup_manager")
-	if manager == null:
-		return muted
-	for field in ["_item_popups", "_stat_popups"]:
-		var popups = manager.get(field)
-		if not popups is Array:
-			continue
-		muted[field] = {}
-		for i in player_indices:
-			if i < popups.size() and popups[i] != null:
-				muted[field][i] = popups[i]
-				popups[i].hide()
-				popups[i] = null
-	return muted

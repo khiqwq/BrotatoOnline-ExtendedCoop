@@ -17,8 +17,13 @@ extends VBoxContainer
 # next to the local one, the two splitting the left side evenly; selecting it
 # again hides it. The shown panel is view-only here: it is outside the local
 # player's focus area and Brotato Online keeps driving it from its owner.
+# The strip is the focus mode of ui/panel_view_controller.gd (D-012), which
+# calls leave_focus_mode/enter_focus_mode around the four-panel mode; the hint
+# under the rows names the key that switches.
 # Fonts and panel styles come from the screen's theme. Layout only: it never
 # changes game state.
+
+const PanelPopups = preload("res://mods-unpacked/CoopPlus-OnlineExtendedCoop/ui/panel_popups.gd")
 
 const MODE_SHOP := "shop"
 const MODE_UPGRADES := "upgrades"
@@ -36,8 +41,8 @@ const SELECTED_BORDER := 6
 const ROW_MIN_BG_ALPHA := 0.95
 
 const TEXT := {
-	"zh": {"ready": "已准备", "shopping": "选购中", "choosing": "选择中", "done": "已完成", "level": "等级 %d", "weapons": "武器 %d", "items": "道具 %d", "hint": "选择玩家可展开或收起其面板"},
-	"en": {"ready": "Ready", "shopping": "Shopping", "choosing": "Choosing", "done": "Done", "level": "LV.%d", "weapons": "Weapons %d", "items": "Items %d", "hint": "Select a player to show or hide their panel"},
+	"zh": {"ready": "已准备", "shopping": "选购中", "choosing": "选择中", "done": "已完成", "level": "等级 %d", "weapons": "武器 %d", "items": "道具 %d", "hint": "选择玩家可展开或收起其面板", "toggle": "V / 手柄 Back 键：四人视图"},
+	"en": {"ready": "Ready", "shopping": "Shopping", "choosing": "Choosing", "done": "Done", "level": "LV.%d", "weapons": "Weapons %d", "items": "Items %d", "hint": "Select a player to show or hide their panel", "toggle": "V / gamepad Back: four-panel view"},
 }
 
 var _screen: Node = null
@@ -48,6 +53,7 @@ var _refresh_left := 0.0
 # Set by enable_view: {row, panels, local, stretch, popups}.
 var _view := {}
 var _viewed := -1
+var _hint: Label = null
 
 
 func setup(screen: Node, mode: String, player_indices: Array) -> void:
@@ -61,24 +67,25 @@ func setup(screen: Node, mode: String, player_indices: Array) -> void:
 	add_constant_override("separation", 12)
 	for player_index in player_indices:
 		_rows[player_index] = _build_row(player_index)
+	_hint = Label.new()
+	_hint.name = "Hint"
+	_hint.align = Label.ALIGN_CENTER
+	_hint.autowrap = true
+	_hint.modulate.a = 0.7
+	add_child(_hint)
+	_update_hint()
 	_refresh()
 
 
 # row: the screen's panel row; panels: every player's panel in player order;
 # local: the local player's index; stretch: the local panel's stretch ratio
 # with nothing shown beside it; popups: {PopupManager field: {player_index:
-# popup}} un-registered by local_focus_layout._mute_popups.
+# popup}} un-registered by PanelPopups.mute().
 func enable_view(row: Container, panels: Array, local: int, stretch: float, popups: Dictionary) -> void:
 	_view = {"row": row, "panels": panels, "local": local, "stretch": stretch, "popups": popups}
 	for player_index in _rows:
 		_add_select_button(player_index)
-	var hint := Label.new()
-	hint.name = "Hint"
-	hint.text = _texts().hint
-	hint.align = Label.ALIGN_CENTER
-	hint.autowrap = true
-	hint.modulate.a = 0.7
-	add_child(hint)
+	_update_hint()
 	_link_shop_items()
 
 
@@ -94,6 +101,22 @@ func select_button(player_index: int) -> Button:
 func toggle_player(player_index: int) -> void:
 	_set_viewed(-1 if player_index == _viewed else player_index)
 	_link_shop_items()
+
+
+# Four-panel mode takes over the row: nothing shown beside the local panel,
+# and the shop items' right neighbour back to vanilla.
+func leave_focus_mode() -> void:
+	_set_viewed(-1)
+	_link_shop_items(true)
+
+
+func enter_focus_mode() -> void:
+	_link_shop_items()
+
+
+func _update_hint() -> void:
+	var t := _texts()
+	_hint.text = (t.hint + "\n" if not _view.empty() else "") + t.toggle
 
 
 func _process(delta: float) -> void:
@@ -193,7 +216,7 @@ func _set_viewed(player_index: int) -> void:
 	if _viewed >= 0:
 		if is_instance_valid(panels[_viewed]):
 			panels[_viewed].visible = false
-		_set_popups_registered(_viewed, false)
+		PanelPopups.set_registered(_screen, _view.popups, _viewed, false)
 		_set_row_selected(_viewed, false)
 		_viewed = -1
 	local_panel.size_flags_stretch_ratio = _view.stretch
@@ -213,38 +236,17 @@ func _set_viewed(player_index: int) -> void:
 	panel.size_flags_stretch_ratio = half
 	local_panel.size_flags_stretch_ratio = half
 	panel.visible = true
-	_set_popups_registered(player_index, true)
+	PanelPopups.set_registered(_screen, _view.popups, player_index, true)
 	_set_row_selected(player_index, true)
 	_viewed = player_index
-
-
-# The shown panel's popups go back to the PopupManager so its owner's focus
-# shows them as on the vanilla screens; hidden again with the panel.
-func _set_popups_registered(player_index: int, registered: bool) -> void:
-	var manager = _screen.get("_popup_manager") if is_instance_valid(_screen) else null
-	if manager == null:
-		return
-	for field in _view.popups:
-		var saved: Dictionary = _view.popups[field]
-		var list = manager.get(field)
-		if not list is Array or not saved.has(player_index) or player_index >= list.size():
-			continue
-		var popup = saved[player_index]
-		if not is_instance_valid(popup):
-			continue
-		if registered:
-			list[player_index] = popup
-		else:
-			popup.hide()
-			list[player_index] = null
 
 
 # Vanilla locks left/right on the shop items (coop_shop_item.tscn: BuyButton
 # focus_neighbour_left/right = "."), so moving right from an item went
 # nowhere. The local player's item buttons point right at the strip instead:
-# the shown player's row, else the first row. The four item nodes live as long
-# as the shop (shop_items_container.gd _ready).
-func _link_shop_items() -> void:
+# the shown player's row, else the first row (restore: vanilla's self link).
+# The four item nodes live as long as the shop (shop_items_container.gd _ready).
+func _link_shop_items(restore: bool = false) -> void:
 	if _mode != MODE_SHOP or _view.empty() or _rows.empty() or not is_instance_valid(_screen) or not _screen.has_method("_get_shop_items_container"):
 		return
 	var container = _screen._get_shop_items_container(_view.local)
@@ -258,7 +260,7 @@ func _link_shop_items() -> void:
 	for shop_item in container._shop_items:
 		var button = shop_item.get("_button") if is_instance_valid(shop_item) else null
 		if button is Control:
-			button.focus_neighbour_right = button.get_path_to(target)
+			button.focus_neighbour_right = NodePath(".") if restore else button.get_path_to(target)
 
 
 func _set_row_selected(player_index: int, selected: bool) -> void:

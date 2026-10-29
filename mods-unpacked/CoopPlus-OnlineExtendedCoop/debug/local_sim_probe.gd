@@ -53,15 +53,20 @@ const SCREENSHOT_AT_SEC := 10.0
 # shown this long and captured, or give up after UPGRADES_SHOT_WAIT_SEC.
 const UPGRADES_SHOT_AFTER_SEC := 0.8
 const UPGRADES_SHOT_WAIT_SEC := 6.0
-# Player-row selection on the first shop and the end-of-run screen (D-011):
-# one step every VIEW_STEP_SEC. "pad_*" sends ui_<dir>_<device> for P1 (the
-# local player), "click_*" clicks a row the way CoopFix-OnlineMouseUI does
-# (its own hit test when that mod is loaded), "shot*" saves a screenshot and
-# every step logs P1's focus and the shown player.
+# Display checks on the first upgrade screen, the first shop and the
+# end-of-run screen (D-011 row selection, D-012 display modes): one step every
+# VIEW_STEP_SEC. "pad_*" sends ui_<dir>_<device> for P1 (the local player),
+# "click_*" clicks a row the way CoopFix-OnlineMouseUI does (its own hit test
+# when that mod is loaded), "key_v" presses the display-mode key, "stick_*"
+# pushes and releases the right stick, "shot*" saves a screenshot; every step
+# logs P1's focus, the shown player, the display mode and the window start.
 const VIEW_STEP_SEC := 0.8
 const VIEW_STEPS := {
-	"shop": ["shot", "pad_right", "pad_down", "pad_accept", "shot_view_pad", "click_last", "shot_view_click", "click_last", "check"],
-	"coop_end_run": ["click_first", "shot_view_click", "click_first", "check"],
+	"upgrades": ["key_v", "shot_pages", "stick_right", "shot_pages_slid", "stick_left", "key_v", "check"],
+	"shop": ["shot", "pad_right", "pad_down", "pad_accept", "shot_view_pad", "click_last", "shot_view_click", "click_last", "check",
+			"key_v", "shot_pages", "pad_right", "stick_right", "shot_pages_slid", "pad_left", "stick_left", "pad_left", "key_v", "check"],
+	"coop_end_run": ["click_first", "shot_view_click", "click_first", "check",
+			"key_v", "shot_pages", "stick_right", "shot_pages_slid", "stick_left", "key_v", "check"],
 }
 const MOUSE_ROUTER_PATH := "/root/ModLoader/CoopFix-OnlineMouseUI/MouseRouter"
 
@@ -406,8 +411,10 @@ func _guard_focus_pause(scene) -> void:
 # Layout review of the co-op upgrade screen (AP-014, D-010) before anyone has
 # chosen. True while the accepts must wait.
 func _hold_for_upgrades_shot(scene, delta: float) -> bool:
-	if _upgrades_shot or _waves_done > 0:
+	if _waves_done > 0:
 		return false
+	if _upgrades_shot:
+		return _run_view_check(scene, "upgrades", delta)
 	if _elapsed - _menu_entered_at > UPGRADES_SHOT_WAIT_SEC:
 		_upgrades_shot = true
 		ProbeLog.event("local_sim.upgrades_shot_skipped")
@@ -420,7 +427,9 @@ func _hold_for_upgrades_shot(scene, delta: float) -> bool:
 		return true
 	_upgrades_shot = true
 	_save_screenshot("upgrades_%dp.png" % _players_wanted)
-	return false
+	# Keep holding: the display checks run before anyone chooses (the first
+	# accept round resolves the whole screen).
+	return true
 
 
 # Runs VIEW_STEPS[prefix] once per screen kind; true while steps remain.
@@ -431,6 +440,9 @@ func _run_view_check(scene, prefix: String, delta: float) -> bool:
 	if check.done:
 		return false
 	var strip = scene.find_node("CoopPlusPlayerStatusStrip", true, false) if scene != null else null
+	if not check.has("entered"):
+		check["entered"] = true
+		ProbeLog.event("local_sim.view.%s.enter" % prefix, {"strip": strip != null, "scene": scene.filename if scene != null else ""})
 	if strip == null or not strip.has_method("toggle_player"):
 		check.done = true
 		ProbeLog.event("local_sim.view.%s.no_strip" % prefix)
@@ -453,15 +465,33 @@ func _run_view_check(scene, prefix: String, delta: float) -> bool:
 	match step:
 		"shot":
 			_save_screenshot("%s_%dp.png" % [prefix, _players_wanted])
-		"shot_view_pad", "shot_view_click":
+		"shot_view_pad", "shot_view_click", "shot_pages", "shot_pages_slid":
 			_save_screenshot("%s_%s_%dp.png" % [prefix, step.substr(5), _players_wanted])
-		"pad_right", "pad_down", "pad_accept":
+		"pad_right", "pad_left", "pad_down", "pad_accept":
 			_pad_press(emulator, "ui_" + step.substr(4))
+		"key_v":
+			for pressed in [true, false]:
+				var key := InputEventKey.new()
+				key.scancode = KEY_V
+				key.physical_scancode = KEY_V
+				key.pressed = pressed
+				Input.parse_input_event(key)
+		"stick_right", "stick_left":
+			for value in [1.0 if step == "stick_right" else -1.0, 0.0]:
+				var motion := InputEventJoypadMotion.new()
+				motion.device = 0
+				motion.axis = JOY_AXIS_2
+				motion.axis_value = value
+				Input.parse_input_event(motion)
 		"click_first", "click_last":
 			detail["click"] = _click_row(scene, strip, emulator, rows[0] if step == "click_first" else rows[rows.size() - 1])
 	# The state reflects the previous step (events go through the input queue).
 	detail["focus"] = _focus_name(emulator, strip)
 	detail["viewed"] = strip.viewed_player()
+	var controller = scene.find_node("CoopPlusPanelViewController", true, false)
+	if controller != null:
+		detail["mode"] = controller.display_mode()
+		detail["start"] = controller.window_start()
 	ProbeLog.event("local_sim.view." + prefix, detail)
 	return true
 
