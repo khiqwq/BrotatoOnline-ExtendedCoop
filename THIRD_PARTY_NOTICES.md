@@ -30,8 +30,10 @@
 
 `extensions/bo/steam_transport_ext.gd` 只沿用方法签名（`start_host`），不含方法体，未加说明行。`debug/` 下的探针不含第三方代码。
 
-### Brotato 游戏代码（商业软件，非 GPL）——待 OWNER 决定
+### Brotato 游戏代码（商业软件，非 GPL）
+
+仓库中不含游戏代码。原先 `extensions/vanilla/main_ext.gd` 复述了 `Main.on_gold_picked_up`，已按 D-006 改为：调用游戏自己的方法，只把其分配结果重新分给 5～8 人（EV-0032）；该复述也已从仓库历史中移除。
 
 | 文件 | 片段 | 原因 | 状态 |
 | ---- | ---- | ---- | ---- |
-| `extensions/vanilla/main_ext.gd` | 游戏 1.1.15.4 `main.gd:827-892` `Main.on_gold_picked_up` 的改写（`_coopplus_pick_up_gold`，只在 5～8 人时执行） | 原方法用局部数组 `[0, 0, 0, 0]` 分配材料/经验，无法从外部扩展（BAT-04、DATA-12） | **D-006（OWNER 已采纳）**：AP-013 中改为不复述原方法的实现；在此之前不得发布含此文件的正式包（发布阻断项） |
+| `extensions/vanilla/main_ext.gd` | （已移除）`main.gd:827-892` `Main.on_gold_picked_up` 的复述 | 原方法用局部数组 `[0, 0, 0, 0]` 分配材料/经验，无法从外部扩展（BAT-04、DATA-12） | **已解决（D-006，2026-10-28）**：游戏方法在人数限为 4 的一次调用中运行，材料/经验发放被捕获后按人轮流分给全部玩家 |
