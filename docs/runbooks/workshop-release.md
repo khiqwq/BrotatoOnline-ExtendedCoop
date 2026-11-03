@@ -37,5 +37,6 @@
 ## 注意
 
 - 每次上传都会用 `workshop-description.txt` 覆盖页面上的标题和说明；在网页上改过的话，先把改动抄回这个文件。
+- Steam 按语言分别保存标题和说明，观看者看到的是自己客户端语言的那份。物品有一份简体中文的（在中文网页上编辑时产生），以前只更新英文那份，中文客户端一直显示旧的 5～8 人说明（2026-11-04）。现在每次上传对 `TEXT_LANGUAGES`（english、schinese）各提交一次同样的标题和说明；只改文字时用 `python tools/workshop_upload.py --text-only --note "……"`，不重新上传内容。核对中文页面：`https://steamcommunity.com/sharedfiles/filedetails/?id=3829355835&l=schinese`。
 - 账号未接受创意工坊法律协议时，工具会提示，物品在接受之前一直隐藏；协议由账号本人在物品页面接受。
 - 不要把截图或日志里的 Steam ID 放进仓库。

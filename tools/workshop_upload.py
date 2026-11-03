@@ -11,8 +11,15 @@ the release zip), the preview image and
 the gallery (the extra screenshots: every .jpg/.png in .local/release/gallery,
 in name order, replacing the item's current ones; left alone when that folder
 is empty or missing), then adds Brotato Online as a required item.
+Steam keeps a title and description per language and shows a viewer the copy
+in their client's language: the item also has a Simplified Chinese copy (made
+by editing the page in Chinese), which Chinese clients showed long after the
+English one was updated. Every upload therefore writes the same title and
+description for each of TEXT_LANGUAGES (one update per language, the first
+also carrying the content); --text-only writes only those.
 
 Usage: python tools/workshop_upload.py --dry-run | --upload [--note "change note"] [--friends-only]
+       python tools/workshop_upload.py --text-only [--note "change note"]
 """
 import ctypes
 import json
@@ -36,6 +43,8 @@ CB_CREATE_ITEM = 3403
 CB_SUBMIT_ITEM_UPDATE = 3404
 CB_ADD_DEPENDENCY = 3412
 ZIP_NAME = "CoopPlus-OnlineExtendedCoop.zip"
+# Steam API language codes; the first is the item's default language.
+TEXT_LANGUAGES = ("english", "schinese")
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 RELEASE = os.path.join(REPO, ".local", "release")
@@ -79,6 +88,7 @@ SIGNATURES = {
     "SteamAPI_ISteamUGC_StartItemUpdate": ([c_void_p, c_uint32, c_uint64], c_uint64),
     "SteamAPI_ISteamUGC_SetItemTitle": ([c_void_p, c_uint64, c_char_p], c_bool),
     "SteamAPI_ISteamUGC_SetItemDescription": ([c_void_p, c_uint64, c_char_p], c_bool),
+    "SteamAPI_ISteamUGC_SetItemUpdateLanguage": ([c_void_p, c_uint64, c_char_p], c_bool),
     "SteamAPI_ISteamUGC_SetItemVisibility": ([c_void_p, c_uint64, c_int], c_bool),
     "SteamAPI_ISteamUGC_SetItemContent": ([c_void_p, c_uint64, c_char_p], c_bool),
     "SteamAPI_ISteamUGC_SetItemPreview": ([c_void_p, c_uint64, c_char_p], c_bool),
@@ -193,6 +203,47 @@ def set_gallery(steam, handle, files, existing):
     return ok
 
 
+# A new update of the item carrying the title and description for `language`;
+# returns the update handle and the setters' results.
+def start_text_update(steam, item_id, language, title, description):
+    lib, ugc = steam.lib, steam.ugc
+    handle = lib.SteamAPI_ISteamUGC_StartItemUpdate(ugc, APP_ID, item_id)
+    return handle, {
+        "language": lib.SteamAPI_ISteamUGC_SetItemUpdateLanguage(ugc, handle, language.encode("utf-8")),
+        "title": lib.SteamAPI_ISteamUGC_SetItemTitle(ugc, handle, title.encode("utf-8")),
+        "description": lib.SteamAPI_ISteamUGC_SetItemDescription(ugc, handle, description.encode("utf-8")),
+    }
+
+
+def submit(steam, handle, fields, note, label):
+    lib, ugc = steam.lib, steam.ugc
+    if not all(fields.values()):
+        raise SystemExit("field rejected, nothing submitted (%s): %r" % (label, fields))
+    last = [None]
+
+    def tick():
+        done, total = c_uint64(0), c_uint64(0)
+        status = lib.SteamAPI_ISteamUGC_GetItemUpdateProgress(ugc, handle, byref(done), byref(total))
+        if (status, done.value, total.value) != last[0]:
+            last[0] = (status, done.value, total.value)
+            print("  progress: status %d, %d/%d bytes" % last[0])
+
+    raw = steam.wait(lib.SteamAPI_ISteamUGC_SubmitItemUpdate(ugc, handle, note.encode("utf-8")), CB_SUBMIT_ITEM_UPDATE, 900, tick)
+    eresult, needs, _ = struct.unpack_from("<i?3xQ", raw)
+    legal_note(needs)
+    if eresult != ERESULT_OK:
+        raise SystemExit("SubmitItemUpdate failed (%s), EResult %d" % (label, eresult))
+    print("submitted (%s)" % label)
+
+
+def upload_text(steam, title, description, note):
+    item_id = int(open(ID_FILE).read().strip())
+    print("updating title and description of item", item_id)
+    for i, language in enumerate(TEXT_LANGUAGES):
+        submit(steam, *start_text_update(steam, item_id, language, title, description), note=note if i == 0 else "", label=language)
+    print("https://steamcommunity.com/sharedfiles/filedetails/?id=%d" % item_id)
+
+
 def upload(steam, title, description, zip_path, note, visibility):
     lib, ugc = steam.lib, steam.ugc
     os.makedirs(CONTENT_DIR, exist_ok=True)
@@ -219,34 +270,17 @@ def upload(steam, title, description, zip_path, note, visibility):
     if gallery:
         print("gallery: %d screenshots (item has %d)" % (len(gallery), existing))
 
-    handle = lib.SteamAPI_ISteamUGC_StartItemUpdate(ugc, APP_ID, item_id)
-    fields = {
-        "title": lib.SteamAPI_ISteamUGC_SetItemTitle(ugc, handle, title.encode("utf-8")),
-        "description": lib.SteamAPI_ISteamUGC_SetItemDescription(ugc, handle, description.encode("utf-8")),
+    handle, fields = start_text_update(steam, item_id, TEXT_LANGUAGES[0], title, description)
+    fields.update({
         "visibility": lib.SteamAPI_ISteamUGC_SetItemVisibility(ugc, handle, visibility),
         "content": lib.SteamAPI_ISteamUGC_SetItemContent(ugc, handle, CONTENT_DIR.encode("utf-8")),
         "preview": lib.SteamAPI_ISteamUGC_SetItemPreview(ugc, handle, PREVIEW.encode("utf-8")),
-    }
+    })
     if gallery:
         fields["gallery"] = set_gallery(steam, handle, gallery, existing)
-    if not all(fields.values()):
-        raise SystemExit("field rejected, nothing submitted: %r" % fields)
-
-    last = [None]
-
-    def tick():
-        done, total = c_uint64(0), c_uint64(0)
-        status = lib.SteamAPI_ISteamUGC_GetItemUpdateProgress(ugc, handle, byref(done), byref(total))
-        if (status, done.value, total.value) != last[0]:
-            last[0] = (status, done.value, total.value)
-            print("  progress: status %d, %d/%d bytes" % last[0])
-
-    raw = steam.wait(lib.SteamAPI_ISteamUGC_SubmitItemUpdate(ugc, handle, note.encode("utf-8")), CB_SUBMIT_ITEM_UPDATE, 900, tick)
-    eresult, needs, _ = struct.unpack_from("<i?3xQ", raw)
-    legal_note(needs)
-    if eresult != ERESULT_OK:
-        raise SystemExit("SubmitItemUpdate failed, EResult %d" % eresult)
-    print("submitted")
+    submit(steam, handle, fields, note, TEXT_LANGUAGES[0])
+    for language in TEXT_LANGUAGES[1:]:
+        submit(steam, *start_text_update(steam, item_id, language, title, description), note="", label=language)
 
     raw = steam.wait(lib.SteamAPI_ISteamUGC_AddDependency(ugc, item_id, BROTATO_ONLINE_ID), CB_ADD_DEPENDENCY, 120)
     eresult = struct.unpack_from("<i", raw)[0]
@@ -272,6 +306,8 @@ def main(argv):
     try:
         if mode == "--upload":
             upload(steam, title, description, zip_path, note, visibility)
+        elif mode == "--text-only":
+            upload_text(steam, title, description, note)
         else:
             print("dry run: nothing uploaded")
     finally:
