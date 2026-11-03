@@ -16,8 +16,8 @@
   "upstream": [
     {
       "id": "six666-BrotatoOnline",
-      "version": "6.6.8",
-      "normalized_fingerprint": "b96080d6a20b1183df5ce4feb7fa2831dbe44909df7207fd50469e0595782d8f",
+      "version": "6.6.6",
+      "normalized_fingerprint": "63bbdd222aff8bb610513908de099a0382499cebfd602cc7f1a22f8c28e4011d",
       "role": "required"
     },
     {

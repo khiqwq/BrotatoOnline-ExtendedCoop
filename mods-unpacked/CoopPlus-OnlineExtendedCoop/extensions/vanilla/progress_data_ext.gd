@@ -241,3 +241,31 @@ func _coopplus_versions() -> Dictionary:
 		if mod != null and mod.manifest != null:
 			versions[mod_id] = str(mod.manifest.version_number)
 	return versions
+
+
+# --- DLCs some player in the room lacks (D-014, scripts/bo/dlc_roster.gd) ---
+# They count as switched off: out of active_update_data (so their characters,
+# weapons and items are disabled on the selection screens and left out of the
+# pools, the way the game treats a set switched off in the item set bar) and
+# not selected in the bar. deactivated_update_data, the saved preference, is
+# never touched: the set is back as it was once the room allows it.
+var coopplus_blocked_dlcs := []
+
+
+func coopplus_set_blocked_dlcs(ids: Array) -> void:
+	if ids == coopplus_blocked_dlcs:
+		return
+	coopplus_blocked_dlcs = ids.duplicate()
+	refresh_active_update_data()
+	ItemService.init_unlocked_pool()
+	emit_signal("item_sets_changed")
+
+
+func refresh_active_update_data() -> void:
+	.refresh_active_update_data()
+	for id in coopplus_blocked_dlcs:
+		active_update_data.erase(id)
+
+
+func is_update_data_selected(update_data_id: String) -> bool:
+	return .is_update_data_selected(update_data_id) and not update_data_id in coopplus_blocked_dlcs

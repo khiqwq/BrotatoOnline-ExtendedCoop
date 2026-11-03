@@ -194,7 +194,9 @@
       "methods": {
         "reset_and_save_run_state": 1,
         "_get_current_run_state": 0,
-        "load_game_file": 1
+        "load_game_file": 1,
+        "refresh_active_update_data": 0,
+        "is_update_data_selected": 1
       },
       "constants": {}
     },
@@ -210,7 +212,8 @@
     },
     "res://ui/menus/run/difficulty_selection/difficulty_selection.gd": {
       "methods": {
-        "_ready": 0
+        "_ready": 0,
+        "_on_element_pressed": 2
       },
       "constants": {}
     },
@@ -272,7 +275,7 @@
         "is_compatible": 2
       },
       "constants": {
-        "NETWORK_PROTOCOL_VERSION": "\"6.1.0\"",
+        "NETWORK_PROTOCOL_VERSION": "\"6.2.0\"",
         "LAN_PROTOCOL_VERSION": "4",
         "GAME_VERSION": "\"1.2.0.0\""
       }
@@ -287,6 +290,14 @@
         "_on_element_pressed": 1,
         "_on_shop_item_focused": 1,
         "_on_shop_item_unfocused": 1
+      },
+      "constants": {}
+    },
+    "res://ui/menus/run/item_set_bar.gd": {
+      "methods": {
+        "set_required_item_sets": 1,
+        "_on_item_sets_changed": 0,
+        "_show_logo": 2
       },
       "constants": {}
     }

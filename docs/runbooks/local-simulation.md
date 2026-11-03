@@ -145,6 +145,14 @@ pwsh ./tools/instance.ps1 -Action Start -Name sim -StopAfterSec 240 -ExtraArgs "
 | 8 人去掉 P5 | 7 人，角色/材料/商店按序保留，再打两波 |
 | 6 人去掉 P2 | 5 人，同上 |
 
+### 扩展房间的 DLC 规则（D-014，证据 EV-0041）
+
+`--coopplus-local-sim-dlc-missing=<玩家编号>`（配合 `-menus`）：把该玩家的已装 DLC 记为空（`scripts/bo/dlc_roster.gd` 的调试名单，规则在离线模拟里也生效），并把保存的区域设成第一个 DLC 区域，用来检查退回。在角色选择截图前，探针显示物品组栏里被挡住的 DLC 的横幅。带 `-menus` 时每个选择界面都记录 `local_sim.dlc`（物品组按钮的禁用/开启、区域列表文字与禁用、每个徽标的玩家与已装情况、被挡住 DLC 的角色是否禁用、过滤后的 `active_update_data`），开局时记录 `local_sim.dlc_run`（`enabled_dlcs`、`active_update_data_ids`、区域、各人角色所属 DLC）。不带这个参数时规则不生效，所有 DLC 照常（离线 R08）。真实联机里名单经 Brotato Online 的模组消息接口传送，不在模拟范围内。
+
+```powershell
+pwsh ./tools/instance.ps1 -Action Start -Name sim -StopAfterSec 150 -ExtraArgs "--audio-driver,Dummy,--coopplus-local-sim=6,--coopplus-local-sim-seconds=12,--coopplus-local-sim-menus,--coopplus-local-sim-dlc-missing=3,--coopplus-probe-quit"
+```
+
 ### Brotato 1.2.0.0 与 Brotato Online 6.6.7/6.6.8（证据 EV-0038～EV-0040）
 
 - 每次模拟开局前记录 `local_sim.bo_scripts`：Brotato Online 的会话管理器、大厅列表、菜单同步、状态快照、移除管理器的脚本是否有效、继承层次和协议版本（6.6.8 为 6.1.0）。日志里 3 条 `Can't preload resource at path: protocol.gd / session_content_catalog.gd`（`GDScript::reload (built-in:3)`）来自 Mod Loader 的备份副本，不影响运行；测试脚本把它们与其他脚本错误分开统计。

@@ -52,6 +52,7 @@ const EXTENSIONS_INIT := [
 	"extensions/vanilla/difficulty_selection_ext.gd",
 	"extensions/vanilla/focus_emulator_ext.gd",
 	"extensions/vanilla/zone_service_ext.gd",
+	"extensions/vanilla/item_set_bar_ext.gd",
 	"extensions/bo/session_manager_ext.gd",
 	"extensions/bo/public_lobby_browser_ext.gd",
 	"extensions/bo/steam_transport_ext.gd",
@@ -156,6 +157,8 @@ func _ready() -> void:
 	if RuntimeGate.decision().get("install_extensions", false):
 		var patch = load(MOD_DIR.plus_file("scripts/bo/resume_identity_patch.gd")).new()
 		add_child(patch)
+		# Which DLCs each player in the room has (scripts/bo/dlc_roster.gd, D-014).
+		add_child(load(MOD_DIR.plus_file("scripts/bo/dlc_roster.gd")).new())
 	if _probe_enabled:
 		_probe_log().event("coopplus.mod_main._ready", {"path": str(get_path())})
 		_add_probe_node("CoopPlusLifecycleProbe", "debug/lifecycle_probe.gd")

@@ -23,6 +23,19 @@ extends "res://ui/menus/run/character_selection.gd"
 # standard (4, vanilla compatible) or extended (5..8). It is shown whenever
 # extended mode is verified on this PC, saves the choice per PC and is locked
 # while an online room is open (the type is fixed per room).
+# DLCs in online extended rooms (D-014, scripts/bo/dlc_roster.gd): a zone of a
+# DLC that some player lacks is disabled in the zone list, its name followed by
+# the players lacking it; on the host a selected one falls back to the first
+# allowed zone, and the random zone never draws one (_setup_zone). Every
+# player's panel shows their DLC icons (ui/dlc_badges.gd). The DLC's own
+# toggle is item_set_bar_ext.gd. Its characters are disabled too: vanilla ties
+# only characters with a required_item_set to the bar, but a client without
+# the DLC could not load them (Brotato Online registers DLC content from the
+# host's enabled DLCs only, session_content_catalog.gd apply), so
+# _get_item_disabled_update also returns the blocked DLC for them (vanilla
+# then greys them out, leaves them out of the random pick and clears such a
+# selection, base_selection.gd _on_item_sets_changed), and the locked panel
+# names the players lacking it.
 
 const RuntimeGate = preload("res://mods-unpacked/CoopPlus-OnlineExtendedCoop/scripts/compatibility/runtime_gate.gd")
 const PerPlayerArrays = preload("res://mods-unpacked/CoopPlus-OnlineExtendedCoop/scripts/core/per_player_arrays.gd")
@@ -30,6 +43,8 @@ const ExtraPlayerPanels = preload("res://mods-unpacked/CoopPlus-OnlineExtendedCo
 const LocalFocusLayout = preload("res://mods-unpacked/CoopPlus-OnlineExtendedCoop/ui/local_focus_layout.gd")
 const SelectionView = preload("res://mods-unpacked/CoopPlus-OnlineExtendedCoop/ui/selection_view_controller.gd")
 const RoomPolicy = preload("res://mods-unpacked/CoopPlus-OnlineExtendedCoop/scripts/core/room_policy.gd")
+const DlcRoster = preload("res://mods-unpacked/CoopPlus-OnlineExtendedCoop/scripts/bo/dlc_roster.gd")
+const DlcBadges = preload("res://mods-unpacked/CoopPlus-OnlineExtendedCoop/ui/dlc_badges.gd")
 const COOPPLUS_ROOM_REFRESH_SEC := 0.5
 const COOPPLUS_ROOM_TEXT := {
 	"zh": {"standard": "标准房间（4 人，原版兼容）", "extended": "扩展房间（%d 人）"},
@@ -55,6 +70,9 @@ var _coopplus_view = null
 var _coopplus_view_key := ""
 var _coopplus_room_button: OptionButton = null
 var _coopplus_room_refresh := 0.0
+# Zone list item index -> its own text, before a "not installed by" suffix.
+var _coopplus_zone_names := {}
+var _coopplus_zone_key := ""
 
 
 func _enter_tree() -> void:
@@ -82,15 +100,64 @@ func _ready() -> void:
 	_coopplus_add_room_button()
 	var _e = CoopService.connect("connected_players_updated", self, "_coopplus_on_players_updated")
 	_coopplus_update_view()
+	var panels: Array = _get_panels()
+	for i in panels.size():
+		var _badges = DlcBadges.overlay(panels[i], i)
 
 
 func _process(delta: float) -> void:
-	if _coopplus_room_button == null:
+	if _coopplus_extra_panels.empty():
 		return
 	_coopplus_room_refresh -= delta
 	if _coopplus_room_refresh <= 0.0:
 		_coopplus_room_refresh = COOPPLUS_ROOM_REFRESH_SEC
-		_coopplus_room_button.disabled = RuntimeGate.room_capacity() > 0
+		if _coopplus_room_button != null:
+			_coopplus_room_button.disabled = RuntimeGate.room_capacity() > 0
+		_coopplus_apply_zone_rule()
+
+
+func _coopplus_apply_zone_rule() -> void:
+	if _zone_selection_button == null:
+		return
+	var roster = DlcRoster.find(get_tree())
+	var blocked: Dictionary = roster.blocked() if roster != null else {}
+	var key := var2str(blocked)
+	if key == _coopplus_zone_key:
+		return
+	_coopplus_zone_key = key
+	var button := _zone_selection_button
+	for i in button.get_item_count():
+		if not _coopplus_zone_names.has(i):
+			_coopplus_zone_names[i] = button.get_item_text(i)
+		var missing: Array = blocked.get(_coopplus_zone_dlc(button.get_item_id(i)), [])
+		button.set_item_disabled(i, not missing.empty())
+		var text: String = _coopplus_zone_names[i]
+		if not missing.empty():
+			text = DlcRoster.texts().zone % [text, DlcRoster.players_text(missing)]
+		button.set_item_text(i, text)
+	var selected := button.selected
+	if roster != null and roster.is_host() and selected >= 0 and button.is_item_disabled(selected):
+		var allowed := _coopplus_allowed_zone_indices()
+		if not allowed.empty():
+			button.select(allowed[0])
+			_on_ZoneSelectionButton_item_selected(allowed[0])
+
+
+# DLC of the zone with this id ("" for the base game and the random entry).
+static func _coopplus_zone_dlc(zone_id: int) -> String:
+	for zone_data in ZoneService.zones:
+		if zone_data.my_id == zone_id:
+			return zone_data.dlc_id
+	return ""
+
+
+# Zone list indices the room allows, the random entry left out.
+func _coopplus_allowed_zone_indices() -> Array:
+	var out := []
+	for i in _zone_selection_button.get_item_count():
+		if not _zone_selection_button.is_item_disabled(i) and _zone_selection_button.get_item_id(i) != ZoneService.zones.size() + 1:
+			out.append(i)
+	return out
 
 
 func _coopplus_add_room_button() -> void:
@@ -178,8 +245,43 @@ func _get_locked_panels() -> Array:
 	return panels
 
 
+# Parent: character_selection.gd:465 (characters needing a switched-off set).
+func _get_item_disabled_update(item: ItemParentData) -> UpdateData:
+	var update = ._get_item_disabled_update(item)
+	if update == null and item is CharacterData:
+		var blocked = ProgressData.get("coopplus_blocked_dlcs")
+		if blocked is Array:
+			update = DlcRoster.blocked_dlc_of_character(item, blocked)
+	return update
+
+
+func _update_locked_panel(element: InventoryElement, player_index: int) -> void:
+	._update_locked_panel(element, player_index)
+	_coopplus_name_missing_players(element, player_index)
+
+
+func _coopplus_name_missing_players(element: InventoryElement, player_index: int) -> void:
+	var locked_panels: Array = _get_locked_panels()
+	if player_index < 0 or player_index >= locked_panels.size() or not locked_panels[player_index].visible:
+		return
+	var roster = DlcRoster.find(get_tree())
+	var text: String = roster.locked_text(_get_element_disabled_update(element)) if roster != null else ""
+	if text != "":
+		locked_panels[player_index].set_description(text)
+
+
 # Parent: character_selection.gd:525/539 refresh the background of Panel1..4.
+# On the host a zone the room's DLCs do not allow (the random zone's draw,
+# character_selection.gd:514, or a selection made before the roster arrived)
+# becomes an allowed one: a random one for the random zone, else the first.
 func _setup_zone(index: int) -> void:
+	var roster = DlcRoster.find(get_tree())
+	if roster != null and roster.is_host() and _zone_selection_button != null:
+		var i := int(index)
+		if i >= 0 and i < _zone_selection_button.get_item_count() and _zone_selection_button.is_item_disabled(i):
+			var allowed := _coopplus_allowed_zone_indices()
+			if not allowed.empty():
+				index = allowed[randi() % allowed.size()] if ProgressData.settings.zone_is_random else allowed[0]
 	._setup_zone(index)
 	_coopplus_update_extra_backgrounds()
 

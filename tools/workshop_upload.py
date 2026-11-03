@@ -5,13 +5,14 @@ steam_api64.dll (ISteamUGC v021, manual callback dispatch); no credentials are
 involved. The item id lives in docs/release/workshop-item-id.txt: without it a
 new item is created and the id written there; with it the existing item is
 updated. Each upload sets the title and description from
-docs/release/workshop-description.txt, the visibility (friends only unless
---public), the content folder (only the release zip), the preview image and
+docs/release/workshop-description.txt, the visibility (public unless
+--friends-only; the item is public since 2026-11-03), the content folder (only
+the release zip), the preview image and
 the gallery (the extra screenshots: every .jpg/.png in .local/release/gallery,
 in name order, replacing the item's current ones; left alone when that folder
 is empty or missing), then adds Brotato Online as a required item.
 
-Usage: python tools/workshop_upload.py --dry-run | --upload [--note "change note"] [--public]
+Usage: python tools/workshop_upload.py --dry-run | --upload [--note "change note"] [--friends-only]
 """
 import ctypes
 import json
@@ -256,7 +257,7 @@ def upload(steam, title, description, zip_path, note, visibility):
 def main(argv):
     mode = argv[1] if len(argv) > 1 else "--dry-run"
     note = argv[argv.index("--note") + 1] if "--note" in argv else "update"
-    visibility = VISIBILITY_PUBLIC if "--public" in argv else VISIBILITY_FRIENDS_ONLY
+    visibility = VISIBILITY_FRIENDS_ONLY if "--friends-only" in argv else VISIBILITY_PUBLIC
     title, description = load_text()
     zip_path = os.path.join(RELEASE, ZIP_NAME)
     for path in (zip_path, PREVIEW):

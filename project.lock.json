@@ -23,14 +23,14 @@
     {
       "id": "six666-BrotatoOnline",
       "role": "required",
-      "version": "6.6.8",
+      "version": "6.6.6",
       "workshop_id": 3741034628,
-      "workshop_manifest": "9039488716196294748",
-      "workshop_timeupdated": 1793684276,
+      "workshop_manifest": "8359037691992970337",
+      "workshop_timeupdated": 1793698739,
       "zip": "six666-BrotatoOnline.zip",
-      "zip_sha256": "5f6fec6181a30ce01f4fc178b264dce7d1acaace02eff4da97c5c4a8979cbaf6",
-      "normalized_fingerprint": "b96080d6a20b1183df5ce4feb7fa2831dbe44909df7207fd50469e0595782d8f",
-      "file_count": 47
+      "zip_sha256": "30af74068d11c069727a1028a56c6c25a94fb4ccbbaddb0c5271880f83303c9f",
+      "normalized_fingerprint": "63bbdd222aff8bb610513908de099a0382499cebfd602cc7f1a22f8c28e4011d",
+      "file_count": 50
     },
     {
       "id": "CoopFix-OnlineMouseUI",

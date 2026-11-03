@@ -30,6 +30,17 @@ extends Node
 #                                     (no lobby is created; its session manager is
 #                                     paused there) and seats every player, then
 #                                     logs the restored shop and plays on
+#   --coopplus-local-sim-dlc-missing=<P>  with -menus: player P (1-based) has no
+#                                     DLC installed (scripts/bo/dlc_roster.gd
+#                                     debug owners, D-014); the saved zone is set
+#                                     to the first DLC zone so the fallback runs.
+#                                     On character selection the bar's banner
+#                                     for the blocked DLC is shown before the
+#                                     screenshot. With -menus (with or without
+#                                     this flag) local_sim.dlc is logged on each
+#                                     selection screen (item set bar, zone list,
+#                                     badges, the filtered content) and
+#                                     local_sim.dlc_run once the run starts
 #   --coopplus-local-sim-pad          exploration only: keep padding the vanilla
 #                                     per-player arrays fixed at 4 entries (DATA-01,
 #                                     BAT-03/04 ...) to 8 every frame, to find the
@@ -159,6 +170,8 @@ var _wave_end_at := -1.0
 var _wave_end_shots_done := 0
 var _remove_player := 0
 var _late_join := false
+var _dlc_missing := 0
+var _dlc_logo_shown := false
 var _zone_logged_wave := -1
 var _late_join_state := ""
 var _late_join_left := 0.0
@@ -189,6 +202,8 @@ func _ready() -> void:
 			_remove_player = int(arg.substr("--coopplus-local-sim-remove=".length()))
 		elif arg.begins_with("--coopplus-local-sim-seed="):
 			seed_value = int(arg.substr("--coopplus-local-sim-seed=".length()))
+		elif arg.begins_with("--coopplus-local-sim-dlc-missing="):
+			_dlc_missing = int(arg.substr("--coopplus-local-sim-dlc-missing=".length()))
 	_quit_after = "--coopplus-probe-quit" in OS.get_cmdline_args()
 	_pad = "--coopplus-local-sim-pad" in OS.get_cmdline_args()
 	_mortal = "--coopplus-local-sim-mortal" in OS.get_cmdline_args()
@@ -299,6 +314,11 @@ func _process(delta: float) -> void:
 			if scene_file == MenuData.game_scene:
 				_setup["players"] = _player_data()
 				ProbeLog.event("local_sim.menus_done", {"seconds": stepify(_menus_time, 0.01), "players": _setup["players"]})
+				if _menus:
+					ProbeLog.event("local_sim.dlc_run", {"enabled_dlcs": RunData.enabled_dlcs.duplicate(),
+							"active_update_data_ids": RunData.active_update_data_ids.duplicate(),
+							"zone": RunData.current_zone, "zone_dlc": ZoneService.get_zone_data(RunData.current_zone).dlc_id,
+							"characters": _dlc_characters()})
 				_state = "in_run"
 				_wave_elapsed = 0.0
 				return
@@ -308,8 +328,12 @@ func _process(delta: float) -> void:
 				_menu_shot = false
 				_accept_timer = 0.0
 			_menu_scene_time += delta
+			if _dlc_missing > 0 and not _dlc_logo_shown and scene_file == MenuData.character_selection_scene 					and _menu_scene_time > MENU_SHOT_SEC - 0.5:
+				_dlc_logo_shown = true
+				_show_blocked_dlc_banner(scene)
 			if not _menu_shot and _menu_scene_time > MENU_SHOT_SEC:
 				_menu_shot = true
+				ProbeLog.event("local_sim.dlc", _dlc_state(scene))
 				_save_screenshot("%s_%dp.png" % [scene_file.get_file().get_basename(), _players_wanted])
 			var menu_name := scene_file.get_file().get_basename()
 			if _menu_shot and menu_name == "character_selection" and _late_join_step(scene, delta):
@@ -426,6 +450,8 @@ func _start_run() -> void:
 	RunData.invulnerable = not _mortal
 	_step("set_player_count")
 	RunData.set_player_count(_players_wanted if _late_join_state == "" else _players_wanted - 1, true)
+	if _menus and _dlc_missing > 0:
+		_setup_dlc_missing()
 	if _menus:
 		RunData.play_mode = RunData.PlayMode.COOP if _players_wanted > 1 else RunData.PlayMode.SOLO
 		RunData.menu_selection_back = true
@@ -470,6 +496,115 @@ func _start_run() -> void:
 	_state = "in_run"
 	var err = get_tree().change_scene(MenuData.game_scene)
 	_setup["change_scene_error"] = err
+
+
+func _setup_dlc_missing() -> void:
+	var roster = get_tree().root.get_node_or_null("ModLoader/CoopPlus-OnlineExtendedCoop/CoopPlusDlcRoster")
+	if roster == null:
+		_setup["dlc_error"] = "no roster"
+		return
+	roster.debug_set_owner(_dlc_missing - 1, [])
+	# The first zone of a DLC, so the zone fallback has something to do.
+	var zone_index := 0
+	for zone_data in ZoneService.zones:
+		if zone_data.dlc_id != "" and ProgressData.available_dlc_ids.has(zone_data.dlc_id):
+			ProgressData.settings.zone_selected = zone_index
+			ProgressData.settings.zone_is_random = false
+			break
+		if zone_data.dlc_id == "" or ProgressData.available_dlc_ids.has(zone_data.dlc_id):
+			zone_index += 1
+	_setup["dlc"] = {"missing_player": _dlc_missing, "available": ProgressData.available_dlc_ids.duplicate(),
+			"zone_selected": ProgressData.settings.zone_selected}
+
+
+func _dlc_state(scene) -> Dictionary:
+	var out := {"scene": scene.filename.get_file() if scene != null else "", "available": ProgressData.available_dlc_ids.duplicate(),
+			"blocked_in_progress": ProgressData.get("coopplus_blocked_dlcs"), "active_update_data": ProgressData.active_update_data.duplicate()}
+	var roster = get_tree().root.get_node_or_null("ModLoader/CoopPlus-OnlineExtendedCoop/CoopPlusDlcRoster")
+	out["blocked"] = roster.blocked() if roster != null else null
+	var bar = scene.find_node("ItemSetBar", true, false) if scene != null else null
+	if bar != null:
+		var buttons := []
+		for i in bar._buttons.size():
+			buttons.append({"id": bar._updates[i].id, "disabled": bar._buttons[i].disabled, "pressed": bar._buttons[i].pressed})
+		out["bar"] = buttons
+	var zone_button = scene.get("_zone_selection_button") if scene != null else null
+	if zone_button is OptionButton:
+		var zones := []
+		for i in zone_button.get_item_count():
+			zones.append({"text": zone_button.get_item_text(i), "disabled": zone_button.is_item_disabled(i)})
+		out["zones"] = zones
+		out["zone_selected_index"] = zone_button.selected
+		out["current_zone"] = RunData.current_zone
+	var badges := []
+	if scene != null:
+		for node in _find_all(scene, "CoopPlusDlcBadges"):
+			var icons := []
+			for icon in node.get_children():
+				icons.append(icon.modulate.a > 0.5)
+			badges.append({"player": int(node.player_index) + 1, "visible": node.is_visible_in_tree(), "owned": icons})
+	out["badges"] = badges
+	# Characters of a blocked DLC on screen, and whether each is disabled.
+	var chars := []
+	var blocked_ids: Array = out["blocked"].keys() if out["blocked"] is Dictionary else []
+	if scene != null and scene.filename == MenuData.character_selection_scene:
+		for element in _find_inventory_elements(scene):
+			var item = element.get("item")
+			if item is CharacterData:
+				var update = _dlc_of_character(item, blocked_ids)
+				if update != null:
+					chars.append({"id": item.my_id, "dlc": update.id, "disabled": bool(element.get_meta("disabled_by_item_set", false)),
+							"locked": bool(item.is_locked), "path": str(element.get_parent().name)})
+		out["dlc_characters"] = chars
+	return out
+
+
+func _find_inventory_elements(node: Node) -> Array:
+	var out := []
+	for child in node.get_children():
+		if child is InventoryElement:
+			out.append(child)
+		else:
+			out.append_array(_find_inventory_elements(child))
+	return out
+
+
+func _dlc_of_character(character, dlc_ids: Array):
+	for update in ItemService.update_data_list:
+		if update != null and update.id in dlc_ids and update.item_set != null:
+			for c in update.item_set.characters:
+				if c != null and c.my_id == character.my_id:
+					return update
+	return null
+
+
+func _find_all(node: Node, node_name: String) -> Array:
+	var out := []
+	for child in node.get_children():
+		if child.name == node_name:
+			out.append(child)
+		out.append_array(_find_all(child, node_name))
+	return out
+
+
+func _show_blocked_dlc_banner(scene) -> void:
+	var bar = scene.find_node("ItemSetBar", true, false) if scene != null else null
+	if bar == null:
+		return
+	for i in bar._buttons.size():
+		if bar._buttons[i].disabled:
+			bar._show_logo(bar._buttons[i], bar._updates[i])
+			return
+
+
+func _dlc_characters() -> Array:
+	var out := []
+	for player_index in RunData.get_player_count():
+		var character = RunData.get_player_character(player_index)
+		var update = _dlc_of_character(character, ProgressData.dlc_ids) if character != null else null
+		out.append({"player": player_index + 1, "id": character.my_id if character != null else "",
+				"dlc": update.id if update != null else ""})
+	return out
 
 
 func _start_continue(scene) -> void:

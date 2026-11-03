@@ -11,7 +11,7 @@
 [h2]需要[/h2]
 [list]
 [*]Brotato 1.2.0.0（内置 Mod Loader 6.3.0）
-[*]订阅并启用 Brotato Online 6.6.8
+[*]订阅并启用 Brotato Online 2026-11-03 更新版（网络协议 6.2.0）
 [*]扩展房间里的每个人都要订阅本扩展
 [/list]
 
@@ -26,13 +26,14 @@
 [*]按 V 或手柄 Back 键切换到原版式的四人视图，用左右方向键、右摇杆或十字键左右滑动查看其他玩家；再按一次切回。
 [*]5～8 人局退出游戏后，可以从标题界面“继续”。
 [*]5～8 人时场地按人数放大（保持 4 人时的人均面积，8 人 45×34 格）；敌人数量、生命、伤害与材料沿用原版的人数缩放。
+[*]DLC：扩展房间里，只有房间内所有人都安装了的 DLC 才能启用。有人没装时，这个 DLC 的开关、区域和角色都无法选择，提示是哪几位玩家（例如“P5 没有安装此 DLC，无法启用”）；每位玩家的面板上显示他安装的 DLC 图标，灰色表示没装。
 [/list]
 
 [h2]兼容性[/h2]
 [list]
 [*]不修改 Brotato Online 的任何文件。
-[*]只认 Brotato Online 6.6.8（锁定文件指纹）。Brotato Online 或游戏更新后，本扩展会自动关闭超四人功能，Brotato Online 照常以 4 人运行，等本扩展更新后再恢复。
-[*]已验证组合：Brotato 1.2.0.0（DLC 已并入游戏本体），Mod Loader 6.3.0，Brotato Online 6.6.8，可选 CoopFix-OnlineMouseUI 1.0.1。
+[*]只认 Brotato Online 2026-11-03 更新版（网络协议 6.2.0）（锁定文件指纹）。Brotato Online 或游戏更新后，本扩展会自动关闭超四人功能，Brotato Online 照常以 4 人运行，等本扩展更新后再恢复。
+[*]已验证组合：Brotato 1.2.0.0（DLC 已并入游戏本体），Mod Loader 6.3.0，Brotato Online 2026-11-03 更新版（网络协议 6.2.0），可选 CoopFix-OnlineMouseUI 1.0.1。
 [*]每台电脑一名玩家；本地（同屏）合作仍最多 4 人。
 [/list]
 
@@ -54,10 +55,11 @@ Extends [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3741034628]B
 [b]Test release 0.1.0:[/b] the full 5-8 player flow (character selection, waves, upgrades, shop, end of run, continue after quitting) works in local simulation; it has not yet been tested online across several PCs.
 
 [list]
-[*]Requires Brotato 1.2.0.0 (Mod Loader 6.3.0) and Brotato Online 6.6.8. Everyone in an extended room needs this mod.
+[*]Requires Brotato 1.2.0.0 (Mod Loader 6.3.0) and the 3 Nov 2026 update of Brotato Online (network protocol 6.2.0). Everyone in an extended room needs this mod.
 [*]Pick the room type in the run options on character selection: Standard (4, vanilla-compatible) or Extended (5-8).
 [*]Shop / upgrades / end of run: your panel is large, the others are shown as status rows; select a player to open their panel. Press V or gamepad Back for the vanilla-style four-panel view and slide with the arrow keys, right stick or D-pad.
 [*]With 5-8 players the arena grows with the player count (same area per player as with 4; 45x34 tiles for 8). Enemy count, HP, damage and materials follow the base game's player scaling.
+[*]DLC: in an extended room a DLC can be enabled only if everyone in the room has it installed. Otherwise its toggle, zones and characters cannot be picked and the hint names the players ("Not installed by P5"); each player's panel shows the icons of their installed DLCs, grey when missing.
 [*]Brotato Online files are not modified. If Brotato Online or the game updates, the mod switches its 5-8 player features off and Brotato Online runs unchanged until this mod is updated.
 [*]Removing a player re-seats the others in order (verified in local simulation); a disconnected player can return to their seat (Brotato Online's own flow). Neither has been tested across several PCs yet.
 [/list]

@@ -9,7 +9,9 @@ extends VBoxContainer
 #   end_run  level, weapon and item counts
 #   character, weapon (selection screens, D-012) one compact line: the
 #            character/weapon the player has picked or is pointing at, and
-#            whether they have picked; no weapon list
+#            whether they have picked; no weapon list. On character selection
+#            the row ends with the player's DLC icons in online extended rooms
+#            (ui/dlc_badges.gd, D-014)
 # On the shop and end-run screens the rows can be selected (D-011, enable_view):
 # each row holds a button inside the local player's FocusEmulator area
 # (local_focus_layout.gd), so the gamepad/keyboard reaches it by moving right
@@ -27,6 +29,7 @@ extends VBoxContainer
 # changes game state.
 
 const PanelPopups = preload("res://mods-unpacked/CoopPlus-OnlineExtendedCoop/ui/panel_popups.gd")
+const DlcBadges = preload("res://mods-unpacked/CoopPlus-OnlineExtendedCoop/ui/dlc_badges.gd")
 
 const MODE_SHOP := "shop"
 const MODE_UPGRADES := "upgrades"
@@ -183,6 +186,9 @@ func _build_row(player_index: int) -> Dictionary:
 	weapons.add_constant_override("hseparation", 6)
 	weapons.add_constant_override("vseparation", 6)
 	row.add_child(weapons)
+	if _mode == MODE_CHARACTER:
+		var badges = DlcBadges.inline(row, player_index)
+		badges.size_flags_horizontal = Control.SIZE_EXPAND | Control.SIZE_SHRINK_END
 	return {"panel": panel, "icon": icon, "texts": texts, "title": title, "status": status, "weapons": weapons, "weapons_key": null,
 			"style": style, "selected_style": selected_style, "button": null}
 
