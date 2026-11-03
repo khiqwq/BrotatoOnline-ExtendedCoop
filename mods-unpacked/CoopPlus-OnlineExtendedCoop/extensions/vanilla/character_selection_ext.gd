@@ -35,10 +35,12 @@ const RoomPolicy = preload("res://mods-unpacked/CoopPlus-OnlineExtendedCoop/scri
 const CapacityPolicy = preload("res://mods-unpacked/CoopPlus-OnlineExtendedCoop/scripts/core/capacity_policy.gd")
 const DlcBadges = preload("res://mods-unpacked/CoopPlus-OnlineExtendedCoop/ui/dlc_badges.gd")
 const COOPPLUS_ROOM_REFRESH_SEC := 0.5
-const COOPPLUS_SESSION_PATH := "/root/ModLoader/six666-BrotatoOnline/BrotatoOnlineSessionManager"
+const COOPPLUS_ROOM_HINT_SEC := 4.0
+const COOPPLUS_ROOM_LOCKED_ALPHA := 0.5
+const COOPPLUS_ROOM_HINT_COLOR := Color(1.0, 0.85, 0.4)
 const COOPPLUS_ROOM_TEXT := {
-	"zh": {"standard": "标准房间（4 人，原版兼容）", "extended": "扩展房间（最多 %d 人）"},
-	"en": {"standard": "Standard room (4, vanilla compatible)", "extended": "Extended room (up to %d players)"},
+	"zh": {"standard": "标准房间（4 人，原版兼容）", "extended": "扩展房间（最多 %d 人）", "locked": "大厅开启时不能更改房间类型，请先关闭“开启大厅”"},
+	"en": {"standard": "Standard room (4, vanilla compatible)", "extended": "Extended room (up to %d players)", "locked": "The room type cannot change while the lobby is open; turn the lobby off first"},
 }
 
 const COOPPLUS_MOD_ID := "CoopPlus-OnlineExtendedCoop"
@@ -57,6 +59,8 @@ var _coopplus_extra_locked_panels := []
 var _coopplus_view = null
 var _coopplus_view_key := ""
 var _coopplus_room_button: OptionButton = null
+var _coopplus_room_hint: Label = null
+var _coopplus_room_hint_left := 0.0
 var _coopplus_room_refresh := 0.0
 
 
@@ -96,7 +100,11 @@ func _process(delta: float) -> void:
 	_coopplus_room_refresh -= delta
 	if _coopplus_room_refresh <= 0.0:
 		_coopplus_room_refresh = COOPPLUS_ROOM_REFRESH_SEC
-		_coopplus_room_button.disabled = _coopplus_room_locked()
+		_coopplus_refresh_room_lock()
+	if _coopplus_room_hint_left > 0.0:
+		_coopplus_room_hint_left -= delta
+		if _coopplus_room_hint_left <= 0.0:
+			_coopplus_room_hint.visible = false
 
 
 func _coopplus_add_room_button() -> void:
@@ -120,9 +128,39 @@ func _coopplus_add_room_button() -> void:
 		button.rect_min_size = _zone_selection_button.rect_min_size
 		button.size_flags_horizontal = _zone_selection_button.size_flags_horizontal
 	var _e = button.connect("item_selected", self, "_coopplus_on_room_selected")
+	# Deferred: runs once whoever opened it (OptionButton or the co-op cursor,
+	# focus_emulator.gd _open_option_button) has shown it.
+	var _p = button.get_popup().connect("about_to_show", self, "_coopplus_on_room_popup", [], CONNECT_DEFERRED)
 	_run_options_panel_content.add_child(button)
 	_coopplus_room_button = button
-	_coopplus_room_button.disabled = _coopplus_room_locked()
+	var hint := Label.new()
+	hint.name = "CoopPlusRoomTypeHint"
+	hint.text = texts.locked
+	hint.autowrap = true
+	hint.align = Label.ALIGN_CENTER
+	hint.add_color_override("font_color", COOPPLUS_ROOM_HINT_COLOR)
+	hint.visible = false
+	_run_options_panel_content.add_child(hint)
+	_coopplus_room_hint = hint
+	_coopplus_refresh_room_lock()
+
+
+# The room type is fixed while a room is open (D-008). The dropdown stays
+# clickable then, looking dimmed, so a click can say why nothing opens: a
+# disabled button would take neither the mouse nor the co-op cursor's accept.
+func _coopplus_refresh_room_lock() -> void:
+	var locked := RuntimeGate.room_capacity() > 0
+	_coopplus_room_button.modulate.a = COOPPLUS_ROOM_LOCKED_ALPHA if locked else 1.0
+	# Opened while locked, the list is hidden again at once; invisible meanwhile.
+	_coopplus_room_button.get_popup().modulate.a = 0.0 if locked else 1.0
+
+
+func _coopplus_on_room_popup() -> void:
+	if RuntimeGate.room_capacity() <= 0:
+		return
+	_coopplus_room_button.get_popup().hide()
+	_coopplus_room_hint.visible = true
+	_coopplus_room_hint_left = COOPPLUS_ROOM_HINT_SEC
 
 
 static func _coopplus_copy_overrides(source: Control, target: Control) -> void:
@@ -137,30 +175,11 @@ static func _coopplus_copy_overrides(source: Control, target: Control) -> void:
 				target.set(key, value)
 
 
-# Locked while a room is open, unless this PC hosts it alone (then the room is
-# opened again with the new type, session_manager_ext.gd coopplus_reopen_room).
-func _coopplus_room_locked() -> bool:
-	if RuntimeGate.room_capacity() <= 0:
-		return false
-	var session = get_node_or_null(COOPPLUS_SESSION_PATH)
-	return session == null or not session.has_method("coopplus_can_change_room") or not session.coopplus_can_change_room()
-
-
 func _coopplus_on_room_selected(index: int) -> void:
 	var choices := _coopplus_room_choices()
-	if index < 0 or index >= choices.size():
-		return
-	var open := RuntimeGate.room_capacity() > 0
-	var session = get_node_or_null(COOPPLUS_SESSION_PATH)
-	if open and _coopplus_room_locked():
+	if index < 0 or index >= choices.size() or RuntimeGate.room_capacity() > 0:
 		return
 	RoomPolicy.save_preference({"type": choices[index][0], "capacity": choices[index][1]})
-	if not open or session == null or not session.has_method("coopplus_get_room"):
-		return
-	var room: Dictionary = session.coopplus_get_room()
-	if str(room.get("type", "")) == choices[index][0] and int(room.get("capacity", 0)) == choices[index][1]:
-		return
-	var _r = session.coopplus_reopen_room()
 
 
 # Standard, or extended for as many players as this version supports: a

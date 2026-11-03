@@ -144,7 +144,8 @@ const MENU_TIMEOUT_SEC := 90.0
 const VIEW_STEP_SEC := 0.8
 const VIEW_STEPS := {
 	"upgrades": ["key_v", "shot_pages", "stick_right", "shot_pages_slid", "stick_left", "key_v", "check"],
-	"character_selection": ["room_popup", "shot_room_popup", "room_popup_close", "key_v", "shot_pages", "stick_right", "shot_pages_slid", "stick_left", "key_v", "check"],
+	"character_selection": ["room_popup", "shot_room_popup", "room_popup_close",
+			"room_lock", "room_popup", "shot_room_locked", "room_popup_close", "room_unlock", "key_v", "shot_pages", "stick_right", "shot_pages_slid", "stick_left", "key_v", "check"],
 	"weapon_selection": ["key_v", "shot_pages", "stick_right", "shot_pages_slid", "stick_left", "key_v", "check"],
 	"shop": ["shot", "pad_right", "pad_down", "pad_accept", "shot_view_pad", "click_last", "shot_view_click", "click_last", "check",
 			"key_v", "shot_pages", "pad_right", "stick_right", "shot_pages_slid", "pad_left", "stick_left", "pad_left", "key_v", "check"],
@@ -900,8 +901,18 @@ func _run_view_check(scene, prefix: String, delta: float) -> bool:
 			strip.save_scroll_mode(strip.SCROLL_ROW if step == "set_row" else strip.SCROLL_PAGE)
 		"room_popup", "room_popup_close":
 			detail["room"] = _room_popup(scene, step == "room_popup")
-		"shot_room_popup":
-			_save_screenshot("%s_room_popup_%dp.png" % [prefix, _players_wanted])
+		"shot_room_popup", "shot_room_locked":
+			_save_screenshot("%s_%s_%dp.png" % [prefix, step.substr(5), _players_wanted])
+			var room_button = scene.find_node("CoopPlusRoomType", true, false)
+			var hint = scene.find_node("CoopPlusRoomTypeHint", true, false)
+			detail["room_state"] = {"list_open": room_button != null and room_button.get_popup().visible,
+					"hint": hint != null and hint.visible, "alpha": room_button.modulate.a if room_button != null else -1.0}
+		"room_lock", "room_unlock":
+			# A room as if a lobby were open (the dropdown is locked then).
+			if step == "room_lock":
+				RuntimeGate.set_room_capacity(RuntimeGate.verified_capacity())
+			else:
+				RuntimeGate.clear_room()
 		"pad_right", "pad_left", "pad_down", "pad_accept":
 			_pad_press(emulator, "ui_" + step.substr(4))
 		"key_v":
