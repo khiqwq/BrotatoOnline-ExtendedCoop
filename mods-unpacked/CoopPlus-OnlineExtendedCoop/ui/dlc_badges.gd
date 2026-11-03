@@ -2,9 +2,10 @@ extends HBoxContainer
 # One player's DLC icons in an online extended room (D-014): for every DLC
 # that some player in the room has installed, its item set bar icon
 # (UpdateData.icon) in the DLC's colour when this player has it, greyed when
-# not (or not reported yet), so the players who keep a DLC off are visible at
-# a glance. Hidden when the room rule does not apply
-# (scripts/bo/dlc_roster.gd is_active). Refreshes itself; layout only.
+# not (or not reported yet). Information only: Brotato Online gives the
+# host's DLC content to players who do not own it, so a DLC run works for
+# everyone. Hidden offline and in standard rooms (scripts/bo/dlc_roster.gd
+# is_active). Refreshes itself; layout only.
 
 const DlcRoster = preload("res://mods-unpacked/CoopPlus-OnlineExtendedCoop/scripts/bo/dlc_roster.gd")
 const SCRIPT_PATH := "res://mods-unpacked/CoopPlus-OnlineExtendedCoop/ui/dlc_badges.gd"

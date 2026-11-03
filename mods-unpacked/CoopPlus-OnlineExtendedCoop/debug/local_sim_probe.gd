@@ -32,15 +32,13 @@ extends Node
 #                                     logs the restored shop and plays on
 #   --coopplus-local-sim-dlc-missing=<P>  with -menus: player P (1-based) has no
 #                                     DLC installed (scripts/bo/dlc_roster.gd
-#                                     debug owners, D-014); the saved zone is set
-#                                     to the first DLC zone so the fallback runs.
-#                                     On character selection the bar's banner
-#                                     for the blocked DLC is shown before the
-#                                     screenshot. With -menus (with or without
+#                                     debug owners, D-014; only the DLC icons
+#                                     change) and the saved zone is the first
+#                                     DLC zone. With -menus (with or without
 #                                     this flag) local_sim.dlc is logged on each
 #                                     selection screen (item set bar, zone list,
-#                                     badges, the filtered content) and
-#                                     local_sim.dlc_run once the run starts
+#                                     icons, DLC characters) and local_sim.dlc_run
+#                                     once the run starts
 #   --coopplus-local-sim-pad          exploration only: keep padding the vanilla
 #                                     per-player arrays fixed at 4 entries (DATA-01,
 #                                     BAT-03/04 ...) to 8 every frame, to find the
@@ -171,7 +169,6 @@ var _wave_end_shots_done := 0
 var _remove_player := 0
 var _late_join := false
 var _dlc_missing := 0
-var _dlc_logo_shown := false
 var _zone_logged_wave := -1
 var _late_join_state := ""
 var _late_join_left := 0.0
@@ -328,9 +325,6 @@ func _process(delta: float) -> void:
 				_menu_shot = false
 				_accept_timer = 0.0
 			_menu_scene_time += delta
-			if _dlc_missing > 0 and not _dlc_logo_shown and scene_file == MenuData.character_selection_scene 					and _menu_scene_time > MENU_SHOT_SEC - 0.5:
-				_dlc_logo_shown = true
-				_show_blocked_dlc_banner(scene)
 			if not _menu_shot and _menu_scene_time > MENU_SHOT_SEC:
 				_menu_shot = true
 				ProbeLog.event("local_sim.dlc", _dlc_state(scene))
@@ -504,7 +498,7 @@ func _setup_dlc_missing() -> void:
 		_setup["dlc_error"] = "no roster"
 		return
 	roster.debug_set_owner(_dlc_missing - 1, [])
-	# The first zone of a DLC, so the zone fallback has something to do.
+	# The first zone of a DLC: it must stay selected for the run.
 	var zone_index := 0
 	for zone_data in ZoneService.zones:
 		if zone_data.dlc_id != "" and ProgressData.available_dlc_ids.has(zone_data.dlc_id):
@@ -519,9 +513,7 @@ func _setup_dlc_missing() -> void:
 
 func _dlc_state(scene) -> Dictionary:
 	var out := {"scene": scene.filename.get_file() if scene != null else "", "available": ProgressData.available_dlc_ids.duplicate(),
-			"blocked_in_progress": ProgressData.get("coopplus_blocked_dlcs"), "active_update_data": ProgressData.active_update_data.duplicate()}
-	var roster = get_tree().root.get_node_or_null("ModLoader/CoopPlus-OnlineExtendedCoop/CoopPlusDlcRoster")
-	out["blocked"] = roster.blocked() if roster != null else null
+			"active_update_data": ProgressData.active_update_data.duplicate()}
 	var bar = scene.find_node("ItemSetBar", true, false) if scene != null else null
 	if bar != null:
 		var buttons := []
@@ -544,14 +536,13 @@ func _dlc_state(scene) -> Dictionary:
 				icons.append(icon.modulate.a > 0.5)
 			badges.append({"player": int(node.player_index) + 1, "visible": node.is_visible_in_tree(), "owned": icons})
 	out["badges"] = badges
-	# Characters of a blocked DLC on screen, and whether each is disabled.
+	# DLC characters on screen, and whether each is disabled.
 	var chars := []
-	var blocked_ids: Array = out["blocked"].keys() if out["blocked"] is Dictionary else []
 	if scene != null and scene.filename == MenuData.character_selection_scene:
 		for element in _find_inventory_elements(scene):
 			var item = element.get("item")
 			if item is CharacterData:
-				var update = _dlc_of_character(item, blocked_ids)
+				var update = _dlc_of_character(item, ProgressData.dlc_ids)
 				if update != null:
 					chars.append({"id": item.my_id, "dlc": update.id, "disabled": bool(element.get_meta("disabled_by_item_set", false)),
 							"locked": bool(item.is_locked), "path": str(element.get_parent().name)})
@@ -585,16 +576,6 @@ func _find_all(node: Node, node_name: String) -> Array:
 			out.append(child)
 		out.append_array(_find_all(child, node_name))
 	return out
-
-
-func _show_blocked_dlc_banner(scene) -> void:
-	var bar = scene.find_node("ItemSetBar", true, false) if scene != null else null
-	if bar == null:
-		return
-	for i in bar._buttons.size():
-		if bar._buttons[i].disabled:
-			bar._show_logo(bar._buttons[i], bar._updates[i])
-			return
 
 
 func _dlc_characters() -> Array:

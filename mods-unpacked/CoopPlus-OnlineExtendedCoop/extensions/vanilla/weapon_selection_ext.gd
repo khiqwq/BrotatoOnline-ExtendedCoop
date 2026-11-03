@@ -32,7 +32,6 @@ const PerPlayerArrays = preload("res://mods-unpacked/CoopPlus-OnlineExtendedCoop
 const ExtraPlayerPanels = preload("res://mods-unpacked/CoopPlus-OnlineExtendedCoop/ui/extra_player_panels.gd")
 const LocalFocusLayout = preload("res://mods-unpacked/CoopPlus-OnlineExtendedCoop/ui/local_focus_layout.gd")
 const SelectionView = preload("res://mods-unpacked/CoopPlus-OnlineExtendedCoop/ui/selection_view_controller.gd")
-const DlcRoster = preload("res://mods-unpacked/CoopPlus-OnlineExtendedCoop/scripts/bo/dlc_roster.gd")
 
 const COOPPLUS_MOD_ID := "CoopPlus-OnlineExtendedCoop"
 const COOPPLUS_PANELS_PATH := "MarginContainer/VBoxContainer/DescriptionContainer/Panels"
@@ -114,20 +113,6 @@ func _get_inventory_containers() -> Array:
 
 
 # Parent: weapon_selection.gd:242 (1.2.0.0; LockedPanel1..4).
-# Weapons of a DLC some player lacks (D-014) are disabled as for a switched-off
-# set (ProgressData.has_item_set, progress_data_ext.gd); the locked panel
-# names the players lacking it.
-func _update_locked_panel(element: InventoryElement, player_index: int) -> void:
-	._update_locked_panel(element, player_index)
-	var locked_panels: Array = _get_locked_panels()
-	if player_index < 0 or player_index >= locked_panels.size() or not locked_panels[player_index].visible:
-		return
-	var roster = DlcRoster.find(get_tree())
-	var text: String = roster.locked_text(_get_element_disabled_update(element)) if roster != null else ""
-	if text != "":
-		locked_panels[player_index].set_description(text)
-
-
 func _get_locked_panels() -> Array:
 	var panels: Array = ._get_locked_panels()
 	if _coopplus_extra_locked_panels.empty():

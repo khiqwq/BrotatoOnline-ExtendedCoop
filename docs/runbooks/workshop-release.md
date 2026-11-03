@@ -23,7 +23,7 @@
    ```
 
    日志里应有 `runtime gate: extended`、`queued 25 of 25 extensions`，除 3 条 `GDScript::reload (built-in:3)` 的 `Can't preload resource at path: protocol.gd / session_content_catalog.gd` 外没有 `SCRIPT ERROR`（那 3 条来自 Mod Loader 的备份副本，见 EV-0038）。
-3. 预览图放在 `.local/release/preview.jpg`（小于 1 MB；当前是 8 人战斗截图缩到 1280x720）。页面上的其他截图放在 `.local/release/gallery/`（按文件名排序，每张小于 1 MB；当前 7 张 1600x900：角色选择、商店本机放大、展开其他玩家、四人视图、升级、结算、扩展房间的 DLC 规则（有人没装时的开关提示与玩家 DLC 图标）），每次上传都替换物品现有的截图；文件夹为空或不存在时不动。截图是游戏画面，只放本机、不入库。
+3. 预览图放在 `.local/release/preview.jpg`（小于 1 MB；当前是 8 人战斗截图缩到 1280x720）。页面上的其他截图放在 `.local/release/gallery/`（按文件名排序，每张小于 1 MB；当前 7 张 1600x900：角色选择、商店本机放大、展开其他玩家、四人视图、升级、结算、扩展房间的玩家 DLC 图标（没装的玩家为灰色）），每次上传都替换物品现有的截图；文件夹为空或不存在时不动。截图是游戏画面，只放本机、不入库。
 4. 先试连，再上传：
 
    ```powershell

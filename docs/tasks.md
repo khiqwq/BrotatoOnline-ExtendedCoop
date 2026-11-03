@@ -22,7 +22,7 @@
 | AP-016 | 实现隔离检查点 | DEV | IN_PROGRESS | 写入路径完成（[ADR-004](adr/ADR-004-extended-run-checkpoint.md)）：`extensions/vanilla/progress_data_ext.gd` 把 5～8 人局内状态写入 `checkpoint_store`（`coopplus_runs/profile_<档位>/`），原版存档只写无进行中局的占位。修复前打开存档时 5 人进入第一个商店即崩溃（EV-0026），修复后 5/8 人带存档连续多波通过（EV-0027）。继续游戏已实现：读检查点、校验与明确拒绝、反序列化（含第 5 人起商店）、身份存入同一检查点（EV-0034）。待：联机继续实测 |
 | AP-017 | 完成断线/继续/移除 | DEV | VERIFY | 继续：BO 身份管理器在继续界面运行时调整（超过 4 槽的登记表、面板加高、4 人以上禁用离线继续，`scripts/bo/resume_identity_patch.gd`）。移除：客户端重建名单后补齐逐玩家数组（GAP1-02、SAVE-13、DATA-15，`extensions/bo/player_removal_manager_ext.gd`）；房主端压缩保持数组长度、身份表 compact 支持任意人数，单机重放 8→7、6→5 通过（EV-0037）。断线重连：沿用 BO 保留断线者槽位与身份校验（R11）；与人数有关的部分已处理——准入只对新成员按房间容量限制（`_remote_connection_rejection_reason`）、客户端显示全部断线者（CAP-16）、LAN 留重连余量（CAP-05）、回来的玩家拿回原虚拟设备（F03）。BO 自身与人数无关的行为未改：开局/重试屏障等待断线者（NET-13、GAP2-04）、LAN 新连接与旧连接并存时判 duplicate_identity（CAP-M01）、移除后客户端 tracked_item_effects 不左移（GAP1-03）。待：多机联机实测（M1） 断线者的角色：房主端在其断线 3 秒后按 Brotato Online 的“客户端报告死亡”处理，重新挑战不再出现无敌角色（`extensions/bo/state_snapshot_ext.gd`，只能联机验证）。 |
 | AP-018 | 跑完 18 类故障 | QA | TODO | |
-| AP-019 | 验证内容与 Mod 组合 | QA | IN_PROGRESS | DLC（D-014）：扩展房间里只有所有人都装了的 DLC 才能启用，房主端强制；物品组开关、区域、角色、武器与开局的 DLC 机制都按全房间名单过滤，提示缺失的玩家，面板显示各人 DLC 图标。本地模拟（模拟某位玩家没装）通过（EV-0041）；待：多机联机实测名单传送。 |
+| AP-019 | 验证内容与 Mod 组合 | QA | IN_PROGRESS | DLC（D-014）：不限制，没装 DLC 的玩家也能玩开了 DLC 的局（Brotato Online 的内容注册）；面板与状态条显示各人 DLC 图标。本地模拟通过（EV-0042）；待：多机联机实测（没装 DLC 的客户端进开了 DLC 的局、图标名单传送）。 |
 | AP-020 | 分析八人性能 | DEV | TODO | |
 | AP-021 | 完整验收与长测 | QA | TODO | |
 | AP-022 | 完成可复现打包与 CI | DEV | TODO | 确定性 zip 与白名单函数已在 `tools/lib/Common.psm1`（开发实例使用） |
