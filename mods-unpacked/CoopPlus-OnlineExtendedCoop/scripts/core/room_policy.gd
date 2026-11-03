@@ -3,7 +3,7 @@ extends Reference
 # stays fixed for that room:
 #   standard  capacity 4; plain Brotato Online players may join; the extension
 #             stays dormant (every override runs its parent, R08)
-#   extended  capacity 5..8; every member needs a matching extension
+#   extended  capacity 5..CapacityPolicy.MAX_SUPPORTED_PLAYERS; every member needs a matching extension
 #             (scripts/network/capability.gd decides from the capacity)
 # The choice is kept per PC (PREFS_PATH). The host advertises the room in its
 # lobby / LAN discovery data (to_metadata); a joining extension reads it
@@ -18,7 +18,10 @@ const TYPE_STANDARD := "standard"
 const TYPE_EXTENDED := "extended"
 const TYPES := [TYPE_STANDARD, TYPE_EXTENDED]
 const DEFAULT_TYPE := TYPE_EXTENDED
-const DEFAULT_CAPACITY := 8
+# Hosts open extended rooms for as many players as this version supports;
+# such a room runs with five players as well (D-015). Rooms advertised with
+# fewer seats (older versions) are still read as they are.
+const DEFAULT_CAPACITY := CapacityPolicy.MAX_SUPPORTED_PLAYERS
 const MIN_EXTENDED := 5
 
 const PREFS_PATH := "user://coopplus_settings.cfg"
@@ -30,7 +33,7 @@ const META_CAPACITY := "coopplus_capacity"
 const META_CAPABILITY := "coopplus_capability"
 
 
-# {type, capacity} with capacity 4 for standard rooms and 5..8 for extended.
+# {type, capacity} with capacity 4 for standard rooms and 5..the maximum for extended.
 static func normalize(room_type, room_capacity) -> Dictionary:
 	var t := str(room_type) if str(room_type) in TYPES else DEFAULT_TYPE
 	if t == TYPE_STANDARD:
@@ -51,15 +54,12 @@ static func host_room(preference: Dictionary, gate_capacity: int) -> Dictionary:
 	return room
 
 
-# Next preference in the order standard, extended 5, 6, 7, 8 (wrapping); the
-# room-type button steps through it.
+# The other room type: standard <-> the largest extended room.
 static func next_preference(preference: Dictionary) -> Dictionary:
 	var room := normalize(preference.get("type"), preference.get("capacity"))
 	if room.type == TYPE_STANDARD:
-		return normalize(TYPE_EXTENDED, MIN_EXTENDED)
-	if room.capacity >= CapacityPolicy.MAX_SUPPORTED_PLAYERS:
-		return normalize(TYPE_STANDARD, 0)
-	return normalize(TYPE_EXTENDED, room.capacity + 1)
+		return normalize(TYPE_EXTENDED, DEFAULT_CAPACITY)
+	return normalize(TYPE_STANDARD, 0)
 
 
 static func to_metadata(room: Dictionary, capability_version: int) -> Dictionary:
@@ -93,11 +93,13 @@ static func join_room(meta, gate_capacity: int, capability_version: int) -> Dict
 	return {"ok": true, "capacity": room.capacity, "reason": ""}
 
 
+# Only the type is a choice: an extended room always has DEFAULT_CAPACITY
+# seats, also when an older version saved 5..15.
 static func load_preference(path: String = PREFS_PATH) -> Dictionary:
 	var config := ConfigFile.new()
 	if config.load(path) != OK:
 		return normalize(DEFAULT_TYPE, DEFAULT_CAPACITY)
-	return normalize(config.get_value(PREFS_SECTION, "type", DEFAULT_TYPE), config.get_value(PREFS_SECTION, "capacity", DEFAULT_CAPACITY))
+	return normalize(config.get_value(PREFS_SECTION, "type", DEFAULT_TYPE), DEFAULT_CAPACITY)
 
 
 static func save_preference(preference: Dictionary, path: String = PREFS_PATH) -> void:

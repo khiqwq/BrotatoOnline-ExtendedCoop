@@ -39,12 +39,9 @@ func test_host_room_follows_gate() -> void:
 	assert_eq(RoomPolicy.host_room({"type": "standard"}, 8).capacity, 4)
 
 
-func test_next_preference_cycles() -> void:
-	var expected := []
-	for capacity in range(5, CapacityPolicy.MAX_SUPPORTED_PLAYERS + 1):
-		expected.append("e%d" % capacity)
-	expected.append("s4")
-	expected.append("e5")
+func test_next_preference_toggles_standard_and_largest_extended() -> void:
+	var largest := "e%d" % CapacityPolicy.MAX_SUPPORTED_PLAYERS
+	var expected := [largest, "s4", largest]
 	var seen := []
 	var pref := {"type": RoomPolicy.TYPE_STANDARD, "capacity": 4}
 	for _i in expected.size():
@@ -88,9 +85,10 @@ func test_join_room_rules() -> void:
 
 func test_preference_round_trip_through_file() -> void:
 	assert_eq(RoomPolicy.load_preference(TMP_PATH).type, RoomPolicy.DEFAULT_TYPE, "no file: default")
+	assert_eq(RoomPolicy.load_preference(TMP_PATH).capacity, CapacityPolicy.MAX_SUPPORTED_PLAYERS, "no file: the largest extended room")
 	RoomPolicy.save_preference({"type": "extended", "capacity": 6}, TMP_PATH)
 	var pref = RoomPolicy.load_preference(TMP_PATH)
 	assert_eq(pref.type, "extended")
-	assert_eq(pref.capacity, 6)
+	assert_eq(pref.capacity, CapacityPolicy.MAX_SUPPORTED_PLAYERS, "a size saved by an older version reads as the largest room")
 	RoomPolicy.save_preference({"type": "standard", "capacity": 8}, TMP_PATH)
 	assert_eq(RoomPolicy.load_preference(TMP_PATH).capacity, 4)

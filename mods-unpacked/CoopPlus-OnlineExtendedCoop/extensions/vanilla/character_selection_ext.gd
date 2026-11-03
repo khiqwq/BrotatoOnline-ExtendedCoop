@@ -36,8 +36,8 @@ const CapacityPolicy = preload("res://mods-unpacked/CoopPlus-OnlineExtendedCoop/
 const DlcBadges = preload("res://mods-unpacked/CoopPlus-OnlineExtendedCoop/ui/dlc_badges.gd")
 const COOPPLUS_ROOM_REFRESH_SEC := 0.5
 const COOPPLUS_ROOM_TEXT := {
-	"zh": {"standard": "标准房间（4 人，原版兼容）", "extended": "扩展房间（%d 人）"},
-	"en": {"standard": "Standard room (4, vanilla compatible)", "extended": "Extended room (%d players)"},
+	"zh": {"standard": "标准房间（4 人，原版兼容）", "extended": "扩展房间（最多 %d 人）"},
+	"en": {"standard": "Standard room (4, vanilla compatible)", "extended": "Extended room (up to %d players)"},
 }
 
 const COOPPLUS_MOD_ID := "CoopPlus-OnlineExtendedCoop"
@@ -143,12 +143,11 @@ func _coopplus_on_room_selected(index: int) -> void:
 	RoomPolicy.save_preference({"type": choices[index][0], "capacity": choices[index][1]})
 
 
-# Dropdown order: standard, then extended 5..the supported maximum.
+# Standard, or extended for as many players as this version supports: a
+# room that size runs with five players too, so there is no size to pick
+# (OWNER, 2026-11-04, D-015).
 static func _coopplus_room_choices() -> Array:
-	var out := [[RoomPolicy.TYPE_STANDARD, CapacityPolicy.VANILLA_MAX_PLAYERS]]
-	for n in range(RoomPolicy.MIN_EXTENDED, CapacityPolicy.MAX_SUPPORTED_PLAYERS + 1):
-		out.append([RoomPolicy.TYPE_EXTENDED, n])
-	return out
+	return [[RoomPolicy.TYPE_STANDARD, CapacityPolicy.VANILLA_MAX_PLAYERS], [RoomPolicy.TYPE_EXTENDED, RoomPolicy.DEFAULT_CAPACITY]]
 
 
 func _coopplus_on_players_updated(_players: Array) -> void:

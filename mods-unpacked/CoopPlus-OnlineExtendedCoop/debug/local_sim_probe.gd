@@ -144,7 +144,7 @@ const MENU_TIMEOUT_SEC := 90.0
 const VIEW_STEP_SEC := 0.8
 const VIEW_STEPS := {
 	"upgrades": ["key_v", "shot_pages", "stick_right", "shot_pages_slid", "stick_left", "key_v", "check"],
-	"character_selection": ["key_v", "shot_pages", "stick_right", "shot_pages_slid", "stick_left", "key_v", "check"],
+	"character_selection": ["room_popup", "shot_room_popup", "room_popup_close", "key_v", "shot_pages", "stick_right", "shot_pages_slid", "stick_left", "key_v", "check"],
 	"weapon_selection": ["key_v", "shot_pages", "stick_right", "shot_pages_slid", "stick_left", "key_v", "check"],
 	"shop": ["shot", "pad_right", "pad_down", "pad_accept", "shot_view_pad", "click_last", "shot_view_click", "click_last", "check",
 			"key_v", "shot_pages", "pad_right", "stick_right", "shot_pages_slid", "pad_left", "stick_left", "pad_left", "key_v", "check"],
@@ -209,6 +209,7 @@ var _menus := false
 var _options_shot := false
 var _options_left := -1.0
 var _options_menu: Node = null
+var _room_prev_focus = null
 var _continue := false
 var _resume_seeded := false
 var _menu_scene := ""
@@ -897,6 +898,10 @@ func _run_view_check(scene, prefix: String, delta: float) -> bool:
 				Input.parse_input_event(motion)
 		"set_row", "set_page":
 			strip.save_scroll_mode(strip.SCROLL_ROW if step == "set_row" else strip.SCROLL_PAGE)
+		"room_popup", "room_popup_close":
+			detail["room"] = _room_popup(scene, step == "room_popup")
+		"shot_room_popup":
+			_save_screenshot("%s_room_popup_%dp.png" % [prefix, _players_wanted])
 		"pad_right", "pad_left", "pad_down", "pad_accept":
 			_pad_press(emulator, "ui_" + step.substr(4))
 		"key_v":
@@ -978,6 +983,30 @@ func _options_step(scene: Node, delta: float) -> bool:
 	_options_menu.queue_free()
 	_options_shot = false
 	return true
+
+
+# Opens (or closes) the room-type dropdown of the run options the way P1's
+# cursor does (focus_emulator.gd _open_option_button); closing gives P1's
+# cursor back to where it was, so the menu accepts carry on.
+func _room_popup(scene: Node, open: bool) -> Dictionary:
+	var button = scene.find_node("CoopPlusRoomType", true, false) if scene != null else null
+	var emulator = scene.get_node_or_null("FocusEmulator1") if scene != null else null
+	if not button is OptionButton or emulator == null or not emulator.has_method("_open_option_button"):
+		return {"error": "no_room_button"}
+	var popup: PopupMenu = button.get_popup()
+	if not open:
+		popup.hide()
+		if is_instance_valid(_room_prev_focus):
+			emulator._set_focused_control_with_style(_room_prev_focus, false)
+		return {"closed": true}
+	var items := []
+	for i in button.get_item_count():
+		items.append(button.get_item_text(i))
+	_room_prev_focus = emulator.focused_control
+	emulator._set_focused_control_with_style(button, false)
+	emulator._open_option_button(button)
+	return {"items": items, "selected": button.get_item_text(button.selected), "disabled": button.disabled,
+			"popup_rect": [int(popup.rect_global_position.y), int(popup.rect_size.y)]}
 
 
 # Moves the mouse to the middle of `control` and turns the wheel there once.

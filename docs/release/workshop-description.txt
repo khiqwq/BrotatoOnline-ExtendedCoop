@@ -20,7 +20,7 @@
 [*]房主在角色选择界面的运行选项里选房间类型：
 [list]
 [*][b]标准房间（4 人，原版兼容）[/b]：没装本扩展的玩家也能加入，一切与原版相同。
-[*][b]扩展房间（5～16 人）[/b]：所有成员都要装本扩展；没装的玩家会看到“版本不兼容”而无法加入。
+[*][b]扩展房间（最多 16 人）[/b]：5～16 人都能开；所有成员都要装本扩展；没装的玩家会看到“版本不兼容”而无法加入。
 [/list]
 [*]商店、升级、结算界面：本机面板放大，旁边是其他玩家的状态条（武器、选购状态）；用手柄选中某个玩家可以展开他的商店、武器和道具。鼠标点击需要同时启用 CoopFix-OnlineMouseUI。
 [*]按 V 或手柄 Back 键切换到原版式的四人视图，用左右方向键、右摇杆或十字键左右滑动查看其他玩家；再按一次切回。
@@ -58,7 +58,7 @@ Extends [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3741034628]B
 
 [list]
 [*]Requires Brotato 1.2.0.1 (Mod Loader 6.3.0) and the 4 Nov 2026 update of Brotato Online (network protocol 6.3.0). Everyone in an extended room needs this mod.
-[*]Pick the room type in the run options on character selection: Standard (4, vanilla-compatible) or Extended (5-16).
+[*]Pick the room type in the run options on character selection: Standard (4, vanilla-compatible) or Extended (up to 16; it runs with 5 players too).
 [*]Shop / upgrades / end of run: your panel is large, the others are shown as status rows; select a player to open their panel. Press V or gamepad Back for the vanilla-style four-panel view and slide with the arrow keys, right stick or D-pad.
 [*]With 9+ players the battle HUD uses thin bars and small material counts, and the player list shows 7 players at a time (6 on the end-of-run screen): scroll it with the mouse wheel over it, the right stick, or by moving the cursor past its first/last row. Settings > Gameplay chooses page by page (default) or one row at a time.
 [*]Performance depends on the host: in local simulation on a laptop RTX 5070 with a full late-game turret kit per player, 12 players stay around 94-163 FPS in late waves, 14 dip to about 40, and 16 swing between about 6 and 50 FPS in the last waves depending on how many enemies are alive.
