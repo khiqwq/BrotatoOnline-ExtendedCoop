@@ -21,8 +21,14 @@ also carrying the content); --text-only writes only those.
 --keep-media leaves the item's preview and gallery as they are (Steam's
 image uploads time out now and then, and unchanged images need no upload).
 
+--refresh-local asks this PC's Steam client to download the item's latest
+version now (ISteamUGC DownloadItem): its change feed can take a while to
+notice an upload, and until then the subscribed copy and the game stay on the
+previous version.
+
 Usage: python tools/workshop_upload.py --dry-run | --upload [--note "change note"] [--friends-only] [--keep-media]
        python tools/workshop_upload.py --text-only [--note "change note"]
+       python tools/workshop_upload.py --refresh-local
 """
 import ctypes
 import json
@@ -107,7 +113,11 @@ SIGNATURES = {
     "SteamAPI_ISteamUGC_AddItemPreviewFile": ([c_void_p, c_uint64, c_char_p, c_int], c_bool),
     "SteamAPI_ISteamUGC_UpdateItemPreviewFile": ([c_void_p, c_uint64, c_uint32, c_char_p], c_bool),
     "SteamAPI_ISteamUGC_RemoveItemPreview": ([c_void_p, c_uint64, c_uint32], c_bool),
+    "SteamAPI_ISteamUGC_DownloadItem": ([c_void_p, c_uint64, c_bool], c_bool),
+    "SteamAPI_ISteamUGC_GetItemState": ([c_void_p, c_uint64], c_uint32),
 }
+ITEM_STATE_INSTALLED = 4
+ITEM_STATE_BUSY = 8 | 16 | 32  # needs update, downloading, download pending
 
 
 class Steam:
@@ -247,6 +257,29 @@ def upload_text(steam, title, description, note):
     print("https://steamcommunity.com/sharedfiles/filedetails/?id=%d" % item_id)
 
 
+# Steam reports the download through a broadcast callback; the item state is
+# polled instead (callbacks are still pumped so the pipe keeps moving).
+def refresh_local(steam, timeout=300):
+    lib, ugc = steam.lib, steam.ugc
+    item_id = int(open(ID_FILE).read().strip())
+    if not lib.SteamAPI_ISteamUGC_DownloadItem(ugc, item_id, True):
+        raise SystemExit("DownloadItem refused (not subscribed?)")
+    print("download requested for item", item_id)
+    msg = CallbackMsg()
+    deadline = time.time() + timeout
+    time.sleep(2)
+    while time.time() < deadline:
+        lib.SteamAPI_ManualDispatch_RunFrame(steam.pipe)
+        while lib.SteamAPI_ManualDispatch_GetNextCallback(steam.pipe, byref(msg)):
+            lib.SteamAPI_ManualDispatch_FreeLastCallback(steam.pipe)
+        state = lib.SteamAPI_ISteamUGC_GetItemState(ugc, item_id)
+        if state & ITEM_STATE_INSTALLED and not state & ITEM_STATE_BUSY:
+            print("installed (state %d)" % state)
+            return
+        time.sleep(0.5)
+    raise SystemExit("timed out waiting for the download")
+
+
 def upload(steam, title, description, zip_path, note, visibility, keep_media=False):
     lib, ugc = steam.lib, steam.ugc
     os.makedirs(CONTENT_DIR, exist_ok=True)
@@ -314,6 +347,8 @@ def main(argv):
             upload(steam, title, description, zip_path, note, visibility, "--keep-media" in argv)
         elif mode == "--text-only":
             upload_text(steam, title, description, note)
+        elif mode == "--refresh-local":
+            refresh_local(steam)
         else:
             print("dry run: nothing uploaded")
     finally:
