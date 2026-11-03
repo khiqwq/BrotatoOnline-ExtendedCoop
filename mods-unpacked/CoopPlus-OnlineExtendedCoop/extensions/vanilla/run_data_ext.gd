@@ -43,6 +43,8 @@ const COOPPLUS_RUN_DATA_FIELDS := [
 	["current_charmed_enemies", PerPlayerArrays.KIND_VALUE, 0],
 	["steps_taken_this_wave", PerPlayerArrays.KIND_VALUE, 0],
 	["locked_shop_items", PerPlayerArrays.KIND_ARRAY],
+	# 1.2.0.0 (run_data.gd:190, reset in _reset_per_wave_properties).
+	["dino_egg_destroyed", PerPlayerArrays.KIND_VALUE, false],
 ]
 const COOPPLUS_TEMP_STATS_FIELDS := [
 	["player_stats", PerPlayerArrays.KIND_DICT],

@@ -28,8 +28,8 @@
       },
       "constants": {
         "MAX_LOBBY_MEMBERS": "4",
-        "NETWORK_PROTOCOL_VERSION": "\"5.0.0\"",
-        "LAN_PROTOCOL_VERSION": "3"
+        "NETWORK_PROTOCOL_VERSION": "Protocol.NETWORK_PROTOCOL_VERSION",
+        "LAN_PROTOCOL_VERSION": "Protocol.LAN_PROTOCOL_VERSION"
       }
     },
     "res://mods-unpacked/six666-BrotatoOnline/scripts/lan_transport.gd": {
@@ -63,7 +63,10 @@
       "methods": {
         "_get_online_coop_layout_player_count": 0,
         "_ready": 0,
-        "_set_node_array_value": 4
+        "_set_node_array_value": 4,
+        "_apply_shop_player_state_to_ui": 2,
+        "_apply_shop_delta_state_to_ui": 2,
+        "_force_rebuild_shop_gear_container": 2
       },
       "constants": {}
     },
@@ -159,7 +162,8 @@
     },
     "res://singletons/debug_service.gd": {
       "methods": {
-        "log_run_info": 2
+        "log_run_info": 2,
+        "_ready": 0
       },
       "constants": {}
     },
@@ -174,7 +178,9 @@
       "methods": {
         "_get_coop_player_container": 1,
         "_get_stat_popup": 1,
-        "_ready": 0
+        "_ready": 0,
+        "on_paused": 0,
+        "on_unpaused": 0
       },
       "constants": {}
     },
@@ -217,7 +223,8 @@
     },
     "res://ui/menus/run/weapon_selection.gd": {
       "methods": {
-        "_ready": 0
+        "_ready": 0,
+        "_get_locked_panels": 0
       },
       "constants": {}
     },
@@ -236,7 +243,50 @@
     },
     "res://main.gd": {
       "methods": {
-        "_ready": 0
+        "_ready": 0,
+        "_get_least_served_player_able_to_pick_up": 3
+      },
+      "constants": {}
+    },
+    "res://mods-unpacked/six666-BrotatoOnline/scripts/state_snapshot.gd": {
+      "methods": {
+        "_prepare_host_remote_player_damage_proxies": 1
+      },
+      "constants": {}
+    },
+    "res://ui/menus/global/focus_emulator.gd": {
+      "methods": {
+        "_ensure_control_visible": 1
+      },
+      "constants": {}
+    },
+    "res://singletons/zone_service.gd": {
+      "methods": {
+        "set_current_zone": 1
+      },
+      "constants": {}
+    },
+    "res://mods-unpacked/six666-BrotatoOnline/scripts/protocol.gd": {
+      "methods": {
+        "get_game_version": 0,
+        "is_compatible": 2
+      },
+      "constants": {
+        "NETWORK_PROTOCOL_VERSION": "\"6.1.0\"",
+        "LAN_PROTOCOL_VERSION": "4",
+        "GAME_VERSION": "\"1.2.0.0\""
+      }
+    },
+    "res://ui/menus/global/popup_manager.gd": {
+      "methods": {
+        "_get_player_index_for_control": 1,
+        "_on_element_hovered": 1,
+        "_on_element_unhovered": 1,
+        "_on_element_focused": 1,
+        "_on_element_unfocused": 1,
+        "_on_element_pressed": 1,
+        "_on_shop_item_focused": 1,
+        "_on_shop_item_unfocused": 1
       },
       "constants": {}
     }

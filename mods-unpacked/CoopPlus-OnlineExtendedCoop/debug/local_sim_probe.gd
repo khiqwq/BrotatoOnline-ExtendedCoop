@@ -74,6 +74,11 @@ const WAVE_END_SHOTS := [0.4, 1.5]
 # client's roster rebuild, player_removal_manager.gd:273-283, 423-432) and
 # rebuild the shop with one player fewer; -nofix leaves out the client fix
 # (extensions/bo/player_removal_manager_ext.gd) to show the failure.
+# --coopplus-local-sim-late-join (with -menus): the last player joins while
+# character selection is open, the way an invited online player arrives;
+# screenshots and the grid's place before and after.
+const LATE_JOIN_WAIT_SEC := 1.5
+const SCROLL_PRESSES := 6
 const REMOVAL_MANAGER_PATH := "/root/ModLoader/six666-BrotatoOnline/BrotatoOnlinePlayerRemovalManager"
 # First wave only: hold the accepts until the co-op upgrade screen has been
 # shown this long and captured, or give up after UPGRADES_SHOT_WAIT_SEC.
@@ -153,6 +158,14 @@ var _menus_time := 0.0
 var _wave_end_at := -1.0
 var _wave_end_shots_done := 0
 var _remove_player := 0
+var _late_join := false
+var _zone_logged_wave := -1
+var _late_join_state := ""
+var _late_join_left := 0.0
+var _late_join_before := {}
+var _late_join_presses := 0
+var _late_join_scroll_after := {}
+var _late_join_saved_focus = null
 var _remove_fix := true
 var _removal_done := false
 var _removal_scene_id := 0
@@ -183,6 +196,7 @@ func _ready() -> void:
 	_menus = "--coopplus-local-sim-menus" in OS.get_cmdline_args()
 	_continue = "--coopplus-local-sim-continue" in OS.get_cmdline_args()
 	_remove_fix = not "--coopplus-local-sim-remove-nofix" in OS.get_cmdline_args()
+	_late_join = "--coopplus-local-sim-late-join" in OS.get_cmdline_args()
 	_players_wanted = int(clamp(_players_wanted, 1, 8))
 	_rng.seed = seed_value
 	ProbeLog.event("local_sim._ready", {"players": _players_wanted, "wave_seconds": _wave_seconds, "seed": seed_value, "save": _save})
@@ -210,6 +224,11 @@ func _process(delta: float) -> void:
 		"in_run":
 			_wave_elapsed += delta
 			_guard_focus_pause(scene)
+			if _zone_logged_wave != _waves_done and scene_file == MenuData.game_scene and ZoneService.current_zone != null:
+				_zone_logged_wave = _waves_done
+				ProbeLog.event("local_sim.zone", {"wave": _waves_done + 1, "width": ZoneService.current_zone.width,
+						"height": ZoneService.current_zone.height, "players": RunData.get_player_count(),
+						"rect": [ZoneService.current_zone_rect.size.x, ZoneService.current_zone_rect.size.y]})
 			if scene_file != MenuData.game_scene and _wave_elapsed > 2.0:
 				_waves_done += 1
 				ProbeLog.event("local_sim.left_battle", {"scene": scene_file, "waves_done": _waves_done})
@@ -293,6 +312,8 @@ func _process(delta: float) -> void:
 				_menu_shot = true
 				_save_screenshot("%s_%dp.png" % [scene_file.get_file().get_basename(), _players_wanted])
 			var menu_name := scene_file.get_file().get_basename()
+			if _menu_shot and menu_name == "character_selection" and _late_join_step(scene, delta):
+				return
 			if _menu_shot and VIEW_STEPS.has(menu_name) and _run_view_check(scene, menu_name, delta):
 				return
 			if _menu_shot and _menu_scene_time > MENU_ACCEPT_SEC:
@@ -342,7 +363,30 @@ func _process(delta: float) -> void:
 				_finish("reached:%s after %d waves" % [scene_file.get_file(), _waves_done])
 
 
+# Brotato Online's managers our extensions take over: their scripts must be
+# live (methods and constants), not only the extension on top.
+func _log_bo_scripts() -> void:
+	var out := {}
+	for name in ["BrotatoOnlineSessionManager", "BrotatoOnlineLobbyBrowser", "BrotatoOnlineMenuSyncManager", "BrotatoOnlineStateSnapshot", "BrotatoOnlinePlayerRemovalManager"]:
+		var node = get_node_or_null("/root/ModLoader/six666-BrotatoOnline/" + name)
+		var info := {"found": node != null}
+		if node != null and node.get_script() != null:
+			var script = node.get_script()
+			info["valid"] = script.can_instance()
+			var levels := []
+			var s = script
+			while s != null:
+				levels.append(str(s.resource_path).get_file())
+				s = s.get_base_script()
+			info["levels"] = levels
+			info["protocol"] = str(node.get("NETWORK_PROTOCOL_VERSION"))
+			info["methods"] = node.has_method("_ready") and node.has_method("get_script")
+		out[name] = info
+	ProbeLog.event("local_sim.bo_scripts", out)
+
+
 func _start_run() -> void:
+	_log_bo_scripts()
 	_elapsed = 0.0
 	# RunData.reset() copies DebugService.invulnerable into RunData (run_data.gd:566).
 	DebugService.invulnerable = not _mortal
@@ -366,9 +410,12 @@ func _start_run() -> void:
 	CoopService.clear()
 	_step("add_player", {"device": KEYBOARD_DEVICE})
 	CoopService._add_player(KEYBOARD_DEVICE, CoopService.PlayerType.KEYBOARD_AND_MOUSE)
-	for i in range(1, _devices.size()):
+	var seated := _devices.size() - 1 if _late_join and _menus and _devices.size() > 1 else _devices.size()
+	for i in range(1, seated):
 		_step("add_player", {"device": _devices[i], "index": i})
 		CoopService._add_player(_devices[i], CoopService.PlayerType.GAMEPAD_XBOX)
+	if seated < _devices.size():
+		_late_join_state = "pending"
 	_step("players_added")
 	_setup["connected_players"] = CoopService.connected_players.duplicate(true)
 	_setup["missing_actions"] = _missing_actions()
@@ -378,7 +425,7 @@ func _start_run() -> void:
 	RunData.set_coop_run(_players_wanted > 1)
 	RunData.invulnerable = not _mortal
 	_step("set_player_count")
-	RunData.set_player_count(_players_wanted, true)
+	RunData.set_player_count(_players_wanted if _late_join_state == "" else _players_wanted - 1, true)
 	if _menus:
 		RunData.play_mode = RunData.PlayMode.COOP if _players_wanted > 1 else RunData.PlayMode.SOLO
 		RunData.menu_selection_back = true
@@ -739,6 +786,84 @@ func _save_screenshot(file_name: String) -> void:
 	var _mk = dir.make_dir_recursive(REPORT_DIR)
 	var err := image.save_png(REPORT_DIR.plus_file(file_name))
 	ProbeLog.event("local_sim.screenshot", {"file": file_name, "error": err, "size": [image.get_width(), image.get_height()]})
+
+
+# True while the late join is still running (holds the other menu steps).
+func _late_join_step(scene, delta: float) -> bool:
+	if _late_join_state == "pending":
+		_late_join_before = _grid_layout(scene)
+		_late_join_state = "joined"
+		_late_join_left = LATE_JOIN_WAIT_SEC
+		var device: int = _devices[_devices.size() - 1]
+		ProbeLog.event("local_sim.late_join", {"device": device, "before": _late_join_before})
+		CoopService._add_player(device, CoopService.PlayerType.GAMEPAD_XBOX)
+		return true
+	if _late_join_state == "joined":
+		_late_join_left -= delta
+		if _late_join_left > 0.0:
+			return true
+		_late_join_state = "scroll_remote"
+		_late_join_presses = 0
+		_save_screenshot("character_selection_joined_%dp.png" % _players_wanted)
+		ProbeLog.event("local_sim.late_join.after", {"before": _late_join_before, "after": _grid_layout(scene),
+				"count": RunData.get_player_count()})
+		_late_join_before = _grid_layout(scene)
+		return true
+	# A remote player's cursor (P2) moves down the shared grid, then P1's own.
+	if _late_join_state == "scroll_remote" or _late_join_state == "scroll_local":
+		_late_join_left -= delta
+		if _late_join_left > 0.0:
+			return true
+		_late_join_left = 0.15
+		var who := "FocusEmulator2" if _late_join_state == "scroll_remote" else "FocusEmulator1"
+		var emulator = scene.get_node_or_null(who)
+		if _late_join_presses == 0 and emulator != null:
+			_late_join_saved_focus = emulator.focused_control
+		if _late_join_presses < SCROLL_PRESSES:
+			_late_join_presses += 1
+			_pad_press(emulator, "ui_down")
+			return true
+		if _late_join_presses == SCROLL_PRESSES:
+			_late_join_presses += 1
+			_late_join_scroll_after = _grid_layout(scene)
+			# Back where it was ("random"): locked cells cannot be picked.
+			if emulator != null and is_instance_valid(_late_join_saved_focus):
+				emulator.focused_control = _late_join_saved_focus
+			return true
+		var after: Dictionary = _late_join_scroll_after
+		ProbeLog.event("local_sim.late_join." + _late_join_state, {"emulator": who, "before_scroll": _late_join_before.get("grid_scroll", -1),
+				"after_scroll": after.get("grid_scroll", -1), "p1_focus": after.get("p1_focus", {}), "back_scroll": _grid_layout(scene).get("grid_scroll", -1)})
+		_late_join_before = after
+		_late_join_presses = 0
+		_late_join_left = 0.3
+		if _late_join_state == "scroll_remote":
+			_late_join_state = "scroll_local"
+		else:
+			_late_join_state = "done"
+			_menu_scene_time = MENU_SHOT_SEC
+		return true
+	return false
+
+
+# The panel row and the character grid's scroll list, as P1's cursor finds it.
+func _grid_layout(scene) -> Dictionary:
+	var out := {}
+	if scene == null:
+		return out
+	var row = scene.get_node_or_null("MarginContainer/VBoxContainer/DescriptionContainer")
+	if row is Control:
+		out["row"] = _rect_info(row)
+	var emulator = scene.get_node_or_null("FocusEmulator1")
+	var control = emulator.get("focused_control") if emulator != null else null
+	if control is Control and is_instance_valid(control):
+		out["p1_focus"] = _rect_info(control)
+		var parent = control.get_parent()
+		while parent != null and not parent is ScrollContainer:
+			parent = parent.get_parent()
+		if parent is ScrollContainer:
+			out["grid"] = _rect_info(parent)
+			out["grid_scroll"] = parent.scroll_vertical
+	return out
 
 
 func _simulate_removal(scene) -> void:

@@ -25,7 +25,7 @@ func _good_inputs() -> Dictionary:
 		"compatibility": {
 			"schema": 1.0,
 			"extension_id": "CoopPlus-OnlineExtendedCoop",
-			"game_versions": ["1.1.15.4"],
+			"game_versions": ["1.2.0.0"],
 			"engine_versions": ["3.7.dev.custom_build.74e86be54"],
 			"mod_loader_versions": ["6.3.0"],
 			"upstream": [
@@ -33,7 +33,7 @@ func _good_inputs() -> Dictionary:
 				{"id": COOPFIX, "version": "1.0.1", "normalized_fingerprint": COOPFIX_FP, "role": "optional"},
 			],
 		},
-		"game_version": "1.1.15.4",
+		"game_version": "1.2.0.0",
 		"engine_version": "3.7.dev.custom_build.74e86be54",
 		"mod_loader_version": "6.3.0",
 		"fingerprints": {BO: {"ok": true, "reason": "", "fingerprint": FP, "file_count": 42}},
@@ -182,7 +182,7 @@ func test_malformed_compatibility_content_keeps_vanilla() -> void:
 	var cases := {
 		"schema": {"schema": 2},
 		"extension_id": {"extension_id": "Other-Mod"},
-		"game_versions": {"game_versions": "1.1.15.4"},
+		"game_versions": {"game_versions": "1.2.0.0"},
 		"upstream": {"upstream": {}},
 		"upstream[0].normalized_fingerprint": {"upstream": [{"id": BO, "role": "required", "normalized_fingerprint": "short"}]},
 		"upstream:six666-BrotatoOnline": {"upstream": [{"id": COOPFIX, "role": "not-supported"}]},
@@ -400,7 +400,7 @@ func test_inconsistent_stored_state_reads_as_vanilla() -> void:
 func test_initialize_reads_real_files_and_runs_once() -> void:
 	# The rule-test project has this mod's compatibility.json but no Brotato
 	# Online directory, so the real gather path must end in vanilla.
-	var first = RuntimeGate.initialize({"game_version": "1.1.15.4", "mod_loader_version": "6.3.0"})
+	var first = RuntimeGate.initialize({"game_version": "1.2.0.0", "mod_loader_version": "6.3.0"})
 	assert_true(RuntimeGate.is_initialized())
 	assert_eq(first.details.compatibility, RuntimeGate.COMPAT_OK, "compatibility.json parsed")
 	assert_eq(first.details.engine_version, RuntimeGate.engine_version_string())

@@ -23,7 +23,11 @@ extends "res://mods-unpacked/six666-BrotatoOnline/scripts/menu_sync_manager.gd"
 const RuntimeGate = preload("res://mods-unpacked/CoopPlus-OnlineExtendedCoop/scripts/compatibility/runtime_gate.gd")
 const CapacityPolicy = preload("res://mods-unpacked/CoopPlus-OnlineExtendedCoop/scripts/core/capacity_policy.gd")
 
+const LocalFocusLayout = preload("res://mods-unpacked/CoopPlus-OnlineExtendedCoop/ui/local_focus_layout.gd")
+
 const COOPPLUS_MOD_ID := "CoopPlus-OnlineExtendedCoop"
+
+var _coopplus_popup_refresh_queued := false
 
 
 # Parent: menu_sync_manager.gd:8007 (clamp at :8015). Its only caller,
@@ -85,4 +89,77 @@ func _coopplus_neutral_value(value):
 			return []
 		TYPE_DICTIONARY:
 			return {}
+	return null
+
+
+# The local player's item popup after Brotato Online rewrites their shop
+# (reported from online play, 2026-11-02: right after entering the shop the
+# popup showed an item the cursor was not on). A client builds its own random
+# shop and shows the popup for its default slot; the host's first snapshot
+# then replaces the slots and rebuilds the inventory (these three methods),
+# and nothing showed the popup again, so it kept the old item. Afterwards the
+# local player's current focus is replayed through the PopupManager (the same
+# calls a focus change makes); a cursor left on a freed or hidden control
+# goes to the shop's default control. Not while the popup itself has focus
+# (buttons shown). Extended rooms only; local UI only.
+# Parents: menu_sync_manager.gd _apply_shop_player_state_to_ui, _apply_shop_delta_state_to_ui,
+# _force_rebuild_shop_gear_container (6.6.8).
+func _apply_shop_player_state_to_ui(shop: Node, state: Dictionary) -> bool:
+	var applied: bool = ._apply_shop_player_state_to_ui(shop, state)
+	_coopplus_queue_popup_refresh(shop, int(state.get("player_index", -1)))
+	return applied
+
+
+func _apply_shop_delta_state_to_ui(shop: Node, state: Dictionary) -> bool:
+	var applied: bool = ._apply_shop_delta_state_to_ui(shop, state)
+	_coopplus_queue_popup_refresh(shop, int(state.get("player_index", -1)))
+	return applied
+
+
+func _force_rebuild_shop_gear_container(shop: Node, player_index: int) -> void:
+	._force_rebuild_shop_gear_container(shop, player_index)
+	_coopplus_queue_popup_refresh(shop, player_index)
+
+
+func _coopplus_queue_popup_refresh(shop: Node, player_index: int) -> void:
+	if _coopplus_popup_refresh_queued or not RuntimeGate.is_extended() or shop == null or not is_instance_valid(shop):
+		return
+	if player_index != LocalFocusLayout.local_player_index():
+		return
+	_coopplus_popup_refresh_queued = true
+	call_deferred("_coopplus_refresh_local_popup", shop)
+
+
+func _coopplus_refresh_local_popup(shop) -> void:
+	_coopplus_popup_refresh_queued = false
+	if shop == null or not is_instance_valid(shop) or shop != get_tree().current_scene:
+		return
+	var local: int = LocalFocusLayout.local_player_index()
+	var manager = shop.get("_popup_manager")
+	if local < 0 or manager == null:
+		return
+	var pressed = manager.get("_elements_pressed")
+	if pressed is Array and local < pressed.size() and pressed[local] != null:
+		return
+	var emulator = Utils.get_focus_emulator(local, shop)
+	if emulator == null:
+		return
+	var control = emulator.focused_control
+	if control == null or not is_instance_valid(control) or control.is_queued_for_deletion() or not control.is_visible_in_tree():
+		if shop.has_method("_get_default_focus_control"):
+			Utils.focus_player_control(shop._get_default_focus_control(local), local, emulator)
+		return
+	var shop_item = _coopplus_shop_item_of(control)
+	if shop_item != null:
+		manager._on_shop_item_focused(shop_item)
+	elif control is InventoryElement:
+		manager._on_element_focused(control)
+
+
+func _coopplus_shop_item_of(control: Node):
+	var node = control
+	while node != null:
+		if node is ShopItem:
+			return node
+		node = node.get_parent()
 	return null

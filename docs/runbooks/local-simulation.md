@@ -145,6 +145,20 @@ pwsh ./tools/instance.ps1 -Action Start -Name sim -StopAfterSec 240 -ExtraArgs "
 | 8 人去掉 P5 | 7 人，角色/材料/商店按序保留，再打两波 |
 | 6 人去掉 P2 | 5 人，同上 |
 
+### Brotato 1.2.0.0 与 Brotato Online 6.6.7/6.6.8（证据 EV-0038～EV-0040）
+
+- 每次模拟开局前记录 `local_sim.bo_scripts`：Brotato Online 的会话管理器、大厅列表、菜单同步、状态快照、移除管理器的脚本是否有效、继承层次和协议版本（6.6.8 为 6.1.0）。日志里 3 条 `Can't preload resource at path: protocol.gd / session_content_catalog.gd`（`GDScript::reload (built-in:3)`）来自 Mod Loader 的备份副本，不影响运行；测试脚本把它们与其他脚本错误分开统计。
+- 每波开始记录 `local_sim.zone`：场地格数与像素大小（4 人 32×24，6 人 39×29，8 人 45×34）。
+- `--coopplus-local-sim-late-join`（配合 `-menus`）：最后一名玩家在角色选择打开后才加入，与联机邀请的到达方式相同；记录加入前后面板行与角色格子的位置和滚动，然后让一名远程玩家（P2）和本机玩家（P1）各向下移动 6 格，记录格子滚动（远程不应滚动，本机照常），再把光标放回原处。
+- 武器选择与难度选择有调试用的断点记录（`debug/probe_extensions/weapon_selection_sim_probe.gd`、`difficulty_selection_sim_probe.gd`），用于定位进入难度选择前的崩溃。
+
+| 运行 | 结果 |
+| ---- | ---- |
+| 5/8 人选人菜单（修复前） | 选完武器即崩溃：武器选择的锁定面板只有 4 个，状态条把多选列表当作武器 |
+| 5/8 人选人菜单 | 选人 → 武器 → 难度 → 战斗 → 商店，2～3 波 |
+| 5 人后加入 | 加入后布局切换为本机放大，格子位置不变；远程光标下移格子不滚动，本机照常 |
+| 4/6/8 人 | 场地 32×24 / 39×29 / 45×34 格 |
+
 实例窗口：`tools/instance.ps1` 默认加 `--no-window --coopplus-no-fullscreen --resolution 1920x1080`。新档默认全屏，以前启动时游戏会把隐藏窗口切成全屏、盖住桌面；现在扩展遇到 `--coopplus-no-fullscreen` 就跳过这一步（引擎会吞掉 `--no-window`，脚本看不到它），窗口一直隐藏，截图为 1920x1080。需要看窗口时用 `-ShowWindow`。
 
 测试环境注意：实例窗口隐藏时，桌面上任何焦点切换都会让游戏收到“失去焦点”并打开暂停菜单（`input_service.gd:91-96`），波次停止。战斗场景和合作商店（`coop_shop.gd:38`）各自连接这个信号，商店里打开的暂停会带进下一波。探针在两处都断开连接，并在采样中记录 `paused`；看到全体同时静止时先查这个字段。模拟运行期间不要再启动其他游戏实例（新窗口会抢焦点）。

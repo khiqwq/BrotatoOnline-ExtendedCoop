@@ -165,7 +165,9 @@ func _coopplus_steam_room_verdict(lobby_id) -> Dictionary:
 func _is_lobby_protocol_compatible(lobby_id) -> bool:
 	if ._is_lobby_protocol_compatible(lobby_id):
 		return true
-	return _steam != null and str(_steam.getLobbyData(lobby_id, "mod_version")) == _coopplus_mod_version_marker()
+	# Same game-version rule as Brotato Online 6.6.7+ (protocol.gd is_compatible).
+	return _steam != null and str(_steam.getLobbyData(lobby_id, "mod_version")) == _coopplus_mod_version_marker() \
+			and str(_steam.getLobbyData(lobby_id, "game_version")) == Protocol.GAME_VERSION and Protocol.get_game_version() == Protocol.GAME_VERSION
 
 
 # Steam capability check (AP-009). Clients without the extension refuse an
@@ -192,7 +194,8 @@ func _accept_client_protocol(peer_key: String, message: Dictionary) -> bool:
 		return true
 	# Never the peer key: on Steam it is the player's Steam ID.
 	ModLoaderLog.info("extended room: refused a client (capability %s)" % str(version), COOPPLUS_MOD_ID)
-	detach_kicked_peer(peer_key)
+	# 6.6.7+ clients show a version mismatch from these fields (detach_kicked_peer).
+	detach_kicked_peer(peer_key, {"reason": "protocol_mismatch", "mod_version": _coopplus_mod_version_marker(), "game_version": Protocol.get_game_version()})
 	_seen_client_hello_by_steam_id.erase(peer_key)
 	_sync_host_coop_slots_from_lobby()
 	return false
@@ -492,7 +495,7 @@ func _handle_transport_identity(transport: Node, peer, message: Dictionary) -> v
 	if msg_type == "transport_identity" and transport == _lan_transport and _is_game_host() and _coopplus_room_extended():
 		var refusal := _coopplus_lan_capability_refusal(transport, peer)
 		if refusal != "":
-			transport.send_packet(peer, to_json({"msg_type": "transport_welcome", "accepted": false, "protocol_version": LAN_PROTOCOL_VERSION, "mod_version": _coopplus_mod_version_marker(), "reason": "protocol_mismatch", COOPPLUS_WELCOME_REASON: refusal}).to_utf8(), P2P_CHANNEL_MENU, true)
+			transport.send_packet(peer, to_json({"msg_type": "transport_welcome", "accepted": false, "protocol_version": LAN_PROTOCOL_VERSION, "mod_version": _coopplus_mod_version_marker(), "game_version": Protocol.get_game_version(), "reason": "protocol_mismatch", COOPPLUS_WELCOME_REASON: refusal}).to_utf8(), P2P_CHANNEL_MENU, true)
 			transport.close_peer(peer, false)
 			return
 	if _coopplus_extended():

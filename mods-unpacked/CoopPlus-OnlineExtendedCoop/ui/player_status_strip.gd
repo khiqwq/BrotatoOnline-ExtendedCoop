@@ -360,6 +360,12 @@ func _refresh_selection_row(entry: Dictionary, player_index: int) -> void:
 		var chosen = _screen.get("_player_characters" if _mode == MODE_CHARACTER else "_player_weapons")
 		if picked and chosen is Array and player_index < chosen.size():
 			item = chosen[player_index]
+			# 1.2.0.0 keeps a list of picks per player on the weapon screen
+			# (weapon_selection.gd:5, 167): show the latest one.
+			if item is Array:
+				item = item.back() if not item.empty() else null
+		if item != null and not item is Object:
+			item = null
 		if item == null:
 			var focused = _screen.get("_latest_focused_element")
 			var element = focused[player_index] if focused is Array and player_index < focused.size() else null

@@ -43,6 +43,29 @@ $workshopDir = Join-Path $instRoot "steamapps\workshop\content\$((Read-Lock).gam
 $userData = Get-LocalDir "userdata\instance-$Name"
 $pidFile = Join-Path $instRoot 'instance.pid'
 
+# Hidden runs must never show a window: some boots switch to fullscreen (the
+# extension's --coopplus-no-fullscreen only works once it loads) and an engine
+# alert is its own window. Every visible top-level window of the process is
+# hidden again while the run waits.
+Add-Type -Namespace CoopPlus -Name Win32Windows -MemberDefinition @'
+public delegate bool EnumProc(System.IntPtr hWnd, System.IntPtr lParam);
+[System.Runtime.InteropServices.DllImport("user32.dll")] public static extern bool EnumWindows(EnumProc cb, System.IntPtr lParam);
+[System.Runtime.InteropServices.DllImport("user32.dll")] public static extern uint GetWindowThreadProcessId(System.IntPtr hWnd, out uint pid);
+[System.Runtime.InteropServices.DllImport("user32.dll")] public static extern bool IsWindowVisible(System.IntPtr hWnd);
+[System.Runtime.InteropServices.DllImport("user32.dll")] public static extern bool ShowWindow(System.IntPtr hWnd, int nCmdShow);
+[System.Runtime.InteropServices.DllImport("kernel32.dll")] public static extern uint SetErrorMode(uint mode);
+public static int HideProcessWindows(uint processId) {
+    int hidden = 0;
+    EnumWindows(delegate (System.IntPtr h, System.IntPtr l) {
+        uint pid;
+        GetWindowThreadProcessId(h, out pid);
+        if (pid == processId && IsWindowVisible(h)) { ShowWindow(h, 0); hidden++; }
+        return true;
+    }, System.IntPtr.Zero);
+    return hidden;
+}
+'@ -ErrorAction SilentlyContinue
+
 function Stop-Instance {
     if (-not (Test-Path $pidFile)) { return $false }
     $procId = [int](Get-Content $pidFile)
@@ -112,6 +135,9 @@ switch ($Action) {
         # --resolution: screenshots at the game's 1920x1080 logical size.
         if (-not $ShowWindow) { $argv += '--no-window'; $argv += '--coopplus-no-fullscreen'; $argv += '--resolution'; $argv += '1920x1080' }
         foreach ($a in $argv + $ExtraArgs) { $psi.ArgumentList.Add($a) }
+        # No Windows crash dialog for a test game that crashes: the child inherits this
+        # process's error mode (SEM_FAILCRITICALERRORS | SEM_NOGPFAULTERRORBOX).
+        if (-not $ShowWindow) { [void][CoopPlus.Win32Windows]::SetErrorMode(0x0003) }
         $p = [System.Diagnostics.Process]::Start($psi)
         Set-Content $pidFile $p.Id
         $outLog = Join-Path $instRoot 'stdout.log'
@@ -119,8 +145,15 @@ switch ($Action) {
         $errTask = $p.StandardError.ReadToEndAsync()
         Write-Host "started $Name pid $($p.Id); user data $userData"
         if ($StopAfterSec -gt 0) {
-            $exited = $p.WaitForExit($StopAfterSec * 1000)
+            $deadline = [DateTime]::UtcNow.AddSeconds($StopAfterSec)
+            $exited = $false
+            $hiddenCount = 0
+            while (-not $exited -and [DateTime]::UtcNow -lt $deadline) {
+                if (-not $ShowWindow) { $hiddenCount += [CoopPlus.Win32Windows]::HideProcessWindows([uint32]$p.Id) }
+                $exited = $p.WaitForExit(200)
+            }
             if (-not $exited) { $p.Kill($true); $p.WaitForExit() }
+            if ($hiddenCount -gt 0) { Write-Host "hid $hiddenCount window(s) the game showed" }
             Remove-Item $pidFile -Force -ErrorAction SilentlyContinue
             Set-Content -Encoding utf8 $outLog ($outTask.Result + $errTask.Result)
             Write-Host "stopped $Name (exited by itself: $exited, code $($p.ExitCode)); output in $outLog"

@@ -67,6 +67,9 @@ func _init() -> void:
 		_proj_on_death_stat_caches.push_back(null)
 	while _player_is_under_half_health.size() < slot_count:
 		_player_is_under_half_health.push_back(false)
+	# 1.2.0.0: evolution consumables shown in the pending-icon rows.
+	while _displayed_consumables_picked_up.size() < slot_count:
+		_displayed_consumables_picked_up.push_back([])
 
 
 # The scene is fully instanced but nothing has run _ready yet. StatsManager
@@ -150,6 +153,20 @@ func _brotato_online_get_authoritative_online_player_count() -> int:
 		ModLoaderLog.warning("main: %d connected players but only %d players in RunData; not adding empty players" % [count, data_count], COOPPLUS_MOD_ID, true)
 		count = data_count
 	return count
+
+
+# Parent: main.gd:1607 (1.2.0.0). It starts each consumable's per-player
+# counter as a four-entry list and indexes it by player_index, so a P5..P8
+# pickup of a mutation fruit or meca part read past the end. The counter is
+# started at the slot count first.
+func _get_least_served_player_able_to_pick_up(consumable, players: Array, received: Dictionary):
+	if RuntimeGate.is_extended() and consumable != null and is_instance_valid(consumable):
+		var id_hash: int = consumable.consumable_data.my_id_hash
+		var counts = received.get(id_hash, [])
+		while counts.size() < _coopplus_slot_count():
+			counts.push_back(0)
+		received[id_hash] = counts
+	return ._get_least_served_player_able_to_pick_up(consumable, players, received)
 
 
 # Parent: main_safe_pool_exit.gd:421, which ends in vanilla main.gd:466 (host

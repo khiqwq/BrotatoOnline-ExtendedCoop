@@ -24,7 +24,7 @@ func _record() -> Dictionary:
 		"extension_version": "0.1.0",
 		"network_capability_version": 1,
 		"save_schema_version": 1,
-		"game_versions": ["1.1.15.4"],
+		"game_versions": ["1.2.0.0"],
 		"engine_versions": ["3.7.dev.custom_build.74e86be54"],
 		"mod_loader_versions": ["6.3.0"],
 		"upstream": [
@@ -39,7 +39,7 @@ func _info() -> Dictionary:
 		"extension_id": "CoopPlus-OnlineExtendedCoop",
 		"extension_version": "0.1.0",
 		"capability_version": 1,
-		"game_version": "1.1.15.4",
+		"game_version": "1.2.0.0",
 		"engine_version": "3.7.dev.custom_build.74e86be54",
 		"upstream_fingerprint": FINGERPRINT,
 		"capacity": 8,
@@ -318,7 +318,7 @@ func test_malformed_hellos_are_rejected_without_crashing() -> void:
 		_hello({"capability_version": 1.5}),
 		_hello({"capability_version": 0}),
 		_hello({"game_version": null}),
-		_hello({"game_version": "1.1.15.4[b]"}),
+		_hello({"game_version": "1.2.0.0[b]"}),
 		_hello({"engine_version": ""}),
 		_hello({"upstream_fingerprint": FINGERPRINT.to_upper()}),
 		_hello({"upstream_fingerprint": "abc"}),
@@ -538,7 +538,7 @@ func test_check_local_support_reasons() -> void:
 	info.supported = "x"
 	cases.append([info, Capability.REASON_RECORD_INVALID, "supported"])
 	info = _info()
-	info.supported.game_versions = "1.1.15.4"
+	info.supported.game_versions = "1.2.0.0"
 	cases.append([info, Capability.REASON_RECORD_INVALID, "game_versions"])
 	info = _info()
 	info.supported.engine_versions = [5]
@@ -560,7 +560,7 @@ func test_check_local_support_reasons() -> void:
 	cases.append([info, Capability.REASON_RECORD_MISMATCH, "capability_version"])
 	info = _info()
 	info.supported.game_versions = []
-	cases.append([info, Capability.REASON_GAME_UNVERIFIED, "1.1.15.4"])
+	cases.append([info, Capability.REASON_GAME_UNVERIFIED, "1.2.0.0"])
 	info = _info()
 	info.supported.engine_versions = ["3.6.stable"]
 	cases.append([info, Capability.REASON_ENGINE_UNVERIFIED, "3.7.dev.custom_build.74e86be54"])
@@ -612,6 +612,11 @@ func test_shipped_compatibility_record_verifies_the_locked_environment() -> void
 	info.supported = record
 	info.extension_version = record.extension_version
 	info.capability_version = record.network_capability_version
+	# The locked Brotato Online version changes with every upstream update.
+	for entry in record.get("upstream", []):
+		if entry.get("id", "") == "six666-BrotatoOnline":
+			info.upstream_fingerprint = entry.normalized_fingerprint
+			info.mods[0].version = entry.version
 	var local = rules.check_local_support(info)
 	assert_true(local.ok, "%s %s" % [local.reason, local.detail])
 	assert_eq(rules.evaluate(info, rules.build_hello(info), 8).mode, Capability.MODE_EXTENDED)

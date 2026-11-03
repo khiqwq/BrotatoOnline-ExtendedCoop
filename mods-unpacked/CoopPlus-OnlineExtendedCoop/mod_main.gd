@@ -50,6 +50,8 @@ const EXTENSIONS_INIT := [
 	"extensions/vanilla/character_selection_ext.gd",
 	"extensions/vanilla/weapon_selection_ext.gd",
 	"extensions/vanilla/difficulty_selection_ext.gd",
+	"extensions/vanilla/focus_emulator_ext.gd",
+	"extensions/vanilla/zone_service_ext.gd",
 	"extensions/bo/session_manager_ext.gd",
 	"extensions/bo/public_lobby_browser_ext.gd",
 	"extensions/bo/steam_transport_ext.gd",
@@ -57,6 +59,7 @@ const EXTENSIONS_INIT := [
 	"extensions/bo/network_heartbeat_ext.gd",
 	"extensions/bo/menu_sync_manager_ext.gd",
 	"extensions/bo/player_removal_manager_ext.gd",
+	"extensions/bo/state_snapshot_ext.gd",
 ]
 # Parent declares const REMOTE_PLACEHOLDER_PLAYER_TYPE = CoopService.PlayerType...
 # (INP-M02), which cannot compile while ModLoader._init runs.
@@ -65,6 +68,7 @@ const EXTENSIONS_ENTER_TREE := [
 ]
 
 const PROBE_FLAG := "--coopplus-probe"
+const NO_FULLSCREEN_FLAG := "--coopplus-no-fullscreen"
 const CAPACITY_PROBE_FLAG := "--coopplus-capacity-probe"
 const LOCAL_SIM_PREFIX := "--coopplus-local-sim="
 const LOCAL_SIM_EXTENSIONS := [
@@ -73,6 +77,8 @@ const LOCAL_SIM_EXTENSIONS := [
 	"debug/probe_extensions/debug_service_sim_probe.gd",
 	"debug/probe_extensions/upgrades_ui_sim_probe.gd",
 	"debug/probe_extensions/end_run_sim_probe.gd",
+	"debug/probe_extensions/weapon_selection_sim_probe.gd",
+	"debug/probe_extensions/difficulty_selection_sim_probe.gd",
 ]
 const PROBE_EXTENSIONS := [
 	"debug/probe_extensions/coop_service_probe.gd",
@@ -96,6 +102,8 @@ var _enter_tree_done := false
 
 func _init() -> void:
 	var args := OS.get_cmdline_args()
+	if NO_FULLSCREEN_FLAG in args:
+		call_deferred("_keep_window_hidden")
 	_probe_enabled = PROBE_FLAG in args and _mod_file_exists("debug/lifecycle_probe.gd")
 	_capacity_probe_enabled = CAPACITY_PROBE_FLAG in args and _mod_file_exists("debug/capacity_probe.gd")
 	for arg in args:
@@ -177,6 +185,23 @@ func _gate_environment() -> Dictionary:
 # by its relative path only: CrashReporter disables every mod on the next start
 # when an ERROR line mentions mods-unpacked (LIFE-03), and Mod Loader's own
 # error for a missing extension would contain the full path.
+# --coopplus-no-fullscreen (passed with the engine's --no-window by
+# tools/instance.ps1 for the hidden test instances) keeps the window hidden:
+# the boot scene otherwise switches to fullscreen from the saved settings
+# (pause.gd -> ProgressData.apply_settings; a fresh profile defaults to
+# fullscreen) and the window covers the user's screen. The game's own
+# no_fullscreen_on_launch option skips that switch. Set here, whatever the
+# gate decides: as an extension of DebugService it only applied when the
+# extensions were installed, and runs the gate refused (a game update) went
+# fullscreen. Deferred: the mod loader runs before the DebugService autoload
+# exists, and the switch happens only after the boot animation. The engine
+# consumes --no-window itself, so OS.get_cmdline_args() never contains it.
+func _keep_window_hidden() -> void:
+	var debug_service = get_node_or_null("/root/DebugService")
+	if debug_service != null:
+		debug_service.set("no_fullscreen_on_launch", true)
+
+
 func _install_list(list: Array, stage: String) -> int:
 	var count := 0
 	for rel in list:

@@ -43,6 +43,11 @@ const COOPPLUS_BASE_SHOP_FIELDS := [
 	["_reroll_count", PerPlayerArrays.KIND_VALUE, 0],
 	["_paid_reroll_count", PerPlayerArrays.KIND_VALUE, 0],
 	["_reroll_discount", PerPlayerArrays.KIND_VALUE, 0],
+	# 1.2.0.0 (base_shop.gd:16, 26-28): reroll focus, pause, dismantle and ban presses.
+	["_reroll_focus_neighbour_left", PerPlayerArrays.KIND_VALUE, null],
+	["_pause_press_received", PerPlayerArrays.KIND_VALUE, false],
+	["_dismantle_press_item", PerPlayerArrays.KIND_VALUE, null],
+	["_ban_press_item", PerPlayerArrays.KIND_VALUE, null],
 ]
 
 # Index 0 belongs to player_index 4.
@@ -67,6 +72,25 @@ func _enter_tree() -> void:
 		return
 	_coopplus_extra_containers = cloned.containers
 	_coopplus_extra_stat_popups = cloned.popups
+
+
+# Parent: coop_shop.gd:36/44, after base_shop.gd:314-322, which set
+# _pause_press_received back to four entries (read by player in
+# _is_pause_requested).
+func on_paused() -> void:
+	.on_paused()
+	_coopplus_regrow_shop_arrays()
+
+
+func on_unpaused() -> void:
+	.on_unpaused()
+	_coopplus_regrow_shop_arrays()
+
+
+func _coopplus_regrow_shop_arrays() -> void:
+	if _coopplus_extra_containers.empty():
+		return
+	var _r = PerPlayerArrays.grow_fields(self, COOPPLUS_BASE_SHOP_FIELDS, PerPlayerArrays.target_size(RunData.get_player_count(), RuntimeGate.capacity()))
 
 
 # Runs after BaseShop/CoopShop _ready set up every player's panel.

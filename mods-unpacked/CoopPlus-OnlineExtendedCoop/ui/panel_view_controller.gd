@@ -29,6 +29,7 @@ const RuntimeGate = preload("res://mods-unpacked/CoopPlus-OnlineExtendedCoop/scr
 const MODE_FOCUS := "focus"
 const MODE_PAGES := "pages"
 const PAGE_SIZE := 4
+const FOCUS_RESCUE_SEC := 0.25
 const PREFS_PATH := "user://coopplus_view.cfg"
 const PREFS_SECTION := "view"
 const PREFS_KEY := "mode"
@@ -75,6 +76,8 @@ var _notice_label: Label = null
 var _notice_left := 0.0
 # player index -> global rect of that player's focused control at the last redraw
 var _frame_rects := {}
+# Seconds the local cursor has been on a control it cannot use.
+var _focus_lost_for := 0.0
 
 
 # panels: every player's panel in player order; holder/strip: the focus-mode
@@ -147,6 +150,7 @@ static func save_mode(mode: String) -> void:
 
 func _process(delta: float) -> void:
 	_refresh_focus_frames()
+	_watch_local_focus(delta)
 	if _cooldown > 0.0:
 		_cooldown -= delta
 	if _notice_left > 0.0:
@@ -178,6 +182,32 @@ func _refresh_focus_frames() -> void:
 		if not _frame_rects.has(i) or _frame_rects[i] != rect:
 			_frame_rects[i] = rect
 			emulator.update()
+
+
+# A local cursor left on a freed, queued or hidden control takes no input at
+# all (focus_emulator.gd:56, 145-150, 166-170); players reported a shop that
+# answered nothing until they opened and closed the pause menu (2026-11-02).
+# Ways in: an item popup closed while its buttons, which point their focus
+# neighbours at themselves, held the cursor; an inventory rebuilt by
+# Brotato Online under the cursor. After FOCUS_RESCUE_SEC the cursor goes to
+# the screen's default control (as _rescue_local_focus does for the
+# four-panel view). Not while the pause menu is open or Brotato Online holds
+# the local player's input.
+func _watch_local_focus(delta: float) -> void:
+	if _input_blocked() or not _local_shown():
+		_focus_lost_for = 0.0
+		return
+	var emulator = _local_emulator()
+	if emulator == null:
+		return
+	var control = emulator.focused_control
+	if control != null and is_instance_valid(control) and not control.is_queued_for_deletion() and control.is_visible_in_tree():
+		_focus_lost_for = 0.0
+		return
+	_focus_lost_for += delta
+	if _focus_lost_for >= FOCUS_RESCUE_SEC:
+		_focus_lost_for = 0.0
+		_rescue_local_focus()
 
 
 func _input(event: InputEvent) -> void:

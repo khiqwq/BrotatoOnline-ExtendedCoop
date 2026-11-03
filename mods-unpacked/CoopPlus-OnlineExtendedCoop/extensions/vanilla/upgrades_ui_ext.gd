@@ -24,6 +24,8 @@ const COOPPLUS_ARRAY_FIELDS := [
 	["_showing_option", PerPlayerArrays.KIND_VALUE, null],
 	["_player_is_choosing", PerPlayerArrays.KIND_VALUE, false],
 	["_extra_items_to_process", PerPlayerArrays.KIND_ARRAY],
+	# 1.2.0.0 (upgrades_ui.gd:31): crate weapon inventories.
+	["_weapons_inventory_enabled", PerPlayerArrays.KIND_VALUE, false],
 ]
 
 # Index 0 belongs to player_index 4.

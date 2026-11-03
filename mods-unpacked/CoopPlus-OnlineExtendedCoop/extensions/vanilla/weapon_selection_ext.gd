@@ -21,6 +21,11 @@ extends "res://ui/menus/run/weapon_selection.gd"
 # With one local player the panel and inventory rows use the two display modes
 # of D-012 (ui/selection_view_controller.gd); the inventories' column count
 # follows the players shown (vanilla: 16 / player count).
+# 1.2.0.0 gave this screen a LockedPanel per player beside each Panel, as on
+# the character screen (weapon_selection.gd:11-14, 242-243): focusing an
+# element calls _update_locked_panel, which indexed the four locked panels by
+# player, so the screen stopped once P5..P8 picked a weapon. LockedPanel 5..N
+# are cloned with the others and belong to their player's display group.
 
 const RuntimeGate = preload("res://mods-unpacked/CoopPlus-OnlineExtendedCoop/scripts/compatibility/runtime_gate.gd")
 const PerPlayerArrays = preload("res://mods-unpacked/CoopPlus-OnlineExtendedCoop/scripts/core/per_player_arrays.gd")
@@ -43,6 +48,7 @@ const COOPPLUS_FIELDS := [
 # Index 0 belongs to player_index 4.
 var _coopplus_extra_panels := []
 var _coopplus_extra_inventories := []
+var _coopplus_extra_locked_panels := []
 var _coopplus_view = null
 
 
@@ -55,12 +61,13 @@ func _enter_tree() -> void:
 	var grown: Dictionary = PerPlayerArrays.grow_fields(self, COOPPLUS_FIELDS, size)
 	if not grown.skipped.empty():
 		ModLoaderLog.warning("weapon selection: per-player arrays missing (%s)" % ",".join(PoolStringArray(grown.skipped)), COOPPLUS_MOD_ID)
-	var cloned: Dictionary = ExtraPlayerPanels.clone_named(self, size, [[COOPPLUS_PANELS_PATH, "Panel"], [COOPPLUS_INVENTORIES_PATH, "Inventory"]])
+	var cloned: Dictionary = ExtraPlayerPanels.clone_named(self, size, [[COOPPLUS_PANELS_PATH, "Panel"], [COOPPLUS_PANELS_PATH, "LockedPanel"], [COOPPLUS_INVENTORIES_PATH, "Inventory"]])
 	if not bool(cloned.ok):
 		ModLoaderLog.error("weapon selection: no P5+ panels (%s)" % cloned.reason, COOPPLUS_MOD_ID)
 		return
 	_coopplus_extra_panels = cloned.nodes["Panel"]
 	_coopplus_extra_inventories = cloned.nodes["Inventory"]
+	_coopplus_extra_locked_panels = cloned.nodes["LockedPanel"]
 	for panel in _coopplus_extra_panels:
 		var description = panel.get_node_or_null(COOPPLUS_DESCRIPTION_PATH)
 		if description != null and "expand_indefinitely" in description:
@@ -74,9 +81,10 @@ func _ready() -> void:
 		return
 	var panels: Array = _get_panels()
 	var containers: Array = _get_inventory_containers()
+	var locked: Array = _get_locked_panels()
 	var groups := []
-	for i in int(min(RunData.get_player_count(), min(panels.size(), containers.size()))):
-		groups.append([panels[i], containers[i]])
+	for i in int(min(RunData.get_player_count(), min(panels.size(), min(containers.size(), locked.size())))):
+		groups.append([panels[i], locked[i], containers[i]])
 	_coopplus_view = SelectionView.apply(self, groups, get_node(COOPPLUS_PANELS_PATH), "weapon", LocalFocusLayout.local_player_index())
 	if _coopplus_view != null:
 		var _e = _coopplus_view.connect("layout_changed", self, "_coopplus_on_layout_changed")
@@ -102,3 +110,13 @@ func _get_inventory_containers() -> Array:
 	var containers: Array = ._get_inventory_containers()
 	containers.append_array(_coopplus_extra_inventories)
 	return containers
+
+
+# Parent: weapon_selection.gd:242 (1.2.0.0; LockedPanel1..4).
+func _get_locked_panels() -> Array:
+	var panels: Array = ._get_locked_panels()
+	if _coopplus_extra_locked_panels.empty():
+		return panels
+	panels.resize(PerPlayerArrays.VANILLA_SLOTS)
+	panels.append_array(_coopplus_extra_locked_panels)
+	return panels

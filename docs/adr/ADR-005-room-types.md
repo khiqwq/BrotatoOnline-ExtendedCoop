@@ -34,7 +34,7 @@
    - `leave_lobby` 清除房间；创建失败也清除。
 5. **广告**。扩展房间在 Steam 大厅数据（`_setup_lobby_data` 建房时同步写入、`_publish_session_metadata`）和 LAN 发现信息中：
    - 发布 `coopplus_room`、`coopplus_capacity`、`coopplus_capability`；
-   - 把 `mod_version` 写成标记 `5.0.0+coopplus`。
+   - 把 `mod_version` 写成标记 `<协议版本>+coopplus`（Brotato Online 6.6.6 时为 `5.0.0+coopplus`，6.6.8 为 `6.1.0+coopplus`）。6.6.7 起 Brotato Online 还比较 `game_version`，本扩展接受标记时同样要求游戏版本一致。
 
    未装扩展的 BO 会精确比较 `mod_version`：
    - 好友邀请或直连时，它们在入座前就自行退出，提示“房主的协议或模组版本不兼容”；
