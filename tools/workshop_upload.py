@@ -18,7 +18,10 @@ English one was updated. Every upload therefore writes the same title and
 description for each of TEXT_LANGUAGES (one update per language, the first
 also carrying the content); --text-only writes only those.
 
-Usage: python tools/workshop_upload.py --dry-run | --upload [--note "change note"] [--friends-only]
+--keep-media leaves the item's preview and gallery as they are (Steam's
+image uploads time out now and then, and unchanged images need no upload).
+
+Usage: python tools/workshop_upload.py --dry-run | --upload [--note "change note"] [--friends-only] [--keep-media]
        python tools/workshop_upload.py --text-only [--note "change note"]
 """
 import ctypes
@@ -244,7 +247,7 @@ def upload_text(steam, title, description, note):
     print("https://steamcommunity.com/sharedfiles/filedetails/?id=%d" % item_id)
 
 
-def upload(steam, title, description, zip_path, note, visibility):
+def upload(steam, title, description, zip_path, note, visibility, keep_media=False):
     lib, ugc = steam.lib, steam.ugc
     os.makedirs(CONTENT_DIR, exist_ok=True)
     for name in os.listdir(CONTENT_DIR):
@@ -265,7 +268,7 @@ def upload(steam, title, description, zip_path, note, visibility):
         print("created item", item_id)
         legal_note(needs)
 
-    gallery = gallery_files()
+    gallery = [] if keep_media else gallery_files()
     existing = count_gallery(steam, item_id) if gallery else 0
     if gallery:
         print("gallery: %d screenshots (item has %d)" % (len(gallery), existing))
@@ -274,8 +277,11 @@ def upload(steam, title, description, zip_path, note, visibility):
     fields.update({
         "visibility": lib.SteamAPI_ISteamUGC_SetItemVisibility(ugc, handle, visibility),
         "content": lib.SteamAPI_ISteamUGC_SetItemContent(ugc, handle, CONTENT_DIR.encode("utf-8")),
-        "preview": lib.SteamAPI_ISteamUGC_SetItemPreview(ugc, handle, PREVIEW.encode("utf-8")),
     })
+    if keep_media:
+        print("preview and gallery: kept as they are on the item")
+    else:
+        fields["preview"] = lib.SteamAPI_ISteamUGC_SetItemPreview(ugc, handle, PREVIEW.encode("utf-8"))
     if gallery:
         fields["gallery"] = set_gallery(steam, handle, gallery, existing)
     submit(steam, handle, fields, note, TEXT_LANGUAGES[0])
@@ -305,7 +311,7 @@ def main(argv):
     print("steam: connected")
     try:
         if mode == "--upload":
-            upload(steam, title, description, zip_path, note, visibility)
+            upload(steam, title, description, zip_path, note, visibility, "--keep-media" in argv)
         elif mode == "--text-only":
             upload_text(steam, title, description, note)
         else:

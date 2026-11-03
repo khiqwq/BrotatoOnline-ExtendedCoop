@@ -31,6 +31,8 @@
    python tools/workshop_upload.py --upload --note "0.1.1：……"
    ```
 
+   截图没有变化时加 `--keep-media`，保留物品现有的预览图与截图、只传内容和文字：Steam 上传图片偶尔超时（`Failed to upload workshop preview file … (Timeout)`，整次提交失败，EResult 16），2026-11-04 连续三次都卡在截图上。`EResult 2`（下载或上传清单失败）也是网络问题，隔一分钟重试即可。
+
    Steam 客户端必须在运行并已登录。上传期间 Steam 会显示你在玩 Brotato。结果以 `D:\steam\logs\workshop_log.txt`（Steam 安装目录下的 `logs`）中的 `Upload finished for workshop item … : OK` 为准。
 5. 更新 `manifest.json` 的版本号与 CHANGELOG。物品已公开，每次上传都直接对所有订阅者生效。
 
