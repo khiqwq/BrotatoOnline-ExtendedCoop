@@ -1,7 +1,24 @@
 extends Node
 # Local N-player simulation (debug/ only, never packaged). Started by mod_main with
-#   --coopplus-local-sim=<N>          players, 1..8
-#   --coopplus-local-sim-seconds=<S>  wave length (default 20)
+#   --coopplus-local-sim=<N>          players, 1..CapacityPolicy.MAX_SUPPORTED_PLAYERS
+#   --coopplus-local-sim-seconds=<S>  wave length (default 20); 0 keeps the
+#                                     game's own wave lengths (20 s rising to
+#                                     60 s, 90 s for wave 20)
+#   --coopplus-local-sim-start-wave=<W>  first wave (DebugService.starting_wave,
+#                                     read by RunData.reset); with -waves=21-W
+#                                     the run ends on the end-of-run screen after
+#                                     wave 20 (a clear: invulnerable players are
+#                                     alive when its timer ends, main.gd
+#                                     _set_run_states)
+#   --coopplus-local-sim-kit=perf     every player gets the game's own
+#                                     late-game performance kit instead of the
+#                                     starting weapon: 6 tier-4 sniper guns and
+#                                     its 20 turret/support items
+#                                     (DebugService PERF_SCENARIO_*; the game's
+#                                     handle_player_spawn_debug_options has
+#                                     four-entry arrays, so the probe adds them)
+#   --coopplus-local-sim-kit=weapons  the same 6 weapons without the items: a
+#                                     typical late-game build without turrets
 #   --coopplus-local-sim-seed=<int>   bot input seed (default 1)
 #   --coopplus-local-sim-mortal       players can die (tests the loss / end-of-run
 #                                     flow); by default they are invulnerable
@@ -69,6 +86,20 @@ const DIRECTIONS := ["left", "right", "up", "down"]
 const STEER_INTERVAL := 0.3
 const SAMPLE_INTERVAL := 1.0
 const EXTRA_TIMEOUT_SEC := 45.0
+const CapacityPolicy = preload("res://mods-unpacked/CoopPlus-OnlineExtendedCoop/scripts/core/capacity_policy.gd")
+const PlayerStatusStrip = preload("res://mods-unpacked/CoopPlus-OnlineExtendedCoop/ui/player_status_strip.gd")
+# --coopplus-local-sim-options-shot: on the title screen, the game's options
+# menu on its Gameplay tab with this mod's list-scroll switch
+# (ui/options_entry.gd): screenshot, then the switch off and on again, logging
+# the saved scroll mode each time (local_sim.options).
+const OPTIONS_SCENE := "res://ui/menus/pages/menu_options.tscn"
+const OPTIONS_TABS_PATH := "Buttons/HBoxContainer3/TabContainer"
+const OPTIONS_GAMEPLAY_BUTTON_PATH := "Buttons/HBoxContainer2/Gameplay_but"
+const OPTIONS_SHOT_SEC := 1.5
+# With the game's own wave lengths (-seconds=0): the longest wave, and how much
+# slower than real time a heavy wave may run before it counts as stuck.
+const LONGEST_WAVE_SEC := 90.0
+const SLOW_WAVE_FACTOR := 8.0
 const ACCEPT_INTERVAL := 0.6
 const AFTER_BATTLE_SEC := 5.0
 const SHOP_SCENE_FILE := "coop_shop.tscn"
@@ -105,6 +136,11 @@ const MENU_TIMEOUT_SEC := 90.0
 # when that mod is loaded), "key_v" presses the display-mode key, "stick_*"
 # pushes and releases the right stick, "shot*" saves a screenshot; every step
 # logs P1's focus, the shown player, the display mode and the window start.
+# With more rows than the strip shows (nine players or more) the screens run
+# VIEW_STEPS_WINDOWED first: "wheel_*" turns the mouse wheel over the strip,
+# "rstick_*" pushes the right stick up/down, "set_row"/"set_page" switch the
+# saved scroll mode (ui/options_entry.gd), and the strip's first shown row
+# and shown players are logged.
 const VIEW_STEP_SEC := 0.8
 const VIEW_STEPS := {
 	"upgrades": ["key_v", "shot_pages", "stick_right", "shot_pages_slid", "stick_left", "key_v", "check"],
@@ -115,10 +151,22 @@ const VIEW_STEPS := {
 	"coop_end_run": ["click_first", "shot_view_click", "click_first", "check",
 			"key_v", "shot_pages", "stick_right", "shot_pages_slid", "stick_left", "key_v", "check"],
 }
+const VIEW_STEPS_WINDOWED := {
+	"upgrades": ["shot_list", "wheel_down", "shot_wheel_page", "set_row", "rstick_up", "rstick_up", "shot_stick_row", "set_page", "wheel_up"],
+	"character_selection": ["shot_list", "wheel_down", "shot_wheel_page", "set_row", "rstick_up", "shot_stick_row", "set_page", "wheel_up"],
+	"weapon_selection": ["shot_list", "wheel_down", "shot_wheel_page", "wheel_up"],
+	"shop": ["shot", "pad_right", "wheel_down", "shot_wheel_page", "wheel_down", "shot_wheel_page_end", "wheel_up", "wheel_up",
+			"set_row", "rstick_down", "rstick_down", "shot_stick_row", "rstick_up", "rstick_up",
+			"pad_down", "pad_down", "pad_down", "pad_down", "pad_down", "pad_down", "pad_down", "shot_pad_edge_row",
+			"set_page", "pad_down", "pad_down", "pad_down", "pad_down", "pad_down", "pad_down", "shot_pad_edge_page", "pad_accept", "shot_view_pad"],
+	"coop_end_run": ["shot_list", "wheel_down", "shot_wheel_page", "wheel_up"],
+}
 const MOUSE_ROUTER_PATH := "/root/ModLoader/CoopFix-OnlineMouseUI/MouseRouter"
 
 var _players_wanted := 0
 var _wave_seconds := 20
+var _start_wave := 1
+var _kit := ""
 var _quit_after := false
 var _rng := RandomNumberGenerator.new()
 var _state := "wait_title"
@@ -158,6 +206,9 @@ var _upgrades_visible_for := 0.0
 var _pad_counts := {}
 var _view_checks := {}
 var _menus := false
+var _options_shot := false
+var _options_left := -1.0
+var _options_menu: Node = null
 var _continue := false
 var _resume_seeded := false
 var _menu_scene := ""
@@ -199,6 +250,10 @@ func _ready() -> void:
 			_remove_player = int(arg.substr("--coopplus-local-sim-remove=".length()))
 		elif arg.begins_with("--coopplus-local-sim-seed="):
 			seed_value = int(arg.substr("--coopplus-local-sim-seed=".length()))
+		elif arg.begins_with("--coopplus-local-sim-start-wave="):
+			_start_wave = int(clamp(int(arg.substr("--coopplus-local-sim-start-wave=".length())), 1, 20))
+		elif arg.begins_with("--coopplus-local-sim-kit="):
+			_kit = arg.substr("--coopplus-local-sim-kit=".length())
 		elif arg.begins_with("--coopplus-local-sim-dlc-missing="):
 			_dlc_missing = int(arg.substr("--coopplus-local-sim-dlc-missing=".length()))
 	_quit_after = "--coopplus-probe-quit" in OS.get_cmdline_args()
@@ -209,7 +264,8 @@ func _ready() -> void:
 	_continue = "--coopplus-local-sim-continue" in OS.get_cmdline_args()
 	_remove_fix = not "--coopplus-local-sim-remove-nofix" in OS.get_cmdline_args()
 	_late_join = "--coopplus-local-sim-late-join" in OS.get_cmdline_args()
-	_players_wanted = int(clamp(_players_wanted, 1, 8))
+	_options_shot = "--coopplus-local-sim-options-shot" in OS.get_cmdline_args()
+	_players_wanted = int(clamp(_players_wanted, 1, CapacityPolicy.MAX_SUPPORTED_PLAYERS))
 	_rng.seed = seed_value
 	ProbeLog.event("local_sim._ready", {"players": _players_wanted, "wave_seconds": _wave_seconds, "seed": seed_value, "save": _save})
 	print("%s waiting for the title screen (players=%d)" % [LINE_PREFIX, _players_wanted])
@@ -229,6 +285,8 @@ func _process(delta: float) -> void:
 	match _state:
 		"wait_title":
 			if scene_file == TITLE_SCENE and _elapsed > 3.0:
+				if _options_shot and _options_step(scene, delta):
+					return
 				if _continue:
 					_start_continue(scene)
 				else:
@@ -291,7 +349,7 @@ func _process(delta: float) -> void:
 				_wave_end_shots_done += 1
 				_save_screenshot("wave_end_%d_%dp.png" % [_wave_end_shots_done, _players_wanted])
 				ProbeLog.event("local_sim.hud_layout", _hud_layout(scene))
-			if _wave_elapsed > _wave_seconds + EXTRA_TIMEOUT_SEC:
+			if _wave_elapsed > _wave_timeout():
 				_finish("timeout_wave_%d" % (_waves_done + 1))
 		"in_resume":
 			_menus_time += delta
@@ -359,6 +417,8 @@ func _process(delta: float) -> void:
 				if _waves_done == 1 and _run_view_check(scene, "shop", delta):
 					return
 				_shop_pressed = true
+				# The timeout counts from the GO press, not from the display checks.
+				_shop_left = 0.0
 				if _waves_done == 1 and not _view_checks.get("shop", {}).get("ran", false):
 					_save_screenshot("shop_%dp.png" % _players_wanted)
 				_player_data_log.append({"after_wave": _waves_done, "players": _player_data()})
@@ -408,8 +468,9 @@ func _start_run() -> void:
 	_elapsed = 0.0
 	# RunData.reset() copies DebugService.invulnerable into RunData (run_data.gd:566).
 	DebugService.invulnerable = not _mortal
-	DebugService.custom_wave_duration = _wave_seconds
+	DebugService.custom_wave_duration = _wave_seconds if _wave_seconds > 0 else -1
 	DebugService.disable_saving = not _save
+	DebugService.starting_wave = _start_wave
 
 	_devices = [KEYBOARD_DEVICE]
 	var virtual_ids: Array = RuntimeGate.virtual_device_ids()
@@ -461,7 +522,9 @@ func _start_run() -> void:
 		RunData.add_character(character, player_index)
 		var weapons: Array = ItemService.get_ordered_starting_weapons(character.starting_weapons)
 		var weapon_id := ""
-		if not weapons.empty():
+		if _kit == "perf" or _kit == "weapons" or _kit == "perf12":
+			weapon_id = _add_perf_kit(player_index, _kit != "weapons", 12 if _kit == "perf12" else 6)
+		elif not weapons.empty():
 			var _w = RunData.add_weapon(weapons[0], player_index, true)
 			weapon_id = weapons[0].my_id
 		chosen.append({"player": player_index + 1, "character": character.my_id, "weapon": weapon_id, "device": _devices[player_index]})
@@ -806,6 +869,8 @@ func _run_view_check(scene, prefix: String, delta: float) -> bool:
 		return true
 	check.timer = VIEW_STEP_SEC
 	var steps: Array = VIEW_STEPS[prefix]
+	if strip.has_method("is_windowed") and strip.is_windowed():
+		steps = VIEW_STEPS_WINDOWED.get(prefix, []) + steps
 	if check.step >= steps.size():
 		check.done = true
 		return false
@@ -819,8 +884,19 @@ func _run_view_check(scene, prefix: String, delta: float) -> bool:
 	match step:
 		"shot":
 			_save_screenshot("%s_%dp.png" % [prefix, _players_wanted])
-		"shot_view_pad", "shot_view_click", "shot_pages", "shot_pages_slid":
+		"shot_view_pad", "shot_view_click", "shot_pages", "shot_pages_slid", "shot_list", "shot_wheel_page", "shot_wheel_page_end", "shot_stick_row", "shot_pad_edge_row", "shot_pad_edge_page":
 			_save_screenshot("%s_%s_%dp.png" % [prefix, step.substr(5), _players_wanted])
+		"wheel_down", "wheel_up":
+			detail["wheel"] = _wheel_over(strip.get_parent(), BUTTON_WHEEL_DOWN if step == "wheel_down" else BUTTON_WHEEL_UP)
+		"rstick_down", "rstick_up":
+			for value in [1.0 if step == "rstick_down" else -1.0, 0.0]:
+				var motion := InputEventJoypadMotion.new()
+				motion.device = 0
+				motion.axis = JOY_AXIS_3
+				motion.axis_value = value
+				Input.parse_input_event(motion)
+		"set_row", "set_page":
+			strip.save_scroll_mode(strip.SCROLL_ROW if step == "set_row" else strip.SCROLL_PAGE)
 		"pad_right", "pad_left", "pad_down", "pad_accept":
 			_pad_press(emulator, "ui_" + step.substr(4))
 		"key_v":
@@ -838,16 +914,89 @@ func _run_view_check(scene, prefix: String, delta: float) -> bool:
 				motion.axis_value = value
 				Input.parse_input_event(motion)
 		"click_first", "click_last":
-			detail["click"] = _click_row(scene, strip, emulator, rows[0] if step == "click_first" else rows[rows.size() - 1])
+			# Rows out of view cannot be clicked: the last one in view.
+			var shown := []
+			for player_index in rows:
+				if strip._rows[player_index].panel.visible:
+					shown.append(player_index)
+			detail["click"] = _click_row(scene, strip, emulator, shown[0] if step == "click_first" else shown[shown.size() - 1])
 	# The state reflects the previous step (events go through the input queue).
 	detail["focus"] = _focus_name(emulator, strip)
 	detail["viewed"] = strip.viewed_player()
+	if "_first" in strip and strip.has_method("is_windowed") and strip.is_windowed():
+		var in_view := []
+		for player_index in strip._order:
+			if strip._rows[player_index].panel.visible:
+				in_view.append(player_index + 1)
+		detail["list_first"] = strip._first
+		detail["list_window"] = strip._window
+		detail["list_shown"] = in_view
+		detail["list_scroll"] = strip.load_scroll_mode()
 	var controller = scene.find_node("CoopPlusPanelViewController", true, false)
 	if controller != null:
 		detail["mode"] = controller.display_mode()
 		detail["start"] = controller.window_start()
 	ProbeLog.event("local_sim.view." + prefix, detail)
 	return true
+
+
+# True while the options check runs (OPTIONS_SCENE above).
+func _options_step(scene: Node, delta: float) -> bool:
+	if _options_menu == null:
+		_options_menu = load(OPTIONS_SCENE).instance()
+		scene.add_child(_options_menu)
+		# Through the tab's own button, so the tab row shows the Gameplay tab
+		# as selected too (ui_better_tab_container.gd _change_tab).
+		var tab_button = _options_menu.get_node_or_null(OPTIONS_GAMEPLAY_BUTTON_PATH)
+		var tabs = _options_menu.get_node_or_null(OPTIONS_TABS_PATH)
+		if tab_button is Button:
+			tab_button.pressed = true
+			tab_button.emit_signal("pressed")
+		elif tabs is TabContainer and tabs.has_node("Gameplay_Container"):
+			tabs.current_tab = tabs.get_node("Gameplay_Container").get_index()
+		if _options_menu.has_method("init_values_from_progress_data"):
+			_options_menu.init_values_from_progress_data()
+		_options_left = OPTIONS_SHOT_SEC
+		return true
+	_options_left -= delta
+	if _options_left > 0.0:
+		return true
+	var entry = _options_menu.find_node("CoopPlusListScrollButton", true, false)
+	var detail := {"entry": entry != null}
+	if entry is CheckButton:
+		_save_screenshot("options_gameplay_%dp.png" % _players_wanted)
+		var anchor = entry.get_parent().get_node_or_null("ShareCoopLootButton")
+		detail["below_share_coop_loot"] = anchor != null and entry.get_index() == anchor.get_index() + 1
+		detail["text"] = entry.text
+		detail["pressed"] = entry.pressed
+		detail["saved"] = PlayerStatusStrip.load_scroll_mode()
+		entry.pressed = not entry.pressed
+		detail["saved_after_toggle"] = PlayerStatusStrip.load_scroll_mode()
+		entry.pressed = not entry.pressed
+		detail["saved_after_second_toggle"] = PlayerStatusStrip.load_scroll_mode()
+	ProbeLog.event("local_sim.options", detail)
+	_options_menu.queue_free()
+	_options_shot = false
+	return true
+
+
+# Moves the mouse to the middle of `control` and turns the wheel there once.
+func _wheel_over(control: Control, button_index: int) -> Dictionary:
+	if control == null:
+		return {"error": "no_control"}
+	var pos: Vector2 = control.get_global_transform_with_canvas().xform(control.rect_size * 0.5)
+	var motion := InputEventMouseMotion.new()
+	motion.position = pos
+	motion.global_position = pos
+	Input.parse_input_event(motion)
+	for pressed in [true, false]:
+		var button := InputEventMouseButton.new()
+		button.button_index = button_index
+		button.pressed = pressed
+		button.position = pos
+		button.global_position = pos
+		Input.parse_input_event(button)
+	return {"at": [stepify(pos.x, 1), stepify(pos.y, 1)]}
 
 
 func _pad_press(emulator, action: String) -> void:
@@ -1069,6 +1218,25 @@ func _step(name: String, detail := {}) -> void:
 	ProbeLog.event("local_sim.step." + name, detail)
 
 
+# The game's late-game performance kit (debug_service.gd _apply_perf_scenario).
+# perf12: twelve guns, the widest weapon list a row can get (layout checks).
+func _add_perf_kit(player_index: int, with_items: bool, weapon_count: int = 6) -> String:
+	var weapon = load(DebugService.PERF_SCENARIO_WEAPON_PATH)
+	for i in weapon_count:
+		var _w = RunData.add_weapon(weapon, player_index)
+	for entry in (DebugService.PERF_SCENARIO_ITEMS if with_items else []):
+		var item = load(entry[0])
+		for i in int(entry[1]):
+			RunData.add_item(item, player_index)
+	return "perf:%s" % weapon.my_id
+
+
+func _wave_timeout() -> float:
+	if _wave_seconds > 0:
+		return _wave_seconds + EXTRA_TIMEOUT_SEC
+	return LONGEST_WAVE_SEC * SLOW_WAVE_FACTOR + EXTRA_TIMEOUT_SEC
+
+
 func _pick_characters(count: int) -> Array:
 	var out := []
 	for character in ItemService.characters:
@@ -1184,7 +1352,15 @@ func _sample(scene) -> void:
 			players.append({"index": i, "valid": true, "x": int(pos.x), "y": int(pos.y), "device": device, "dead": bool(p.dead) if "dead" in p else false})
 		if "_players_ui" in scene:
 			hud = scene._players_ui.size()
-	_samples.append({"t": stepify(_elapsed, 0.01), "players": players, "hud_entries": hud, "run_data_players": RunData.get_player_count(), "paused": get_tree().paused})
+	var spawner = scene.get("_entity_spawner") if scene != null else null
+	_samples.append({"t": stepify(_elapsed, 0.01), "players": players, "hud_entries": hud, "run_data_players": RunData.get_player_count(), "paused": get_tree().paused,
+			"wave": RunData.current_wave, "fps": Engine.get_frames_per_second(),
+			"process_ms": stepify(Performance.get_monitor(Performance.TIME_PROCESS) * 1000.0, 0.01),
+			"physics_ms": stepify(Performance.get_monitor(Performance.TIME_PHYSICS_PROCESS) * 1000.0, 0.01),
+			"nodes": int(Performance.get_monitor(Performance.OBJECT_NODE_COUNT)),
+			"static_mb": stepify(Performance.get_monitor(Performance.MEMORY_STATIC) / 1048576.0, 0.1),
+			"enemies": spawner.enemies.size() if spawner != null and "enemies" in spawner else -1,
+			"structures": spawner.structures.size() if spawner != null and "structures" in spawner else -1})
 
 
 func _finish(reason: String) -> void:

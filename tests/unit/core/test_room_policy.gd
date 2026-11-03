@@ -1,6 +1,7 @@
 extends "res://tests/runner/test_case.gd"
 
 const RoomPolicy = preload("res://mods-unpacked/CoopPlus-OnlineExtendedCoop/scripts/core/room_policy.gd")
+const CapacityPolicy = preload("res://mods-unpacked/CoopPlus-OnlineExtendedCoop/scripts/core/capacity_policy.gd")
 
 const TMP_PATH := "user://test_room_policy.cfg"
 
@@ -17,8 +18,12 @@ func test_normalize_standard_is_four() -> void:
 	assert_eq(room.capacity, 4)
 
 
-func test_normalize_extended_clamps_to_five_through_eight() -> void:
-	var cases := {3: 5, 5: 5, 7: 7, 8: 8, 12: 8, "6": 6, 6.0: 6}
+func test_normalize_extended_clamps_to_five_through_max() -> void:
+	var max_players := CapacityPolicy.MAX_SUPPORTED_PLAYERS
+	var cases := {3: 5, 5: 5, 7: 7, 8: 8, "6": 6, 6.0: 6}
+	cases[max_players] = max_players
+	cases[max_players + 1] = max_players
+	cases[max_players + 4] = max_players
 	for given in cases:
 		var room = RoomPolicy.normalize(RoomPolicy.TYPE_EXTENDED, given)
 		assert_eq(room.capacity, cases[given], str(given))
@@ -35,12 +40,17 @@ func test_host_room_follows_gate() -> void:
 
 
 func test_next_preference_cycles() -> void:
+	var expected := []
+	for capacity in range(5, CapacityPolicy.MAX_SUPPORTED_PLAYERS + 1):
+		expected.append("e%d" % capacity)
+	expected.append("s4")
+	expected.append("e5")
 	var seen := []
 	var pref := {"type": RoomPolicy.TYPE_STANDARD, "capacity": 4}
-	for _i in 6:
+	for _i in expected.size():
 		pref = RoomPolicy.next_preference(pref)
 		seen.append("%s%d" % [pref.type.substr(0, 1), pref.capacity])
-	assert_eq(seen, ["e5", "e6", "e7", "e8", "s4", "e5"])
+	assert_eq(seen, expected)
 
 
 func test_metadata_round_trip() -> void:

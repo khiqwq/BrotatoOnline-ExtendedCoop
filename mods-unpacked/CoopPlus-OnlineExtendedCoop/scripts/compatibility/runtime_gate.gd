@@ -24,6 +24,7 @@ extends Reference
 # arrive through the argument, the rule-test project has no Mod Loader).
 
 const UpstreamFingerprint = preload("res://mods-unpacked/CoopPlus-OnlineExtendedCoop/scripts/compatibility/upstream_fingerprint.gd")
+const CapacityPolicy = preload("res://mods-unpacked/CoopPlus-OnlineExtendedCoop/scripts/core/capacity_policy.gd")
 
 const MOD_ID := "CoopPlus-OnlineExtendedCoop"
 const META_KEY := "coopplus_runtime_gate"
@@ -37,7 +38,7 @@ const UNPACKED_ROOT := "res://mods-unpacked"
 const LOG_SCRIPT_PATH := "res://addons/mod_loader/api/log.gd"
 
 const VANILLA_CAPACITY := 4
-const EXTENDED_CAPACITY := 8
+const EXTENDED_CAPACITY := CapacityPolicy.MAX_SUPPORTED_PLAYERS
 # First virtual input device id for remote players. Godot 3 numbers physical
 # joypads 0..15 (JOYPADS_MAX), vanilla uses remapped ids 0..7 and debug
 # keyboards 8..11, so ids from 16 never match a physical event, a joypad

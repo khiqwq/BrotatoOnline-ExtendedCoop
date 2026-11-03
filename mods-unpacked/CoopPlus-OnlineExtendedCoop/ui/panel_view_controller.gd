@@ -15,6 +15,12 @@ extends Node
 # vanilla locks left/right, so there they always slide. With the local panel
 # outside the window its FocusEmulator ignores input (every focus base hidden)
 # and left/right only slide.
+# In focus mode with more players than the strip shows at once
+# (player_status_strip.gd is_windowed), the mouse wheel over the strip and
+# the right stick up/down (one step per push, repeating while held) scroll
+# its rows, and up/down past its first or last shown row scroll it as well.
+# The game scrolls a crowded item description with the right stick too
+# (item_description.gd _process); both move.
 # Added as the screen's last child so its _input runs before the
 # FocusEmulators' (Godot calls _input in reverse tree order). Layout only: it
 # never changes game state; hidden panels stay in the scene as in D-010.
@@ -36,9 +42,12 @@ const PREFS_KEY := "mode"
 const TOGGLE_KEY := KEY_V
 const TOGGLE_JOY_BUTTON := JOY_SELECT
 const STICK_AXIS := JOY_AXIS_2
+const LIST_STICK_AXIS := JOY_AXIS_3
 const STICK_PRESS := 0.6
 const STICK_RELEASE := 0.3
 const SLIDE_COOLDOWN_SEC := 0.18
+const LIST_REPEAT_DELAY_SEC := 0.45
+const LIST_REPEAT_SEC := 0.2
 const EDGE_WIDTH := 40.0
 const EDGE_FONT_SIZE := 26
 const NOTICE_SEC := 4.0
@@ -69,6 +78,9 @@ var _count := 0
 var _start := 0
 var _cooldown := 0.0
 var _stick_dir := 0
+# Right stick up/down held on the strip: direction and seconds to the next step.
+var _list_stick_dir := 0
+var _list_repeat_left := 0.0
 var _edges := []
 var _edge_font: Font = null
 var _notice: Control = null
@@ -153,6 +165,12 @@ func _process(delta: float) -> void:
 	_watch_local_focus(delta)
 	if _cooldown > 0.0:
 		_cooldown -= delta
+	if _list_stick_dir != 0:
+		_list_repeat_left -= delta
+		if _list_repeat_left <= 0.0:
+			_list_repeat_left = LIST_REPEAT_SEC
+			if _input_blocked() or not _scroll_list(_list_stick_dir):
+				_list_stick_dir = 0
 	if _notice_left > 0.0:
 		_notice_left -= delta
 		_notice.modulate.a = clamp(_notice_left / NOTICE_FADE_SEC, 0.0, 1.0)
@@ -216,6 +234,10 @@ func _input(event: InputEvent) -> void:
 	if _is_toggle(event):
 		toggle_mode()
 		get_tree().set_input_as_handled()
+		return
+	if _mode == MODE_FOCUS:
+		if _list_input(event):
+			get_tree().set_input_as_handled()
 		return
 	if _mode != MODE_PAGES:
 		return
@@ -448,6 +470,50 @@ func _stick_direction(event: InputEvent) -> int:
 		return _stick_dir
 	if _stick_dir != 0 and abs(value) <= STICK_RELEASE:
 		_stick_dir = 0
+	return 0
+
+
+# Focus mode: wheel, right stick and up/down at the ends of a windowed strip.
+# True when the event was used.
+func _list_input(event: InputEvent) -> bool:
+	if _strip == null or not _strip.has_method("is_windowed") or not _strip.is_windowed():
+		return false
+	if event is InputEventMouseButton:
+		if not event.pressed or not event.button_index in [BUTTON_WHEEL_UP, BUTTON_WHEEL_DOWN]:
+			return false
+		if not is_instance_valid(_holder) or not _holder.is_visible_in_tree() or not _holder.get_global_rect().has_point(_holder.get_global_mouse_position()):
+			return false
+		var _s = _scroll_list(-1 if event.button_index == BUTTON_WHEEL_UP else 1)
+		return true
+	if event is InputEventJoypadMotion:
+		if event.axis != LIST_STICK_AXIS or RuntimeGate.is_virtual_device(event.device):
+			return false
+		var value: float = event.axis_value
+		if _list_stick_dir == 0 and abs(value) >= STICK_PRESS:
+			_list_stick_dir = 1 if value > 0.0 else -1
+			_list_repeat_left = LIST_REPEAT_DELAY_SEC
+			if not _scroll_list(_list_stick_dir):
+				_list_stick_dir = 0
+		elif _list_stick_dir != 0 and abs(value) <= STICK_RELEASE:
+			_list_stick_dir = 0
+		return false
+	var dir := _local_action_direction(event, "ui_up", "ui_down")
+	return dir != 0 and _strip.step_focus(dir)
+
+
+func _scroll_list(dir: int) -> bool:
+	return _strip != null and _holder.is_visible_in_tree() and _strip.scroll_rows(dir)
+
+
+# -1 / 1 when the event presses the local player's first / second action, else 0.
+func _local_action_direction(event: InputEvent, back: String, forward: String) -> int:
+	if _local < 0 or _local >= CoopService.connected_players.size():
+		return 0
+	var device := int(CoopService.connected_players[_local][0])
+	for pair in [[back, -1], [forward, 1]]:
+		var action := "%s_%d" % [pair[0], device]
+		if InputMap.has_action(action) and event.is_action_pressed(action):
+			return pair[1]
 	return 0
 
 

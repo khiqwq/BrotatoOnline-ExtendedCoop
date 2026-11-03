@@ -2,6 +2,7 @@ extends "res://tests/runner/test_case.gd"
 
 const ActionLedger = preload("res://mods-unpacked/CoopPlus-OnlineExtendedCoop/scripts/network/action_ledger.gd")
 const PayloadGuard = preload("res://mods-unpacked/CoopPlus-OnlineExtendedCoop/scripts/network/payload_guard.gd")
+const CapacityPolicy = preload("res://mods-unpacked/CoopPlus-OnlineExtendedCoop/scripts/core/capacity_policy.gd")
 
 const SCOPE := "s1|run1|wave3|shop|r0"
 const NEXT_SCOPE := "s1|run1|wave4|shop|r0"
@@ -238,16 +239,17 @@ func test_begin_scope_accepts_one_to_eight_senders() -> void:
 			assert_eq(ledger.check(SCOPE, s, 1, 0, true).status, ActionLedger.STATUS_NEW, "n %d" % n)
 
 
-func test_ninth_sender_is_refused_not_dropped() -> void:
-	var ledger = _ledger(8)
-	var nine := _senders(9)
-	assert_eq(ledger.check(SCOPE, nine[8], 1, 0, true).reason, ActionLedger.REASON_UNKNOWN_SENDER)
-	var r = ledger.begin_scope(NEXT_SCOPE, nine)
+func test_sender_one_past_max_is_refused_not_dropped() -> void:
+	var max_players := CapacityPolicy.MAX_SUPPORTED_PLAYERS
+	var ledger = _ledger(max_players)
+	var too_many := _senders(max_players + 1)
+	assert_eq(ledger.check(SCOPE, too_many[max_players], 1, 0, true).reason, ActionLedger.REASON_UNKNOWN_SENDER)
+	var r = ledger.begin_scope(NEXT_SCOPE, too_many)
 	assert_false(r.ok)
 	assert_eq(r.reason, ActionLedger.REASON_TOO_MANY_SENDERS)
 	# nobody is silently cut: the whole scope stays closed instead
 	assert_eq(ledger.current_scope(), "")
-	for s in nine:
+	for s in too_many:
 		assert_eq(ledger.check(NEXT_SCOPE, s, 1, 0, true).reason, ActionLedger.REASON_NO_SCOPE)
 
 
@@ -307,8 +309,8 @@ func test_check_rejects_malformed_input_without_reserving() -> void:
 		[SCOPE, me, ActionLedger.MAX_ACTION_ID + 1, 0, true, "", ActionLedger.REASON_ACTION_ID_OUT_OF_RANGE],
 		[SCOPE, me, 9223372036854775807, 0, true, "", ActionLedger.REASON_ACTION_ID_OUT_OF_RANGE],
 		[SCOPE, me, 1, -1, true, "", ActionLedger.REASON_INVALID_TARGET],
-		[SCOPE, me, 1, 8, true, "", ActionLedger.REASON_INVALID_TARGET],
-		[SCOPE, me, 1, 100, true, "", ActionLedger.REASON_INVALID_TARGET],
+		[SCOPE, me, 1, CapacityPolicy.MAX_SUPPORTED_PLAYERS, true, "", ActionLedger.REASON_INVALID_TARGET],
+		[SCOPE, me, 1, CapacityPolicy.MAX_SUPPORTED_PLAYERS + 100, true, "", ActionLedger.REASON_INVALID_TARGET],
 		[SCOPE, me, 1, "0", true, "", ActionLedger.REASON_INVALID_TARGET],
 		[SCOPE, me, 1, 0.0, true, "", ActionLedger.REASON_INVALID_TARGET],
 		[SCOPE, me, 1, null, true, "", ActionLedger.REASON_INVALID_TARGET],
@@ -331,7 +333,7 @@ func test_check_rejects_malformed_input_without_reserving() -> void:
 	assert_eq(ledger.highest_action_id(me), 0)
 	# the same id is still free for the genuine action
 	assert_eq(ledger.check(SCOPE, me, 1, 0, true).status, ActionLedger.STATUS_NEW)
-	assert_eq(ledger.check(SCOPE, me, ActionLedger.MAX_ACTION_ID, 7, true, _string_of(64)).status, ActionLedger.STATUS_NEW, "upper limits inclusive")
+	assert_eq(ledger.check(SCOPE, me, ActionLedger.MAX_ACTION_ID, CapacityPolicy.MAX_SUPPORTED_PLAYERS - 1, true, _string_of(64)).status, ActionLedger.STATUS_NEW, "upper limits inclusive")
 
 
 func test_forged_player_index_never_executes_for_any_roster() -> void:

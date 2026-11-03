@@ -3,6 +3,7 @@ extends "res://tests/runner/test_case.gd"
 # continue), T15 (DLC sets), T17 (unverified upstream/game/engine).
 
 const Capability = preload("res://mods-unpacked/CoopPlus-OnlineExtendedCoop/scripts/network/capability.gd")
+const CapacityPolicy = preload("res://mods-unpacked/CoopPlus-OnlineExtendedCoop/scripts/core/capacity_policy.gd")
 const COMPAT_PATH := "res://mods-unpacked/CoopPlus-OnlineExtendedCoop/compatibility.json"
 
 const FINGERPRINT := "17443875f52fd7659af33d0f0deb9fb495b0d46110aaeba08d0fc419d439b819"
@@ -48,6 +49,11 @@ func _info() -> Dictionary:
 		"incompatible_mods": [MOUSE_UI],
 		"supported": _record(),
 	}
+
+
+# Session capacities no capacity policy accepts: the first one past the max and further out.
+func _invalid_capacities() -> Array:
+	return [0, -1, CapacityPolicy.MAX_SUPPORTED_PLAYERS + 1, CapacityPolicy.MAX_SUPPORTED_PLAYERS * 2]
 
 
 func _hello(overrides := {}) -> Dictionary:
@@ -190,7 +196,7 @@ func test_missing_extension_rejected_for_five_to_eight() -> void:
 
 
 func test_invalid_session_capacity_rejected_even_for_matching_peer() -> void:
-	for n in [0, -1, 9, 16]:
+	for n in _invalid_capacities():
 		_assert_rejected(rules.evaluate(_info(), null, n), Capability.REASON_INVALID_CAPACITY, "null, capacity %d" % n)
 		_assert_rejected(rules.evaluate(_info(), _hello(), n), Capability.REASON_INVALID_CAPACITY, "hello, capacity %d" % n)
 		assert_true(rules.requires_handshake(n), "capacity %d" % n)
@@ -612,7 +618,8 @@ func test_shipped_compatibility_record_verifies_the_locked_environment() -> void
 	info.supported = record
 	info.extension_version = record.extension_version
 	info.capability_version = record.network_capability_version
-	# The locked Brotato Online version changes with every upstream update.
+	# The locked game and Brotato Online versions change with every update.
+	info.game_version = record.game_versions[0]
 	for entry in record.get("upstream", []):
 		if entry.get("id", "") == "six666-BrotatoOnline":
 			info.upstream_fingerprint = entry.normalized_fingerprint
@@ -668,7 +675,7 @@ func test_result_round_trip_keeps_the_decision() -> void:
 		rules.evaluate(_info(), _hello({"mods": [{"id": MOUSE_UI, "version": "1.0.1"}]}), 5),
 		rules.evaluate(_info(), _hello({"upstream_fingerprint": OTHER_FINGERPRINT}), 6),
 		rules.evaluate(_info(), null, 8),
-		rules.evaluate(_info(), null, 9),
+		rules.evaluate(_info(), null, CapacityPolicy.MAX_SUPPORTED_PLAYERS + 1),
 	]
 	for d in decisions:
 		var msg = rules.build_result(d)
@@ -768,12 +775,16 @@ func test_result_key_and_byte_limits_are_exact() -> void:
 
 
 func test_mode_for_capacity_follows_the_capacity_policy() -> void:
-	for n in [-1, 0, 9, 16]:
+	for n in _invalid_capacities():
 		assert_eq(rules.mode_for_capacity(n), Capability.MODE_NONE, "capacity %d" % n)
-	for n in range(1, 9):
+	# Host and peer both support the max, so evaluate() can agree at every capacity.
+	var info = _info()
+	info.capacity = CapacityPolicy.MAX_SUPPORTED_PLAYERS
+	var hello = _hello({"capacity": CapacityPolicy.MAX_SUPPORTED_PLAYERS})
+	for n in range(1, CapacityPolicy.MAX_SUPPORTED_PLAYERS + 1):
 		var expected: String = Capability.MODE_VANILLA_COMPAT if n <= 4 else Capability.MODE_EXTENDED
 		assert_eq(rules.mode_for_capacity(n), expected, "capacity %d" % n)
-		var d = rules.evaluate(_info(), _hello(), n)
+		var d = rules.evaluate(info, hello, n)
 		assert_eq(d.mode, expected, "evaluate agrees, capacity %d" % n)
 
 
@@ -842,7 +853,7 @@ func test_client_without_a_result() -> void:
 			else:
 				_assert_rejected(d, item[1], label)
 				assert_eq(d.note, Capability.REASON_NONE, label)
-	for n in [0, -1, 9, 16]:
+	for n in _invalid_capacities():
 		var r = rules.client_decision(rules.build_result(rules.evaluate(_info(), _hello(), 8)), n)
 		_assert_rejected(r, Capability.REASON_INVALID_CAPACITY, "capacity %d" % n)
 		_assert_rejected(rules.client_decision(null, n), Capability.REASON_INVALID_CAPACITY, "null, capacity %d" % n)
@@ -862,7 +873,7 @@ func test_client_refuses_a_mode_that_does_not_fit_the_lobby() -> void:
 		_assert_rejected(d, Capability.REASON_MODE_MISMATCH, "extended in a vanilla lobby, capacity %d" % n)
 		assert_eq(d.detail, "host=extended session=%d" % n)
 	# A host's rejection stands, also in 1..4 lobbies.
-	var rejected = rules.build_result(rules.evaluate(_info(), null, 9))
+	var rejected = rules.build_result(rules.evaluate(_info(), null, CapacityPolicy.MAX_SUPPORTED_PLAYERS + 1))
 	for n in range(1, 9):
 		_assert_rejected(rules.client_decision(rejected, n), Capability.REASON_INVALID_CAPACITY, "capacity %d" % n)
 

@@ -36,7 +36,8 @@ extends "res://main.gd"
 #     pending containers join _things_to_process_player_containers right
 #     before players_spawned uses them, and the P5..P8 blocks are placed in
 #     the P1..P4 corners afterwards; in _ready the team bag of leftover
-#     materials moves from P1's block to P5's
+#     materials moves from P1's block to P5's; with more than eight players
+#     every block is compacted (ui/compact_hud.gd) once the players spawn
 # Left for later: camera
 # targets (BAT-M08), log_run_info defaults (BAT-10) and the RunData
 # per-player arrays other than _players_die_args (DATA-01/02, BAT-M04).
@@ -44,11 +45,13 @@ extends "res://main.gd"
 const RuntimeGate = preload("res://mods-unpacked/CoopPlus-OnlineExtendedCoop/scripts/compatibility/runtime_gate.gd")
 const CapacityPolicy = preload("res://mods-unpacked/CoopPlus-OnlineExtendedCoop/scripts/core/capacity_policy.gd")
 const ExtraPlayerHud = preload("res://mods-unpacked/CoopPlus-OnlineExtendedCoop/ui/extra_player_hud.gd")
+const CompactHud = preload("res://mods-unpacked/CoopPlus-OnlineExtendedCoop/ui/compact_hud.gd")
 
 const COOPPLUS_MOD_ID := "CoopPlus-OnlineExtendedCoop"
 
-# Pending-icon containers of P5..P8, created in _enter_tree.
+# Pending-icon containers of P5 and up and their block layers, created in _enter_tree.
 var _coopplus_extra_things := []
+var _coopplus_extra_layers := []
 
 
 # Main has no _init of its own (vanilla or Brotato Online); member
@@ -88,15 +91,17 @@ func _enter_tree() -> void:
 		if not bool(built.ok):
 			ModLoaderLog.error("main: no P5+ battle HUD (%s)" % built.reason, COOPPLUS_MOD_ID)
 		_coopplus_extra_things = built.things
+		_coopplus_extra_layers = built.get("layers", [])
 
 
 # Runs after every parent _ready (ADR-001 rule 1: not called here). Main's
 # onready references to the team bag and FPS label (main.gd:90-91, 106) are
-# set by now and follow the nodes when they move to P5's block.
+# set by now and follow the nodes when they move to the last top-left block
+# (P5, P9 or P13).
 func _ready() -> void:
 	if RuntimeGate.is_extended() and not _coopplus_extra_things.empty():
 		if not ExtraPlayerHud.attach_team_widgets(self):
-			ModLoaderLog.warning("main: team bag stays in P1's HUD block (no P5 block)", COOPPLUS_MOD_ID)
+			ModLoaderLog.warning("main: team bag stays in P1's HUD block (no P5..P13 block)", COOPPLUS_MOD_ID)
 
 
 # Parent: main_safe_pool_exit.gd:162, which ends in vanilla main.gd:1361. Vanilla
@@ -111,6 +116,8 @@ func _on_EntitySpawner_players_spawned(players: Array) -> void:
 	._on_EntitySpawner_players_spawned(players)
 	if RuntimeGate.is_extended():
 		ExtraPlayerHud.place_player_huds(_players_ui)
+		if CompactHud.applies(_players_ui.size()):
+			CompactHud.apply(self, _players_ui, _coopplus_extra_layers)
 
 
 func _coopplus_grow_stats_manager_queues() -> void:

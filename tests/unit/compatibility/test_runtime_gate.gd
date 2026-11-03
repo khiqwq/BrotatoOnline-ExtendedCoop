@@ -1,6 +1,7 @@
 extends "res://tests/runner/test_case.gd"
 
 const RuntimeGate = preload("res://mods-unpacked/CoopPlus-OnlineExtendedCoop/scripts/compatibility/runtime_gate.gd")
+const CapacityPolicy = preload("res://mods-unpacked/CoopPlus-OnlineExtendedCoop/scripts/core/capacity_policy.gd")
 
 const BO := "six666-BrotatoOnline"
 const COOPFIX := "CoopFix-OnlineMouseUI"
@@ -45,6 +46,11 @@ func _good_inputs() -> Dictionary:
 	}
 
 
+# Remote virtual device ids at full capacity: 16 up, one per remote player.
+func _max_virtual_ids() -> Array:
+	return range(16, 16 + CapacityPolicy.MAX_SUPPORTED_PLAYERS - 1)
+
+
 func _assert_vanilla(result: Dictionary, reasons: Array, message := "") -> void:
 	assert_eq(result.capacity, 4, message)
 	assert_false(result.extended, message)
@@ -53,12 +59,12 @@ func _assert_vanilla(result: Dictionary, reasons: Array, message := "") -> void:
 	assert_eq(result.reasons, reasons, message)
 
 
-func test_locked_target_allows_eight_players() -> void:
+func test_locked_target_allows_max_players() -> void:
 	var r = RuntimeGate.decide(_good_inputs())
-	assert_eq(r.capacity, 8)
+	assert_eq(r.capacity, CapacityPolicy.MAX_SUPPORTED_PLAYERS)
 	assert_true(r.extended)
-	assert_eq(r.max_remote_players, 7)
-	assert_eq(r.virtual_device_ids, [16, 17, 18, 19, 20, 21, 22])
+	assert_eq(r.max_remote_players, CapacityPolicy.MAX_SUPPORTED_PLAYERS - 1)
+	assert_eq(r.virtual_device_ids, _max_virtual_ids())
 	assert_eq(r.reasons, [])
 	assert_true(r.install_extensions)
 	assert_eq(r.details.upstream[BO].result, "match")
@@ -93,10 +99,10 @@ func _with_coopfix(fingerprint) -> Dictionary:
 	return inputs
 
 
-func test_locked_coopfix_allows_eight_players() -> void:
+func test_locked_coopfix_allows_max_players() -> void:
 	var r = RuntimeGate.decide(_with_coopfix(COOPFIX_FP))
 	assert_true(r.extended)
-	assert_eq(r.capacity, 8)
+	assert_eq(r.capacity, CapacityPolicy.MAX_SUPPORTED_PLAYERS)
 	assert_eq(r.reasons, [])
 	assert_eq(var2str(r.details.optional_running), var2str({COOPFIX: "match"}))
 	assert_eq(r.details.unsupported_running, [])
@@ -313,13 +319,14 @@ func test_getters_are_vanilla_before_initialize() -> void:
 func test_getters_follow_an_extended_decision() -> void:
 	RuntimeGate._store(RuntimeGate.decide(_good_inputs()))
 	assert_true(RuntimeGate.is_initialized())
-	assert_eq(RuntimeGate.capacity(), 8)
+	assert_eq(RuntimeGate.capacity(), CapacityPolicy.MAX_SUPPORTED_PLAYERS)
 	assert_true(RuntimeGate.is_extended())
-	assert_eq(RuntimeGate.max_remote_players(), 7)
+	assert_eq(RuntimeGate.max_remote_players(), CapacityPolicy.MAX_SUPPORTED_PLAYERS - 1)
 	assert_eq(RuntimeGate.block_reasons(), [])
-	assert_eq(RuntimeGate.virtual_device_ids(), [16, 17, 18, 19, 20, 21, 22])
-	for device in range(0, 30):
-		assert_eq(RuntimeGate.is_virtual_device(device), device >= 16 and device <= 22, "device %d" % device)
+	assert_eq(RuntimeGate.virtual_device_ids(), _max_virtual_ids())
+	var last: int = 16 + CapacityPolicy.MAX_SUPPORTED_PLAYERS - 2
+	for device in range(0, last + 8):
+		assert_eq(RuntimeGate.is_virtual_device(device), device >= 16 and device <= last, "device %d" % device)
 
 
 func test_room_capacity_limits_an_extended_decision() -> void:
@@ -333,11 +340,11 @@ func test_room_capacity_limits_an_extended_decision() -> void:
 	assert_eq(RuntimeGate.capacity(), 6)
 	assert_eq(RuntimeGate.virtual_device_ids(), [16, 17, 18, 19, 20])
 	assert_eq(RuntimeGate.room_capacity(), 6)
-	RuntimeGate.set_room_capacity(12)
-	assert_eq(RuntimeGate.capacity(), 8, "never above the decision")
+	RuntimeGate.set_room_capacity(CapacityPolicy.MAX_SUPPORTED_PLAYERS + 1)
+	assert_eq(RuntimeGate.capacity(), CapacityPolicy.MAX_SUPPORTED_PLAYERS, "never above the decision")
 	RuntimeGate.clear_room()
 	assert_eq(RuntimeGate.room_capacity(), 0)
-	assert_eq(RuntimeGate.capacity(), 8, "offline: the decision's capacity")
+	assert_eq(RuntimeGate.capacity(), CapacityPolicy.MAX_SUPPORTED_PLAYERS, "offline: the decision's capacity")
 
 
 func test_capability_version_comes_from_compatibility() -> void:
@@ -347,9 +354,9 @@ func test_capability_version_comes_from_compatibility() -> void:
 	inputs.compatibility["network_capability_version"] = 3.0
 	RuntimeGate._store(RuntimeGate.decide(inputs))
 	assert_eq(RuntimeGate.capability_version(), 3)
-	assert_eq(RuntimeGate.verified_capacity(), 8)
+	assert_eq(RuntimeGate.verified_capacity(), CapacityPolicy.MAX_SUPPORTED_PLAYERS)
 	RuntimeGate.set_room_capacity(4)
-	assert_eq(RuntimeGate.verified_capacity(), 8, "the room never changes what the machine supports")
+	assert_eq(RuntimeGate.verified_capacity(), CapacityPolicy.MAX_SUPPORTED_PLAYERS, "the room never changes what the machine supports")
 
 
 func test_room_capacity_never_extends_a_vanilla_decision() -> void:
@@ -364,7 +371,7 @@ func test_room_capacity_never_extends_a_vanilla_decision() -> void:
 func test_virtual_ids_avoid_every_vanilla_and_physical_id() -> void:
 	RuntimeGate._store(RuntimeGate.decide(_good_inputs()))
 	var ids = RuntimeGate.virtual_device_ids()
-	assert_eq(ids.size(), 7, "one per remote player")
+	assert_eq(ids.size(), CapacityPolicy.MAX_SUPPORTED_PLAYERS - 1, "one per remote player")
 	for id in ids:
 		assert_true(id >= 16, "above Godot's 16 physical joypads, vanilla remaps 0..7 and debug 8..11: %d" % id)
 
@@ -374,7 +381,7 @@ func test_getter_results_are_copies() -> void:
 	RuntimeGate.virtual_device_ids().append(99)
 	RuntimeGate.block_reasons().append("x")
 	RuntimeGate.decision().reasons.append("x")
-	assert_eq(RuntimeGate.virtual_device_ids().size(), 7)
+	assert_eq(RuntimeGate.virtual_device_ids().size(), CapacityPolicy.MAX_SUPPORTED_PLAYERS - 1)
 	assert_eq(RuntimeGate.block_reasons(), [])
 	assert_true(RuntimeGate.is_extended())
 
@@ -390,7 +397,8 @@ func test_vanilla_decision_getters() -> void:
 
 
 func test_inconsistent_stored_state_reads_as_vanilla() -> void:
-	for bad in [{"capacity": 99, "reasons": []}, {"capacity": 8, "reasons": ["x"]}, {"capacity": 8.0, "reasons": []}, "garbage"]:
+	var max_players := CapacityPolicy.MAX_SUPPORTED_PLAYERS
+	for bad in [{"capacity": max_players + 1, "reasons": []}, {"capacity": max_players, "reasons": ["x"]}, {"capacity": float(max_players), "reasons": []}, "garbage"]:
 		Engine.set_meta(RuntimeGate.META_KEY, bad)
 		assert_eq(RuntimeGate.capacity(), 4, var2str(bad))
 		assert_false(RuntimeGate.is_initialized(), var2str(bad))
@@ -399,8 +407,11 @@ func test_inconsistent_stored_state_reads_as_vanilla() -> void:
 
 func test_initialize_reads_real_files_and_runs_once() -> void:
 	# The rule-test project has this mod's compatibility.json but no Brotato
-	# Online directory, so the real gather path must end in vanilla.
-	var first = RuntimeGate.initialize({"game_version": "1.2.0.0", "mod_loader_version": "6.3.0"})
+	# Online directory, so the real gather path must end in vanilla. The game
+	# version is the shipped record's (it changes with every game update).
+	var shipped: Dictionary = RuntimeGate.gather_inputs().get("compatibility", {})
+	var game_version: String = shipped.get("game_versions", [""])[0]
+	var first = RuntimeGate.initialize({"game_version": game_version, "mod_loader_version": "6.3.0"})
 	assert_true(RuntimeGate.is_initialized())
 	assert_eq(first.details.compatibility, RuntimeGate.COMPAT_OK, "compatibility.json parsed")
 	assert_eq(first.details.engine_version, RuntimeGate.engine_version_string())
@@ -415,7 +426,8 @@ func test_initialize_reads_real_files_and_runs_once() -> void:
 
 func test_describe_is_one_line_without_full_fingerprints() -> void:
 	var good = RuntimeGate.describe(RuntimeGate.decide(_good_inputs()))
-	assert_true(good.begins_with("runtime gate: extended capacity=8 virtual_devices=16..22"), good)
+	var head := "runtime gate: extended capacity=%d virtual_devices=16..%d" % [CapacityPolicy.MAX_SUPPORTED_PLAYERS, 16 + CapacityPolicy.MAX_SUPPORTED_PLAYERS - 2]
+	assert_true(good.begins_with(head), good)
 	assert_false("\n" in good)
 	assert_false(FP in good, "short fingerprints only")
 	var inputs = _good_inputs()

@@ -1,0 +1,70 @@
+EV-0043 local simulation stress runs (hidden isolated instance, one PC: laptop RTX 5070). Kit 'perf' = 6 tier-4 sniper guns + 20 turret/support items per player; 'weap' = guns only. Waves 15-20 at the game's own lengths; invulnerable simulated players. Game 1.2.0.0, Brotato Online 11-03 3rd update.
+== dlc-stress-8p-w15: reached:coop_end_run.tscn after 6 waves players=8; script errors 3 (benign preload 3)
+   wave  n   fps(med/min)  frame_ms(med/max)  physics_ms(med/max)  enemies(max)  structures  nodes(max)
+     15  72     285/208         5.2/166.7          6.9/11.2            23          160      19382
+     16  63     294/51          5.4/57.8           6.7/11.8            14          160      19130
+     17  65     280/110         5.3/984.4          7.1/15.0            24          160      19563
+     18  62     285/192         5.2/34.0           7.1/13.2            26          161      19603
+     19  64     259/70          5.8/936.1          8.8/21.6            36          161      20201
+     20  40     293/90          5.8/884.6          7.1/27.2            15          161      19496
+   process: 702 MB peak, 432 s CPU; wall 429 s
+== dlc-stress-12p-w15: reached:coop_end_run.tscn after 6 waves players=12; script errors 3 (benign preload 3)
+   wave  n   fps(med/min)  frame_ms(med/max)  physics_ms(med/max)  enemies(max)  structures  nodes(max)
+     15  74     140/24          6.8/237.3         12.8/65.1            52          240      27888
+     16  64     121/6           7.1/1384.2        13.0/33.7            61          240      27500
+     17  63      94/1           6.5/89.3          14.1/32.1            62          242      27729
+     18  62      97/31          8.5/53.5          14.9/20.6            51          242      27912
+     19  62      94/12          7.8/1514.3        16.2/25.3            70          243      28187
+     20  47     163/47          7.1/1491.6        12.7/21.0            50          243      27862
+   process: 737 MB peak, 479 s CPU; wall 445 s
+== dlc-stress-12p-w19: reached:coop_end_run.tscn after 2 waves players=12; script errors 3 (benign preload 3)
+   wave  n   fps(med/min)  frame_ms(med/max)  physics_ms(med/max)  enemies(max)  structures  nodes(max)
+     19  73      63/5           7.4/174.3         14.8/28.0           100          240      28624
+     20  46     136/31          6.4/1270.3        11.2/18.1            52          240      27851
+cat: dlc-stress-12p-w19/process.txt: No such file or directory
+   process: 
+== dlc-stress-14p-w15: reached:coop_end_run.tscn after 6 waves players=14; script errors 3 (benign preload 3)
+   wave  n   fps(med/min)  frame_ms(med/max)  physics_ms(med/max)  enemies(max)  structures  nodes(max)
+     15  74     100/1           8.0/179.2         15.6/30.7            64          280      31539
+     16  64     120/58          7.8/120.5         14.3/20.9            55          280      31332
+     17  62      45/5          10.1/118.7         19.1/38.6           100          280      31738
+     18  64      81/17          8.9/120.7         16.8/25.6            60          280      31786
+     19  62      40/6          10.2/131.3         19.7/29.6            99          280      32127
+     20  46     121/15          8.1/94.7          14.7/24.4            66          281      31653
+   process: 776 MB peak, 472 s CPU; wall 450 s
+== dlc-stress-16p-w15: reached:coop_end_run.tscn after 6 waves players=16; script errors 3 (benign preload 3)
+   wave  n   fps(med/min)  frame_ms(med/max)  physics_ms(med/max)  enemies(max)  structures  nodes(max)
+     15  72      40/7           9.2/169.3         17.2/28.2            66          320      35149
+     16  63      51/5           8.3/1638.0        16.1/44.6            57          320      34730
+     17  61       6/3          13.6/122.5         27.0/43.5           110          320      35718
+     18  60       7/4          13.5/160.2         23.9/46.0            74          320      35483
+     19  60       7/4          12.7/1725.3        23.4/58.0            88          320      35464
+     20  59      47/5          10.0/1636.1        17.4/72.3           103          321      35790
+   process: 789 MB peak, 522 s CPU; wall 509 s
+== dlc-weap-16p-w15: reached:coop_end_run.tscn after 6 waves players=16; script errors 3 (benign preload 3)
+   wave  n   fps(med/min)  frame_ms(med/max)  physics_ms(med/max)  enemies(max)  structures  nodes(max)
+     15  71       3/2          10.0/157.9         51.0/87.9           333            0      36856
+     16  61       5/3           7.9/1925.9        31.5/50.1           312            0      35934
+     17  61       3/2           8.4/1548.3        49.1/79.7           345            0      37155
+     18  61      11/3           8.2/96.6          22.5/48.8           362            1      37887
+     19  61       5/2           8.3/1554.5        34.7/61.3           329            1      36725
+     20  90       4/2           8.1/1572.0        35.1/63.5           370            1      37298
+   process: 864 MB peak, 819 s CPU; wall 825 s
+== dlc-stress-24p-w15: reached:coop_end_run.tscn after 6 waves players=24; script errors 3 (benign preload 3)
+   wave  n   fps(med/min)  frame_ms(med/max)  physics_ms(med/max)  enemies(max)  structures  nodes(max)
+     15  70       4/2          16.4/219.6         35.7/63.1           191          482      53107
+     16  62       4/3          16.2/178.6         37.1/60.7           157          482      51293
+     17  61       2/1          21.1/262.9         75.2/144.9          402          482      56111
+     18  59       3/2          19.2/131.0         40.7/65.4           213          482      53227
+     19  60       3/2          19.5/2472.5        43.2/71.4           211          482      52547
+     20  88       3/2          19.5/32.2          49.3/79.2           405          482      56203
+   process: 838 MB peak, 1,088 s CPU; wall 1086 s
+== dlc-stress-32p-w15: reached:coop_end_run.tscn after 6 waves players=32; script errors 3 (benign preload 3)
+   wave  n   fps(med/min)  frame_ms(med/max)  physics_ms(med/max)  enemies(max)  structures  nodes(max)
+     15  70       1/1          24.2/296.4        120.3/245.5          509          642      73822
+     16  59       1/1          22.5/237.4        137.1/169.8          504          642      72842
+     17  63       1/1          26.4/3151.4       158.9/280.7          546          643      74084
+     18  59       1/1          27.6/190.6        111.7/258.3          536          643      75320
+     19  61       1/1          26.4/3220.8       147.2/202.4          523          643      73061
+     20  88       2/1          15.9/382.1         65.8/170.8          579          142      68764
+   process: 1,035 MB peak, 2,610 s CPU; wall 2601 s

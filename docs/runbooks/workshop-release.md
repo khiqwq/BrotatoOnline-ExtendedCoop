@@ -22,8 +22,8 @@
    pwsh ./tools/instance.ps1 -Action Start -Name rel -StopAfterSec 40 -ExtraArgs "--audio-driver,Dummy"
    ```
 
-   日志里应有 `runtime gate: extended`、`queued 25 of 25 extensions`，除 3 条 `GDScript::reload (built-in:3)` 的 `Can't preload resource at path: protocol.gd / session_content_catalog.gd` 外没有 `SCRIPT ERROR`（那 3 条来自 Mod Loader 的备份副本，见 EV-0038）。
-3. 预览图放在 `.local/release/preview.jpg`（小于 1 MB；当前是 8 人战斗截图缩到 1280x720）。页面上的其他截图放在 `.local/release/gallery/`（按文件名排序，每张小于 1 MB；当前 7 张 1600x900：角色选择、商店本机放大、展开其他玩家、四人视图、升级、结算、扩展房间的玩家 DLC 图标（没装的玩家为灰色）），每次上传都替换物品现有的截图；文件夹为空或不存在时不动。截图是游戏画面，只放本机、不入库。
+   日志里应有 `runtime gate: extended`、`queued 24 of 24 extensions`、`installed 2 of 2 enter_tree extensions`，除 3 条 `GDScript::reload (built-in:3)` 的 `Can't preload resource at path: protocol.gd / session_content_catalog.gd` 外没有 `SCRIPT ERROR`（那 3 条来自 Mod Loader 的备份副本，见 EV-0038）。
+3. 预览图放在 `.local/release/preview.jpg`（小于 1 MB；当前是 16 人第 20 波战斗截图缩到 1280x720）。页面上的其他截图放在 `.local/release/gallery/`（按文件名排序，每张小于 1 MB；当前 9 张 1600x900，除 DLC 图标那张（6 人）外都是 16 人：角色选择、商店本机放大（状态条逐个滚动）、展开其他玩家（状态条第二页）、四人视图、升级、结算、扩展房间的玩家 DLC 图标（没装的玩家为灰色）、第 20 波战斗与紧凑 HUD、设置里的翻页开关），每次上传都替换物品现有的截图；文件夹为空或不存在时不动。截图是游戏画面，只放本机、不入库；用本地模拟的截图（`--coopplus-local-sim-menus`、`-kit=perf`、`-options-shot`，见 [local-simulation.md](local-simulation.md)）。
 4. 先试连，再上传：
 
    ```powershell

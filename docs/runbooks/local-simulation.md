@@ -22,7 +22,7 @@ pwsh ./tools/instance.ps1 -Action New -Name sim -Mods "BrotatoOnline,Extension" 
 pwsh ./tools/instance.ps1 -Action Start -Name sim -StopAfterSec 150 -ExtraArgs "--audio-driver,Dummy,--coopplus-local-sim=5,--coopplus-local-sim-seconds=20,--coopplus-probe-quit"
 ```
 
-参数：`--coopplus-local-sim=<1..8>` 人数；`--coopplus-local-sim-save` 打开存档（默认关闭；只在隔离实例中用，见 ADR-004）；`--coopplus-local-sim-seconds=<秒>` 波次时长；`--coopplus-local-sim-seed=<整数>` 机器人输入种子；`--coopplus-local-sim-pad` 仅用于探路，每帧把原版固定 4 格的逐玩家数组补到 8 格，以便找到它们之后的下一个阻塞点（**不是修复**，正式修复在 AP-013）。每次运行前删除 `.local/userdata/instance-sim`；改代码后重新 `-Action New`。退出码 -1073741819 表示引擎崩溃，看 `events.log` 最后一条定位。
+参数：`--coopplus-local-sim=<1..16>` 人数（上限即 `CapacityPolicy.MAX_SUPPORTED_PLAYERS`）；`--coopplus-local-sim-save` 打开存档（默认关闭；只在隔离实例中用，见 ADR-004）；`--coopplus-local-sim-seconds=<秒>` 波次时长；`--coopplus-local-sim-seed=<整数>` 机器人输入种子；`--coopplus-local-sim-pad` 仅用于探路，每帧把原版固定 4 格的逐玩家数组补到 8 格，以便找到它们之后的下一个阻塞点（**不是修复**，正式修复在 AP-013）。每次运行前删除 `.local/userdata/instance-sim`；改代码后重新 `-Action New`。退出码 -1073741819 表示引擎崩溃，看 `events.log` 最后一条定位。
 
 想看画面时加 `-ShowWindow`。需要人手操作时，游戏自带的调试开关 `DebugService.coop_multiple_keyboard_inputs` 可让一个键盘分成多名本地玩家（WASD / TFGH / IJKL / 方向键，设备 8～11），但原版本地合作仍限制 4 人。
 
@@ -172,3 +172,20 @@ pwsh ./tools/instance.ps1 -Action Start -Name sim -StopAfterSec 150 -ExtraArgs "
 测试环境注意：实例窗口隐藏时，桌面上任何焦点切换都会让游戏收到“失去焦点”并打开暂停菜单（`input_service.gd:91-96`），波次停止。战斗场景和合作商店（`coop_shop.gd:38`）各自连接这个信号，商店里打开的暂停会带进下一波。探针在两处都断开连接，并在采样中记录 `paused`；看到全体同时静止时先查这个字段。模拟运行期间不要再启动其他游戏实例（新窗口会抢焦点）。
 
 修复内容：`scripts/core/per_player_arrays.gd`（按 max(4, 人数) 只增不减地扩容）、`extensions/vanilla/run_data_ext.gd`（RunData/TempStats/LinkedStats/Utils 数组，含 RunData 三个重置函数之后）、`utils_ext.gd`（Utils 两个重置函数之后）、`popup_manager_ext.gd`（弹窗管理器五个数组）、`upgrades_ui_ext.gd`（合作升级界面补建 P5～P8 面板、属性弹窗、FocusEmulator 与界面数组；5～8 人的最终布局待 AP-014 样例确认）。
+
+## 人数上限与压力测试（D-015，EV-0043）
+
+- `--coopplus-local-sim-seconds=0`：用游戏自己的波次时长（20 秒逐波增加到 60 秒，第 20 波 90 秒）；单波超时按最长波 ×8 计，重负载下帧率很低也能打完。
+- `--coopplus-local-sim-start-wave=<W>`：从第 W 波开始（`DebugService.starting_wave`）；配合 `-waves=<21-W>` 打到第 20 波后进入结算（无敌的模拟玩家在计时结束时存活，算通关）。
+- `--coopplus-local-sim-kit=perf`：每人换成游戏自带的后期性能测试套装——6 把 4 级狙击枪与 20 个炮台类道具（`DebugService.PERF_SCENARIO_*`）；`-kit=weapons` 只给武器；`-kit=perf12` 给 12 把枪（状态条每行两排武器，检查版面的极端情况）。游戏的 `handle_player_spawn_debug_options` 只有 4 项数组，所以由模拟器自己添加。
+- 采样（每秒一次，写入 `local_sim.json` 的 `samples`）：波次、FPS、每帧处理与物理耗时（`process_ms`、`physics_ms`）、节点数、敌人数、建筑数。物理每步超过约 16.7 ms 时帧率会成倍下降（一帧要补多个物理步）；波次计时按真实时间走，帧率很低也能“打完”，所以可玩性看 FPS。
+
+```powershell
+pwsh ./tools/instance.ps1 -Action Start -Name sim -StopAfterSec 1500 -ExtraArgs "--audio-driver,Dummy,--coopplus-probe-quit,--coopplus-local-sim=12,--coopplus-local-sim-seconds=0,--coopplus-local-sim-start-wave=15,--coopplus-local-sim-waves=6,--coopplus-local-sim-kit=perf"
+```
+
+## 9 人以上的状态条翻页（D-015，EV-0044）
+
+状态条一次显示 7 名玩家时，检查步骤先跑 `VIEW_STEPS_WINDOWED`：`wheel_down`/`wheel_up` 把鼠标移到状态条中间并转一格滚轮，`rstick_down`/`rstick_up` 推一下右摇杆上下（轴 3），`set_row`/`set_page` 改存的滚动方式（与“设置 → 游戏操作”的开关同一个设置），商店里还用光标走过末行（逐个滚动与整页翻动各一次）。每步记录 `list_first`（第一行在列表里的位置）、`list_shown`（显示中的玩家编号）和 `list_scroll`。截图：`<界面>_list_`、`_wheel_page_`、`_wheel_page_end_`、`_stick_row_`、`_pad_edge_row_`、`_pad_edge_page_<N>p.png`。
+
+`--coopplus-local-sim-options-shot`：在标题界面打开游戏的设置菜单并切到“游戏操作”页，截图 `options_gameplay_<N>p.png`，再把本扩展的翻页开关关一次、开一次，记录每次存下的滚动方式（`local_sim.options`：开关是否在“分享合作战利品”下方、文字、是否开启、`saved`/`saved_after_toggle`/`saved_after_second_toggle`），然后照常开局。

@@ -45,7 +45,6 @@ const EXTENSIONS_INIT := [
 	"extensions/vanilla/popup_manager_ext.gd",
 	"extensions/vanilla/upgrades_ui_ext.gd",
 	"extensions/vanilla/debug_service_ext.gd",
-	"extensions/vanilla/coop_shop_ext.gd",
 	"extensions/vanilla/coop_end_run_ext.gd",
 	"extensions/vanilla/character_selection_ext.gd",
 	"extensions/vanilla/weapon_selection_ext.gd",
@@ -61,10 +60,16 @@ const EXTENSIONS_INIT := [
 	"extensions/bo/player_removal_manager_ext.gd",
 	"extensions/bo/state_snapshot_ext.gd",
 ]
-# Parent declares const REMOTE_PLACEHOLDER_PLAYER_TYPE = CoopService.PlayerType...
-# (INP-M02), which cannot compile while ModLoader._init runs.
+# Parents that cannot compile while ModLoader._init runs, before the autoloads
+# exist: online_player_slot_manager.gd declares const
+# REMOTE_PLACEHOLDER_PLAYER_TYPE = CoopService.PlayerType... (INP-M02);
+# base_shop.gd (under coop_shop.gd) has `var next_wave:= RunData.get_next_wave()`
+# since Brotato 1.2.0.1, and the type of a scene autoload's function is only
+# known once the autoload is instanced (the shop then failed to load and the
+# game crashed on entering it with 5+ players).
 const EXTENSIONS_ENTER_TREE := [
 	"extensions/bo/online_player_slot_manager_ext.gd",
+	"extensions/vanilla/coop_shop_ext.gd",
 ]
 
 const PROBE_FLAG := "--coopplus-probe"
@@ -158,6 +163,8 @@ func _ready() -> void:
 		add_child(patch)
 		# Which DLCs each player in the room has, for their icons (scripts/bo/dlc_roster.gd, D-014).
 		add_child(load(MOD_DIR.plus_file("scripts/bo/dlc_roster.gd")).new())
+		# How the player list scrolls in rooms of nine or more (ui/options_entry.gd, D-015).
+		add_child(load(MOD_DIR.plus_file("ui/options_entry.gd")).new())
 	if _probe_enabled:
 		_probe_log().event("coopplus.mod_main._ready", {"path": str(get_path())})
 		_add_probe_node("CoopPlusLifecycleProbe", "debug/lifecycle_probe.gd")

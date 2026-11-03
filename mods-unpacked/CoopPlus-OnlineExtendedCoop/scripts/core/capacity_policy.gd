@@ -7,7 +7,11 @@ extends Reference
 # Pure rules: no autoloads, no scene tree.
 
 const VANILLA_MAX_PLAYERS := 4
-const MAX_SUPPORTED_PLAYERS := 8
+# Every other limit (runtime gate, arena size, room choices, saved runs,
+# identity slots, colours, HUD layers) follows this one. 16: late waves stay
+# above about 40 FPS up to 14-16 players on a laptop RTX 5070 host, and drop
+# to single digits beyond (EV-0043, D-015).
+const MAX_SUPPORTED_PLAYERS := 16
 
 const REJECT_NONE := ""
 const REJECT_FULL := "session_full"

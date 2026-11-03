@@ -1,8 +1,9 @@
 extends "res://singletons/coop_service.gd"
 # CoopService data for 5..8 players (AP-006; R01, R02, R08, R14; INP-02,
 # INP-06, INP-09).
-#   - player_colors gets four more colours in _ready when extended mode is on
-#     (INP-09). It is an exported var holding four colours
+#   - player_colors gets a colour for every player up to the gate's capacity
+#     in _ready when extended mode is on (INP-09, D-015). It is an exported
+#     var holding four colours
 #     (coop_service.tscn:66) and is indexed without bounds checks by
 #     get_player_color (coop_service.gd:203) and directly (for example
 #     character_panel_ui.gd:159-160), in battle, HUD and menus alike, so one
@@ -40,6 +41,13 @@ const COOPPLUS_EXTRA_PLAYER_COLORS := [
 	Color("f7a8f1"),
 	Color("f7a8bc"),
 ]
+# Hues of P9..P16 in the same pastel band: in the gaps P1..P8 leave, away
+# from the CHARM blue (200) and CURSE violet (279), each next player far from
+# the one before (P9 green 126, P10 pink 325, P11 blue 235, P12 red 3,
+# P13 spring green 146, P14 yellow-lime 69, P15 cyan 183, P16 chartreuse 106).
+const COOPPLUS_MORE_PLAYER_HUES := [126, 325, 235, 3, 146, 69, 183, 106]
+const COOPPLUS_PASTEL_SATURATION := 0.32
+const COOPPLUS_PASTEL_VALUE := 0.97
 
 
 func _ready() -> void:
@@ -53,14 +61,25 @@ func _ready() -> void:
 		return
 	# Only the missing entries are added, so colours another mod appended stay.
 	var appended := 0
-	while colors.size() < capacity and colors.size() < COOPPLUS_VANILLA_COLOR_COUNT + COOPPLUS_EXTRA_PLAYER_COLORS.size():
-		colors.append(COOPPLUS_EXTRA_PLAYER_COLORS[colors.size() - COOPPLUS_VANILLA_COLOR_COUNT])
+	while colors.size() < capacity:
+		var extra := colors.size() - COOPPLUS_VANILLA_COLOR_COUNT
+		colors.append(COOPPLUS_EXTRA_PLAYER_COLORS[extra] if extra < COOPPLUS_EXTRA_PLAYER_COLORS.size() else _coopplus_more_color(extra - COOPPLUS_EXTRA_PLAYER_COLORS.size()))
 		appended += 1
 	if appended == 0:
 		return
 	# A new array: the old one may be shared with the scene's stored state.
 	player_colors = colors
 	ModLoaderLog.info("player colours extended to %d" % colors.size(), COOPPLUS_MOD_ID)
+
+
+# k-th colour after P8. Saturation and value first: a hue set on a grey
+# colour is lost (it has none).
+static func _coopplus_more_color(k: int) -> Color:
+	var color := Color(1, 0, 0)
+	color.s = COOPPLUS_PASTEL_SATURATION
+	color.v = COOPPLUS_PASTEL_VALUE
+	color.h = COOPPLUS_MORE_PLAYER_HUES[k % COOPPLUS_MORE_PLAYER_HUES.size()] / 360.0
+	return color
 
 
 # Parent: res://singletons/coop_service.gd:367 (connected by name in the

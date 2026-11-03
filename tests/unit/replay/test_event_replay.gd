@@ -165,8 +165,13 @@ func test_fixtures_replay_to_their_expectations() -> void:
 			assert_eq(again.digest_hash, r.digest_hash, "%s replays identically from its literal events" % path)
 
 
-func test_generated_runs_are_clean_for_one_to_eight_players() -> void:
-	for n in range(1, 9):
+# Every count up to eight, then the max itself (every count up to a high max
+# would make this slow).
+func test_generated_runs_are_clean_for_one_to_max_players() -> void:
+	var counts: Array = range(1, 9)
+	if not counts.has(CapacityPolicy.MAX_SUPPORTED_PLAYERS):
+		counts.append(CapacityPolicy.MAX_SUPPORTED_PLAYERS)
+	for n in counts:
 		var label: String = "%d players" % n
 		var fixture := _generated(n)
 		var r = _run(fixture)
@@ -347,7 +352,8 @@ func test_stale_replays_have_no_side_effects() -> void:
 func test_forged_player_index_is_rejected() -> void:
 	for n in [5, 8]:
 		var label: String = "%d players" % n
-		var f = _faulted(_generated(n), [{"kind": FaultInjection.FAULT_FORGE_INDEX, "rate": 0.5}])
+		var fixture := _generated(n)
+		var f = _faulted(fixture, [{"kind": FaultInjection.FAULT_FORGE_INDEX, "rate": 0.5}])
 		if f == null:
 			continue
 		assert_eq(f.run.committed_hash, f.clean.committed_hash, label + " committed state unchanged")
@@ -356,22 +362,30 @@ func test_forged_player_index_is_rejected() -> void:
 		assert_true(forged.size() > 2 * n, label + " forgeries: %d" % forged.size())
 		var reasons := {}
 		var types := {}
-		var ninth := 0
 		for e in forged:
 			var index = f.run.events[e.at].payload.player_index
 			var where: String = "%s forged eid %d index %s" % [label, e.eid, str(index)]
 			assert_eq(e.status, EventReplay.STATUS_REJECTED, where)
-			# Another seat: not owner; beyond the roster (8 = a ninth player): out of range.
+			# Another seat: not owner; beyond the roster (up to one past the max): out of range.
 			var expected: String = PayloadGuard.REASON_OUT_OF_RANGE if index >= n else ActionLedger.REASON_NOT_OWNER
 			assert_eq(e.reason, expected, where)
 			assert_has(FORGE_REASONS, e.reason, where)
 			reasons[e.reason] = true
 			types[e.type] = true
-			if index == CapacityPolicy.MAX_SUPPORTED_PLAYERS:
-				ninth += 1
 		assert_true(reasons.has(ActionLedger.REASON_NOT_OWNER) and reasons.has(PayloadGuard.REASON_OUT_OF_RANGE), label + " both reasons")
 		assert_true(types.has(EventReplay.TYPE_READY) and types.has(EventReplay.TYPE_ACTION), label + " both message types")
-		assert_true(ninth > 0, label + " a ninth player's index was forged")
+		if forged.empty():
+			continue
+		# The injector draws from every index up to one past the max, so with a
+		# high max a seed may never draw that one: forge it on the first copy.
+		var events: Array = f.run.events.duplicate(true)
+		var first: Dictionary = forged[0]
+		events[first.at].payload["player_index"] = CapacityPolicy.MAX_SUPPORTED_PLAYERS
+		var top = _run(EventReplay.with_events(fixture, events))
+		if top == null:
+			continue
+		_expect_log(top, first.at, EventReplay.STATUS_REJECTED, PayloadGuard.REASON_OUT_OF_RANGE, label + " index one past the max")
+		assert_eq(top.committed_hash, f.clean.committed_hash, label + " index one past the max changes nothing")
 
 
 func test_oversized_payloads_are_rejected() -> void:
@@ -515,7 +529,7 @@ func test_one_to_four_player_sequences_unaffected() -> void:
 		if vanilla == null or extended == null:
 			continue
 		assert_eq(vanilla.digest.rejections.size(), 0, label + " vanilla: " + _reasons_text(vanilla.digest.rejections))
-		assert_eq(extended.committed_hash, vanilla.committed_hash, label + " same committed state with capacity 4 and 8")
+		assert_eq(extended.committed_hash, vanilla.committed_hash, label + " same committed state with capacity 4 and the max")
 		assert_eq(extended.digest.counts[EventReplay.STATUS_APPLIED], vanilla.digest.counts[EventReplay.STATUS_APPLIED], label)
 		for fixture in [vanilla_fixture, extended_fixture]:
 			var f = _faulted(fixture, _benign_faults())

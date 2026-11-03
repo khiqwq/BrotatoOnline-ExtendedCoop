@@ -32,14 +32,13 @@ const ExtraPlayerPanels = preload("res://mods-unpacked/CoopPlus-OnlineExtendedCo
 const LocalFocusLayout = preload("res://mods-unpacked/CoopPlus-OnlineExtendedCoop/ui/local_focus_layout.gd")
 const SelectionView = preload("res://mods-unpacked/CoopPlus-OnlineExtendedCoop/ui/selection_view_controller.gd")
 const RoomPolicy = preload("res://mods-unpacked/CoopPlus-OnlineExtendedCoop/scripts/core/room_policy.gd")
+const CapacityPolicy = preload("res://mods-unpacked/CoopPlus-OnlineExtendedCoop/scripts/core/capacity_policy.gd")
 const DlcBadges = preload("res://mods-unpacked/CoopPlus-OnlineExtendedCoop/ui/dlc_badges.gd")
 const COOPPLUS_ROOM_REFRESH_SEC := 0.5
 const COOPPLUS_ROOM_TEXT := {
 	"zh": {"standard": "标准房间（4 人，原版兼容）", "extended": "扩展房间（%d 人）"},
 	"en": {"standard": "Standard room (4, vanilla compatible)", "extended": "Extended room (%d players)"},
 }
-# Dropdown order: standard, then extended 5..8.
-const COOPPLUS_ROOM_CHOICES := [["standard", 4], ["extended", 5], ["extended", 6], ["extended", 7], ["extended", 8]]
 
 const COOPPLUS_MOD_ID := "CoopPlus-OnlineExtendedCoop"
 const COOPPLUS_ROW_PATH := "MarginContainer/VBoxContainer/DescriptionContainer/HBoxContainer"
@@ -106,11 +105,12 @@ func _coopplus_add_room_button() -> void:
 	var button := OptionButton.new()
 	button.name = "CoopPlusRoomType"
 	button.focus_mode = Control.FOCUS_ALL
-	for choice in COOPPLUS_ROOM_CHOICES:
+	var choices := _coopplus_room_choices()
+	for choice in choices:
 		button.add_item(texts.standard if choice[0] == RoomPolicy.TYPE_STANDARD else texts.extended % choice[1])
 	var pref: Dictionary = RoomPolicy.load_preference()
-	for i in COOPPLUS_ROOM_CHOICES.size():
-		if COOPPLUS_ROOM_CHOICES[i][0] == pref.type and COOPPLUS_ROOM_CHOICES[i][1] == pref.capacity:
+	for i in choices.size():
+		if choices[i][0] == pref.type and choices[i][1] == pref.capacity:
 			button.select(i)
 	if _zone_selection_button != null:
 		# Same look as the zone dropdown above it (its font and styles are scene overrides).
@@ -137,9 +137,18 @@ static func _coopplus_copy_overrides(source: Control, target: Control) -> void:
 
 
 func _coopplus_on_room_selected(index: int) -> void:
-	if index < 0 or index >= COOPPLUS_ROOM_CHOICES.size() or RuntimeGate.room_capacity() > 0:
+	var choices := _coopplus_room_choices()
+	if index < 0 or index >= choices.size() or RuntimeGate.room_capacity() > 0:
 		return
-	RoomPolicy.save_preference({"type": COOPPLUS_ROOM_CHOICES[index][0], "capacity": COOPPLUS_ROOM_CHOICES[index][1]})
+	RoomPolicy.save_preference({"type": choices[index][0], "capacity": choices[index][1]})
+
+
+# Dropdown order: standard, then extended 5..the supported maximum.
+static func _coopplus_room_choices() -> Array:
+	var out := [[RoomPolicy.TYPE_STANDARD, CapacityPolicy.VANILLA_MAX_PLAYERS]]
+	for n in range(RoomPolicy.MIN_EXTENDED, CapacityPolicy.MAX_SUPPORTED_PLAYERS + 1):
+		out.append([RoomPolicy.TYPE_EXTENDED, n])
+	return out
 
 
 func _coopplus_on_players_updated(_players: Array) -> void:

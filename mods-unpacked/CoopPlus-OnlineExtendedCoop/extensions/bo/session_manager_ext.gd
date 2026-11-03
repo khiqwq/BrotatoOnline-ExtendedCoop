@@ -50,9 +50,9 @@ const COOPPLUS_ROOM_TEXT := {
 		"extension_required": "这是超四人扩展房间，需要安装同一版本的超四人联机合作扩展才能加入。",
 	},
 	"en": {
-		"extended_room_unsupported": "This is an extended (5-8 player) room; the extension on this PC is off or unverified.",
-		"capability_mismatch": "This is an extended (5-8 player) room running a different extension version.",
-		"extension_required": "This is an extended (5-8 player) room; joining needs the same version of the extension.",
+		"extended_room_unsupported": "This is an extended (5+ player) room; the extension on this PC is off or unverified.",
+		"capability_mismatch": "This is an extended (5+ player) room running a different extension version.",
+		"extension_required": "This is an extended (5+ player) room; joining needs the same version of the extension.",
 	},
 }
 # Extension messages (all start with coopplus_, capability.gd MSG_PREFIX) and
@@ -165,9 +165,11 @@ func _coopplus_steam_room_verdict(lobby_id) -> Dictionary:
 func _is_lobby_protocol_compatible(lobby_id) -> bool:
 	if ._is_lobby_protocol_compatible(lobby_id):
 		return true
-	# Same game-version rule as Brotato Online 6.6.7+ (protocol.gd is_compatible).
+	# Same game-version rule as Brotato Online (protocol.gd is_compatible since
+	# protocol 6.3.0: the lobby's game version equals this game's).
+	var local_version: String = Protocol.get_game_version()
 	return _steam != null and str(_steam.getLobbyData(lobby_id, "mod_version")) == _coopplus_mod_version_marker() \
-			and str(_steam.getLobbyData(lobby_id, "game_version")) == Protocol.GAME_VERSION and Protocol.get_game_version() == Protocol.GAME_VERSION
+			and local_version != "" and str(_steam.getLobbyData(lobby_id, "game_version")) == local_version
 
 
 # Steam capability check (AP-009). Clients without the extension refuse an

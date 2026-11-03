@@ -1,6 +1,7 @@
 extends "res://tests/runner/test_case.gd"
 
 const PayloadGuard = preload("res://mods-unpacked/CoopPlus-OnlineExtendedCoop/scripts/network/payload_guard.gd")
+const CapacityPolicy = preload("res://mods-unpacked/CoopPlus-OnlineExtendedCoop/scripts/core/capacity_policy.gd")
 
 const BUY_SCHEMA := {
 	"type": "dict",
@@ -101,13 +102,14 @@ func test_player_index_outside_roster_is_rejected() -> void:
 			_expect(_buy(index), PayloadGuard.REASON_OUT_OF_RANGE, "player_index", "roster %d index %d" % [n, index], BUY_SCHEMA, _ctx(n))
 
 
-func test_ninth_player_index_rejected_with_full_roster() -> void:
-	_expect(_buy(8), PayloadGuard.REASON_OUT_OF_RANGE, "player_index", "P9 on a roster of 8", BUY_SCHEMA, _ctx(8))
-	assert_true(guard.validate(_buy(7), BUY_SCHEMA, _ctx(8)).ok, "P8 is legal")
+func test_player_index_one_past_max_rejected_with_full_roster() -> void:
+	var max_players := CapacityPolicy.MAX_SUPPORTED_PLAYERS
+	_expect(_buy(max_players), PayloadGuard.REASON_OUT_OF_RANGE, "player_index", "P%d on a roster of %d" % [max_players + 1, max_players], BUY_SCHEMA, _ctx(max_players))
+	assert_true(guard.validate(_buy(max_players - 1), BUY_SCHEMA, _ctx(max_players)).ok, "P%d is legal" % max_players)
 
 
 func test_bad_roster_context_is_rejected() -> void:
-	for context in [{}, _ctx(0), _ctx(9), _ctx(-1), _ctx("5"), _ctx(5.0), _ctx(null), [], "roster", 5]:
+	for context in [{}, _ctx(0), _ctx(CapacityPolicy.MAX_SUPPORTED_PLAYERS + 1), _ctx(-1), _ctx("5"), _ctx(5.0), _ctx(null), [], "roster", 5]:
 		var r = guard.validate(_buy(0), BUY_SCHEMA, context)
 		assert_false(r.ok, var2str(context))
 		assert_eq(r.reason, PayloadGuard.REASON_BAD_CONTEXT, var2str(context))

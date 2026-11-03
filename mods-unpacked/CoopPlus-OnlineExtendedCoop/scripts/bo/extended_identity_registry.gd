@@ -9,8 +9,9 @@ extends "res://mods-unpacked/six666-BrotatoOnline/scripts/player_identity_regist
 # slot pairs unique across all chunks. No parent code is restated.
 
 const BASE_PATH := "res://mods-unpacked/six666-BrotatoOnline/scripts/player_identity_registry.gd"
+const CapacityPolicy = preload("res://mods-unpacked/CoopPlus-OnlineExtendedCoop/scripts/core/capacity_policy.gd")
 const CHUNK := 4
-const MAX_SLOTS := 8
+const MAX_SLOTS := CapacityPolicy.MAX_SUPPORTED_PLAYERS
 
 
 func load_metadata(metadata, player_count: int) -> bool:

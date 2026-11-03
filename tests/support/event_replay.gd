@@ -30,9 +30,11 @@ extends Reference
 # cannot quietly drop a field. JSON: load_fixture() turns every integral
 # number into an int (parse_json gives floats); write {"$float": 2} for 2.0.
 #
-# SESSION, all optional: capacity 8, session_id "session", start_gold 30,
-#   device_candidates [1, 2, 3, 4, 5, 0, 8, 9, 10, 11] and device_reserved
-#   [6, 7] (placeholders until the upstream audit), hint_after_msec 10000 and
+# SESSION, all optional: capacity CapacityPolicy.MAX_SUPPORTED_PLAYERS,
+#   session_id "session", start_gold 30, device_candidates
+#   [1, 2, 3, 4, 5, 0, 8, 9, 10, 11] (placeholders until the upstream audit)
+#   followed by 16, 17, ... so a full session at the max seats every remote,
+#   device_reserved [6, 7], hint_after_msec 10000 and
 #   timeout_msec 30000 (R18), ledger_max_entries 512,
 #   ledger_max_entries_per_sender 64. Values are handed to the modules, which
 #   judge them (an invalid capacity gives an invalid registry, not an error).
@@ -289,11 +291,16 @@ func run(fixture) -> Dictionary:
 
 
 static func default_session() -> Dictionary:
+	# The placeholders keep their allocation order; the ids appended from 16
+	# (the runtime gate's virtual device base) cover the remotes past them.
+	var candidates := [1, 2, 3, 4, 5, 0, 8, 9, 10, 11]
+	for id in range(16, 16 + CapacityPolicy.MAX_SUPPORTED_PLAYERS - 1):
+		candidates.append(id)
 	return {
 		"capacity": CapacityPolicy.MAX_SUPPORTED_PLAYERS,
 		"session_id": "session",
 		"start_gold": DEFAULT_START_GOLD,
-		"device_candidates": [1, 2, 3, 4, 5, 0, 8, 9, 10, 11],
+		"device_candidates": candidates,
 		"device_reserved": [6, 7],
 		"hint_after_msec": ReadyBarrier.DEFAULT_HINT_AFTER_MSEC,
 		"timeout_msec": ReadyBarrier.DEFAULT_TIMEOUT_MSEC,
@@ -439,7 +446,7 @@ static func check_fixture(fixture) -> Dictionary:
 # per player, start_wave barrier) -> next wave. Every advance after a barrier
 # requires its key. Messages are authored; the senders' messages interleave
 # randomly but each sender's order is kept. Same arguments, same fixture.
-static func generate_fixture(player_count: int, waves: int, seed_value: int, capacity: int = 8) -> Dictionary:
+static func generate_fixture(player_count: int, waves: int, seed_value: int, capacity: int = CapacityPolicy.MAX_SUPPORTED_PLAYERS) -> Dictionary:
 	var rng := RandomNumberGenerator.new()
 	rng.seed = seed_value
 	var ids := []

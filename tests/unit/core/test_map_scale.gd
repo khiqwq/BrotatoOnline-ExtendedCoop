@@ -1,6 +1,7 @@
 extends "res://tests/runner/test_case.gd"
 
 const MapScale = preload("res://mods-unpacked/CoopPlus-OnlineExtendedCoop/scripts/core/map_scale.gd")
+const CapacityPolicy = preload("res://mods-unpacked/CoopPlus-OnlineExtendedCoop/scripts/core/capacity_policy.gd")
 
 
 func test_one_to_four_players_keep_the_zone_size() -> void:
@@ -19,8 +20,11 @@ func test_five_to_eight_players_keep_the_four_player_area_per_player() -> void:
 		assert_true(abs(area_per_player - 32 * 24 / 4.0) < 12.0, "area per player %d: %f" % [n, area_per_player])
 
 
-func test_counts_past_eight_use_eight() -> void:
-	assert_eq(MapScale.side_factor(12), MapScale.side_factor(8))
+func test_counts_past_max_use_max() -> void:
+	var max_players := CapacityPolicy.MAX_SUPPORTED_PLAYERS
+	assert_eq(MapScale.side_factor(max_players + 1), MapScale.side_factor(max_players))
+	assert_eq(MapScale.side_factor(max_players + 4), MapScale.side_factor(max_players))
+	assert_true(MapScale.side_factor(max_players) > MapScale.side_factor(max_players - 1), "the max itself still grows the arena")
 
 
 func test_never_shrinks_a_small_map() -> void:

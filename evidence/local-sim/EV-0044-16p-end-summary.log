@@ -1,0 +1,6 @@
+EV-0044 16 players, waves 19-20 at the game's own lengths, perf kit, Brotato 1.2.0.1 + Brotato Online 11-04 (protocol 6.3.0)
+== dlc-w16-end: reached:coop_end_run.tscn after 2 waves players=16; script errors 3 (benign preload 3)
+   wave  n   fps(med/min)  frame_ms(med/max)  physics_ms(med/max)  enemies(max)  structures  nodes(max)
+     19  78      34/3          12.4/165.5         17.3/59.1           143          320      36379
+     20  88      33/5           8.7/1646.0        16.6/44.8           107          320      35805
+   process: 812 MB peak, 259 s CPU; wall 269 s

@@ -4,7 +4,11 @@ Only autoload names and the global class registry are carried over. Autoloads po
 at stubs so recovered scripts can be compiled without running any game singleton
 code. With <recovered root>, each autoload gets its own stub carrying the real
 script's top-level enums and literal constants (needed by upstream const
-expressions such as CoopService.PlayerType.GAMEPAD_XBOX); otherwise one empty stub.
+expressions such as CoopService.PlayerType.GAMEPAD_XBOX) and, for each public
+function with a declared return type, a function of that name and return type
+whose parameters are all optional (needed by type inference such as
+`var next_wave:= RunData.get_next_wave()`, Brotato 1.2.0.1 base_shop.gd);
+otherwise one empty stub.
 
 Usage: python -I project_binary.py <project.binary> <out project.godot> <out settings.json> [recovered root]
 """
@@ -23,6 +27,42 @@ EXT_SCRIPT_RE = re.compile(r'\[ext_resource path="res://([^"]+)" type="Script" i
 ROOT_NODE_RE = re.compile(r'\[node name="[^"]+"(?![^\]]*parent=)[^\]]*\](.*?)(?:\n\[|\Z)', re.S)
 NODE_SCRIPT_RE = re.compile(r"^script = ExtResource\( (\d+) \)", re.M)
 LITERAL_WORDS = {"true", "false", "null", "INF", "NAN", "PI", "TAU"}
+FUNC_RE = re.compile(r"^(static\s+)?func\s+([A-Za-z]\w*)\s*\((.*)\)\s*->\s*(\w+)\s*:", re.S)
+# Return values for the stubs' functions; a global class returns null, and a
+# function returning any other type (an inner class) is left untyped.
+TYPE_DEFAULTS = {"int": "0", "float": "0.0", "bool": "false", "String": '""', "Array": "[]", "Dictionary": "{}"}
+BUILTIN_TYPES = {"Vector2", "Vector3", "Rect2", "Transform2D", "Plane", "Quat", "AABB", "Basis", "Transform",
+                 "Color", "NodePath", "RID", "PoolByteArray", "PoolIntArray", "PoolRealArray", "PoolStringArray",
+                 "PoolVector2Array", "PoolVector3Array", "PoolColorArray"}
+
+
+# One stub function per public typed function; `header` is the full signature
+# (possibly over several lines). Parameters become a0, a1, ... = null.
+def _stub_function(header, class_names):
+    m = FUNC_RE.match(header)
+    if not m or m.group(4) == "void":
+        return None
+    depth, count, token = 0, 0, False
+    for ch in m.group(3):
+        if ch in "([{":
+            depth += 1
+        elif ch in ")]}":
+            depth -= 1
+        elif ch == "," and depth == 0:
+            count += 1
+            token = False
+            continue
+        if not ch.isspace():
+            token = True
+    count += 1 if token else 0
+    params = ", ".join("a%d = null" % k for k in range(count))
+    ret = m.group(4)
+    if ret in TYPE_DEFAULTS or ret in BUILTIN_TYPES:
+        value = TYPE_DEFAULTS.get(ret, ret + "()")
+    else:
+        value = "null"
+    typed = " -> " + ret if ret in TYPE_DEFAULTS or ret in BUILTIN_TYPES or ret in class_names else ""
+    return ["%sfunc %s(%s)%s:" % (m.group(1) or "", m.group(2), params, typed), "\treturn " + value]
 
 
 def decode(buf, p):
@@ -136,7 +176,7 @@ def _script_of_autoload(root, res_path):
     return ext.get(sm.group(1)) if sm else None
 
 
-def make_stub(root, name, res_path, stub_dir):
+def make_stub(root, name, res_path, stub_dir, class_names=()):
     rel = _script_of_autoload(root, res_path)
     if not rel:
         return None
@@ -144,11 +184,20 @@ def make_stub(root, name, res_path, stub_dir):
     if not os.path.exists(path):
         return None
     lines = open(path, encoding="utf-8").read().split("\n")
-    out = ["extends Node", "# Validation stub for autoload %s (%s): top-level enums and literal consts only." % (name, rel)]
+    out = ["extends Node", "# Validation stub for autoload %s (%s): top-level enums, literal consts and typed public function signatures." % (name, rel)]
+    functions = []
     i = 0
     while i < len(lines):
         line = lines[i]
-        if line.startswith("enum "):
+        if re.match(r"^(static\s+)?func\s+[A-Za-z]", line):
+            header = line
+            while header.count("(") > header.count(")") and i + 1 < len(lines):
+                i += 1
+                header += "\n" + lines[i]
+            stub = _stub_function(header, class_names)
+            if stub:
+                functions.extend([""] + stub)
+        elif line.startswith("enum "):
             block = [line]
             depth = line.count("{") - line.count("}")
             while depth > 0 and i + 1 < len(lines):
@@ -161,6 +210,7 @@ def make_stub(root, name, res_path, stub_dir):
             if m and _is_literal(m.group(3)):
                 out.append(line)
         i += 1
+    out.extend(functions)
     os.makedirs(stub_dir, exist_ok=True)
     with open(os.path.join(stub_dir, name + ".gd"), "w", encoding="utf-8", newline="\n") as f:
         f.write("\n".join(out) + "\n")
@@ -188,7 +238,8 @@ def main():
             name = k[len("autoload/"):]
             stub = None
             if root:
-                stub = make_stub(root, name, str(settings[k]).lstrip("*"), os.path.join(root, "__validation__", "stubs"))
+                stub = make_stub(root, name, str(settings[k]).lstrip("*"), os.path.join(root, "__validation__", "stubs"),
+                                 {c["class"] for c in classes})
             stubs += 1 if stub else 0
             lines.append('%s="*%s"' % (name, stub or STUB))
     lines.append("")

@@ -33,7 +33,9 @@ const RuntimeGate = preload("res://mods-unpacked/CoopPlus-OnlineExtendedCoop/scr
 const CapacityPolicy = preload("res://mods-unpacked/CoopPlus-OnlineExtendedCoop/scripts/core/capacity_policy.gd")
 
 const COOPPLUS_MOD_ID := "CoopPlus-OnlineExtendedCoop"
-# Vanilla grid columns are 100 px apart; P5..P8 use the next two columns.
+# Vanilla grid columns are 100 px apart; every further group of four players
+# takes the next two columns, alternating right and left (P5..P8 right,
+# P9..P12 left, P13..P16 further right, ...), so the start stays centred.
 const COOPPLUS_EXTRA_PLAYER_X_OFFSET := 200.0
 
 
@@ -51,7 +53,9 @@ func _init() -> void:
 # position through args.position; only P5..P8 are moved.
 func spawn_entity(scene: PackedScene, args: SpawnEntityArgs, data: Resource = null, source = null, charmed_by: int = -1) -> KinematicBody2D:
 	if RuntimeGate.is_extended() and args != null and args.type == EntityType.PLAYER and args.player_index >= CapacityPolicy.VANILLA_MAX_PLAYERS:
-		args.position.x += COOPPLUS_EXTRA_PLAYER_X_OFFSET
+		var group := int(args.player_index / CapacityPolicy.VANILLA_MAX_PLAYERS)
+		var side := 1.0 if group % 2 == 1 else -1.0
+		args.position.x += side * COOPPLUS_EXTRA_PLAYER_X_OFFSET * ceil(group / 2.0)
 	return .spawn_entity(scene, args, data, source, charmed_by)
 
 

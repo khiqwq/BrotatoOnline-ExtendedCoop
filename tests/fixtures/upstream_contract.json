@@ -272,9 +272,8 @@
         "is_compatible": 2
       },
       "constants": {
-        "NETWORK_PROTOCOL_VERSION": "\"6.2.0\"",
-        "LAN_PROTOCOL_VERSION": "4",
-        "GAME_VERSION": "\"1.2.0.0\""
+        "NETWORK_PROTOCOL_VERSION": "\"6.3.0\"",
+        "LAN_PROTOCOL_VERSION": "4"
       }
     },
     "res://ui/menus/global/popup_manager.gd": {

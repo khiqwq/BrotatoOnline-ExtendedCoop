@@ -26,7 +26,9 @@ func _read_lobby_entry(lobby_id: int) -> Dictionary:
 	var meta := {}
 	for key in [RoomPolicy.META_TYPE, RoomPolicy.META_CAPACITY, RoomPolicy.META_CAPABILITY]:
 		meta[key] = str(_steam.getLobbyData(lobby_id, key))
-	var compatible := _coopplus_can_join(meta) and str(_steam.getLobbyData(lobby_id, "game_version")) == GAME_VERSION
+	# Game-version rule of protocol.gd is_compatible (Brotato Online protocol 6.3.0).
+	var local_version: String = Protocol.get_game_version()
+	var compatible := _coopplus_can_join(meta) and local_version != "" and str(_steam.getLobbyData(lobby_id, "game_version")) == local_version
 	var state := str(entry.get("state", ""))
 	var host_id := str(entry.get("host_id", ""))
 	entry["compatible"] = compatible

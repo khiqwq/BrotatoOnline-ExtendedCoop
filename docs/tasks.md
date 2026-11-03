@@ -23,7 +23,7 @@
 | AP-017 | 完成断线/继续/移除 | DEV | VERIFY | 继续：BO 身份管理器在继续界面运行时调整（超过 4 槽的登记表、面板加高、4 人以上禁用离线继续，`scripts/bo/resume_identity_patch.gd`）。移除：客户端重建名单后补齐逐玩家数组（GAP1-02、SAVE-13、DATA-15，`extensions/bo/player_removal_manager_ext.gd`）；房主端压缩保持数组长度、身份表 compact 支持任意人数，单机重放 8→7、6→5 通过（EV-0037）。断线重连：沿用 BO 保留断线者槽位与身份校验（R11）；与人数有关的部分已处理——准入只对新成员按房间容量限制（`_remote_connection_rejection_reason`）、客户端显示全部断线者（CAP-16）、LAN 留重连余量（CAP-05）、回来的玩家拿回原虚拟设备（F03）。BO 自身与人数无关的行为未改：开局/重试屏障等待断线者（NET-13、GAP2-04）、LAN 新连接与旧连接并存时判 duplicate_identity（CAP-M01）、移除后客户端 tracked_item_effects 不左移（GAP1-03）。待：多机联机实测（M1） 断线者的角色：房主端在其断线 3 秒后按 Brotato Online 的“客户端报告死亡”处理，重新挑战不再出现无敌角色（`extensions/bo/state_snapshot_ext.gd`，只能联机验证）。 |
 | AP-018 | 跑完 18 类故障 | QA | TODO | |
 | AP-019 | 验证内容与 Mod 组合 | QA | IN_PROGRESS | DLC（D-014）：不限制，没装 DLC 的玩家也能玩开了 DLC 的局（Brotato Online 的内容注册）；面板与状态条显示各人 DLC 图标。本地模拟通过（EV-0042）；待：多机联机实测（没装 DLC 的客户端进开了 DLC 的局、图标名单传送）。 |
-| AP-020 | 分析八人性能 | DEV | TODO | |
+| AP-020 | 分析八人性能 | DEV | IN_PROGRESS | 单机模拟（房主负载，未含网络带宽）：每人后期炮台套装，第 15～20 波 8 人 260～290 FPS、12 人 94～163、14 人 40～120、16 人最后几波 6～7、24/32 人 1～4，全程无崩溃；只带武器时 16 人敌人堆积到约 300 只、3～11 FPS（EV-0043）。据此上限定为 16（D-015）。待：多台电脑联机时的带宽与延迟 |
 | AP-021 | 完整验收与长测 | QA | TODO | |
 | AP-022 | 完成可复现打包与 CI | DEV | TODO | 确定性 zip 与白名单函数已在 `tools/lib/Common.psm1`（开发实例使用） |
 | AP-023 | 冻结 RC 并交付 | QA/OWNER | TODO | |

@@ -184,7 +184,7 @@ func test_invalid_setup_refuses_everything() -> void:
 		SlotRegistry.new(CapacityPolicy.new(8), null),
 		SlotRegistry.new(null, good_pool),
 		SlotRegistry.new(good_pool, CapacityPolicy.new(8)),
-		SlotRegistry.new(CapacityPolicy.new(9), good_pool),
+		SlotRegistry.new(CapacityPolicy.new(CapacityPolicy.MAX_SUPPORTED_PLAYERS + 1), good_pool),
 		SlotRegistry.new(CapacityPolicy.new(0), good_pool),
 		SlotRegistry.new(CapacityPolicy.new(8), VirtualDevicePool.new([1, 1], [])),
 	]
@@ -686,7 +686,7 @@ func test_deserialize_rejects_bad_checkpoints_and_keeps_state() -> void:
 	small.capacity = 2
 	cases.append([small, SlotRegistry.REASON_OVER_CAPACITY])
 	var bad_capacity := good.duplicate(true)
-	bad_capacity.capacity = 9
+	bad_capacity.capacity = CapacityPolicy.MAX_SUPPORTED_PLAYERS + 1
 	cases.append([bad_capacity, SlotRegistry.REASON_MALFORMED])
 	cases.append([_checkpoint([_row(0, "a", 0), _row(0, "b", 1)]), SlotRegistry.REASON_INVARIANT_VIOLATION])
 	cases.append([_checkpoint([_row(0, "a", 0), _row(1, "b", 0)]), SlotRegistry.REASON_INVARIANT_VIOLATION])

@@ -25,11 +25,23 @@ extends VBoxContainer
 # The strip is the focus mode of ui/panel_view_controller.gd (D-012), which
 # calls leave_focus_mode/enter_focus_mode around the four-panel mode; the hint
 # under the rows names the key that switches.
+# With more than VISIBLE_ROWS rows (nine players or more) the strip shows
+# VISIBLE_ROWS of them at a time (as many as an eight-player room has, which
+# fit every screen; END_RUN_WINDOW_ROWS on the end-of-run screen) between two
+# lines naming the players above and below. A row grows to two lines of
+# weapons from seven weapons on; while the strip runs past the bottom of the
+# screen it shows one row fewer (_fit_window, at least MIN_WINDOW_ROWS).
+# scroll_rows moves the window: a whole page of new rows, or one row so the
+# top one leaves as the next comes in, as chosen per PC (load_scroll_mode,
+# the game's Gameplay options, ui/options_entry.gd). ui/panel_view_controller.gd
+# calls it for the mouse wheel over the strip and the right stick, and
+# step_focus when the local cursor moves past the first or last shown row.
 # Fonts and panel styles come from the screen's theme. Layout only: it never
 # changes game state.
 
 const PanelPopups = preload("res://mods-unpacked/CoopPlus-OnlineExtendedCoop/ui/panel_popups.gd")
 const DlcBadges = preload("res://mods-unpacked/CoopPlus-OnlineExtendedCoop/ui/dlc_badges.gd")
+const ListWindow = preload("res://mods-unpacked/CoopPlus-OnlineExtendedCoop/scripts/core/list_window.gd")
 
 const MODE_SHOP := "shop"
 const MODE_UPGRADES := "upgrades"
@@ -49,10 +61,23 @@ const SELECTED_BORDER := 6
 # upgrade screen would show the HUD blocks of P2..P8 through the rows
 # (EV-0025), so rows are made close to opaque.
 const ROW_MIN_BG_ALPHA := 0.95
+const VISIBLE_ROWS := 7
+# End-of-run rows are taller (two lines of weapons from seven on) and the
+# screen starts lower: with the two lines naming the other players and the
+# scroll hint, seven rows ran past the bottom of a 1080 px screen.
+const END_RUN_WINDOW_ROWS := 6
+const MIN_WINDOW_ROWS := 3
+const SCROLL_PAGE := ListWindow.MODE_PAGE
+const SCROLL_ROW := ListWindow.MODE_ROW
+const PREFS_PATH := "user://coopplus_view.cfg"
+const PREFS_SECTION := "view"
+const PREFS_SCROLL_KEY := "list_scroll"
+const MORE_FONT_SIZE := 26
+const MORE_HEIGHT := 34.0
 
 const TEXT := {
-	"zh": {"ready": "已准备", "shopping": "选购中", "choosing": "选择中", "done": "已完成", "level": "等级 %d", "weapons": "武器 %d", "items": "道具 %d", "hint": "选择玩家可展开或收起其面板", "toggle": "V / 手柄 Back 键：四人视图", "selected": "已选择"},
-	"en": {"ready": "Ready", "shopping": "Shopping", "choosing": "Choosing", "done": "Done", "level": "LV.%d", "weapons": "Weapons %d", "items": "Items %d", "hint": "Select a player to show or hide their panel", "toggle": "V / gamepad Back: four-panel view", "selected": "Picked"},
+	"zh": {"ready": "已准备", "shopping": "选购中", "choosing": "选择中", "done": "已完成", "level": "等级 %d", "weapons": "武器 %d", "items": "道具 %d", "hint": "选择玩家可展开或收起其面板", "toggle": "V / 手柄 Back 键：四人视图", "selected": "已选择", "scroll": "鼠标滚轮 / 右摇杆：翻看更多玩家"},
+	"en": {"ready": "Ready", "shopping": "Shopping", "choosing": "Choosing", "done": "Done", "level": "LV.%d", "weapons": "Weapons %d", "items": "Items %d", "hint": "Select a player to show or hide their panel", "toggle": "V / gamepad Back: four-panel view", "selected": "Picked", "scroll": "Mouse wheel / right stick: more players"},
 }
 
 var _screen: Node = null
@@ -60,10 +85,34 @@ var _mode := MODE_SHOP
 # player_index -> {panel, texts, title, status, weapons, weapons_key, style, selected_style, button}
 var _rows := {}
 var _refresh_left := 0.0
+# Players in row order, and the index in it of the first shown row.
+var _order := []
+var _first := 0
+var _window := VISIBLE_ROWS
+# Lines above and below the rows naming the players out of view (windowed only).
+var _more_above: HBoxContainer = null
+var _more_below: HBoxContainer = null
+var _more_font: Font = null
 # Set by enable_view: {row, panels, local, stretch, popups}.
 var _view := {}
 var _viewed := -1
 var _hint: Label = null
+
+
+static func load_scroll_mode() -> String:
+	var config := ConfigFile.new()
+	if config.load(PREFS_PATH) != OK:
+		return SCROLL_PAGE
+	var value := str(config.get_value(PREFS_SECTION, PREFS_SCROLL_KEY, SCROLL_PAGE))
+	return value if value in [SCROLL_PAGE, SCROLL_ROW] else SCROLL_PAGE
+
+
+# Same file as the display mode (panel_view_controller.gd PREFS_PATH).
+static func save_scroll_mode(mode: String) -> void:
+	var config := ConfigFile.new()
+	var _r = config.load(PREFS_PATH)
+	config.set_value(PREFS_SECTION, PREFS_SCROLL_KEY, mode)
+	var _s = config.save(PREFS_PATH)
 
 
 func setup(screen: Node, mode: String, player_indices: Array) -> void:
@@ -75,8 +124,15 @@ func setup(screen: Node, mode: String, player_indices: Array) -> void:
 	size_flags_vertical = Control.SIZE_FILL
 	alignment = BoxContainer.ALIGN_CENTER
 	add_constant_override("separation", 8 if _compact() else 12)
+	_order = player_indices.duplicate()
+	_window = END_RUN_WINDOW_ROWS if _mode == MODE_END_RUN else VISIBLE_ROWS
+	if is_windowed():
+		_more_above = _build_more_line("MoreAbove")
 	for player_index in player_indices:
 		_rows[player_index] = _build_row(player_index)
+	if is_windowed():
+		_more_below = _build_more_line("MoreBelow")
+		_apply_window()
 	_hint = Label.new()
 	_hint.name = "Hint"
 	_hint.align = Label.ALIGN_CENTER
@@ -124,12 +180,145 @@ func enter_focus_mode() -> void:
 	_link_shop_items()
 
 
+func is_windowed() -> bool:
+	return _order.size() > VISIBLE_ROWS
+
+
+# Moves the shown rows by one page or one row (load_scroll_mode) towards the
+# end (dir 1) or the start (-1). False when already at that end.
+func scroll_rows(dir: int) -> bool:
+	if not is_windowed() or dir == 0:
+		return false
+	var first: int = ListWindow.scrolled(_first, _order.size(), _window_rows(), dir, load_scroll_mode())
+	if first == _first:
+		return false
+	var focused_slot := _local_focused_slot()
+	_first = first
+	_apply_window()
+	if focused_slot >= 0:
+		# The local cursor stays on the same place in the list.
+		_focus_row(int(min(_first + focused_slot, _last_shown())))
+	return true
+
+
+# Local cursor on the first shown row moving up, or on the last one moving
+# down, with more rows that way: scrolls and puts the cursor on the next row.
+func step_focus(dir: int) -> bool:
+	var slot := _local_focused_slot()
+	if slot < 0 or not is_windowed():
+		return false
+	var to := _first + slot + dir
+	if to < 0 or to >= _order.size() or (to >= _first and to <= _last_shown()):
+		return false
+	_first = ListWindow.revealing(_first, _order.size(), _window_rows(), to, load_scroll_mode())
+	_apply_window()
+	_focus_row(to)
+	return true
+
+
+func _last_shown() -> int:
+	return ListWindow.last_shown(_first, _order.size(), _window_rows())
+
+
+# Rows shown at once once the list is windowed.
+func _window_rows() -> int:
+	return _window
+
+
+# One row fewer while the strip's bottom is below the screen's (taller rows
+# than the window was sized for). Never grows back on the same screen, so it
+# cannot flip between two sizes.
+func _fit_window() -> void:
+	if not is_windowed() or _window <= MIN_WINDOW_ROWS or not is_visible_in_tree():
+		return
+	if get_global_rect().end.y <= get_viewport_rect().size.y + 0.5:
+		return
+	_window -= 1
+	_apply_window()
+
+
+func _apply_window() -> void:
+	for k in _order.size():
+		_rows[_order[k]].panel.visible = k >= _first and k <= _last_shown()
+	_fill_more_line(_more_above, _order.slice(0, _first - 1) if _first > 0 else [], "▲")
+	_fill_more_line(_more_below, _order.slice(_last_shown() + 1, _order.size() - 1) if _last_shown() + 1 < _order.size() else [], "▼")
+	_link_shop_items()
+
+
+# Same height with or without players named, so the rows do not move.
+func _build_more_line(line_name: String) -> HBoxContainer:
+	if _more_font == null:
+		var base_font = get_font("font", "Label")
+		if base_font is DynamicFont:
+			_more_font = base_font.duplicate()
+			_more_font.size = MORE_FONT_SIZE
+	var line := HBoxContainer.new()
+	line.name = line_name
+	line.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	line.alignment = BoxContainer.ALIGN_CENTER
+	line.rect_min_size = Vector2(0, MORE_HEIGHT)
+	line.add_constant_override("separation", 10)
+	add_child(line)
+	return line
+
+
+func _fill_more_line(line: HBoxContainer, players: Array, arrow: String) -> void:
+	if line == null:
+		return
+	for child in line.get_children():
+		line.remove_child(child)
+		child.queue_free()
+	if players.empty():
+		return
+	line.add_child(_more_label(arrow, Color.white))
+	for player_index in players:
+		line.add_child(_more_label(str(player_index + 1), CoopService.get_player_color(player_index)))
+
+
+func _more_label(text: String, color: Color) -> Label:
+	var label := Label.new()
+	label.text = text
+	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	label.add_color_override("font_color", color)
+	if _more_font != null:
+		label.add_font_override("font", _more_font)
+	return label
+
+
+# Shown-row position (0 = first shown) of the row whose button holds the local
+# cursor, or -1.
+func _local_focused_slot() -> int:
+	var emulator = _local_emulator()
+	if emulator == null:
+		return -1
+	var focused = emulator.get("focused_control")
+	for k in range(_first, _last_shown() + 1):
+		var button = _rows[_order[k]].button
+		if button != null and focused == button:
+			return k - _first
+	return -1
+
+
+func _focus_row(k: int) -> void:
+	var emulator = _local_emulator()
+	var button = _rows[_order[k]].button if k >= 0 and k < _order.size() else null
+	if emulator != null and button != null and button.is_visible_in_tree():
+		Utils.focus_player_control(button, _view.local, emulator)
+
+
+func _local_emulator():
+	if _view.empty() or not is_instance_valid(_screen):
+		return null
+	return _screen.get_node_or_null("FocusEmulator%d" % (_view.local + 1))
+
+
 func _update_hint() -> void:
 	var t := _texts()
-	_hint.text = (t.hint + "\n" if not _view.empty() else "") + t.toggle
+	_hint.text = (t.hint + "\n" if not _view.empty() else "") + (t.scroll + "\n" if is_windowed() else "") + t.toggle
 
 
 func _process(delta: float) -> void:
+	_fit_window()
 	_refresh_left -= delta
 	if _refresh_left <= 0.0:
 		_refresh_left = REFRESH_SEC
@@ -260,7 +449,8 @@ func _set_viewed(player_index: int) -> void:
 # Vanilla locks left/right on the shop items (coop_shop_item.tscn: BuyButton
 # focus_neighbour_left/right = "."), so moving right from an item went
 # nowhere. The local player's item buttons point right at the strip instead:
-# the shown player's row, else the first row (restore: vanilla's self link).
+# the shown player's row while it is in view, else the first row in view
+# (restore: vanilla's self link).
 # The four item nodes live as long as the shop (shop_items_container.gd _ready).
 func _link_shop_items(restore: bool = false) -> void:
 	if _mode != MODE_SHOP or _view.empty() or _rows.empty() or not is_instance_valid(_screen) or not _screen.has_method("_get_shop_items_container"):
@@ -268,9 +458,9 @@ func _link_shop_items(restore: bool = false) -> void:
 	var container = _screen._get_shop_items_container(_view.local)
 	if container == null or not "_shop_items" in container:
 		return
-	var rows: Array = _rows.keys()
-	rows.sort()
-	var target = select_button(_viewed if _viewed >= 0 else rows[0])
+	var first: int = _order[_first]
+	var shown: bool = _viewed >= 0 and _rows.has(_viewed) and _rows[_viewed].panel.visible
+	var target = select_button(_viewed if shown else first)
 	if target == null:
 		return
 	for shop_item in container._shop_items:

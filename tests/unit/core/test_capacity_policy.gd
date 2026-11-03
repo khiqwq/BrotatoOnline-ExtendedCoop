@@ -3,16 +3,16 @@ extends "res://tests/runner/test_case.gd"
 const CapacityPolicy = preload("res://mods-unpacked/CoopPlus-OnlineExtendedCoop/scripts/core/capacity_policy.gd")
 
 
-func test_default_capacity_is_eight() -> void:
+func test_default_capacity_is_max() -> void:
 	var p = CapacityPolicy.new()
-	assert_eq(p.capacity, 8)
+	assert_eq(p.capacity, CapacityPolicy.MAX_SUPPORTED_PLAYERS)
 	assert_true(p.is_valid())
 	assert_true(p.is_extended())
-	assert_eq(p.max_remote_players(), 7)
+	assert_eq(p.max_remote_players(), CapacityPolicy.MAX_SUPPORTED_PLAYERS - 1)
 
 
 func test_invalid_capacities_are_rejected() -> void:
-	for cap in [0, -1, 9, 16]:
+	for cap in [0, -1, CapacityPolicy.MAX_SUPPORTED_PLAYERS + 1, CapacityPolicy.MAX_SUPPORTED_PLAYERS * 2]:
 		var p = CapacityPolicy.new(cap)
 		assert_false(p.is_valid(), "capacity %d" % cap)
 		assert_eq(p.check_join(0, false).reason, CapacityPolicy.REJECT_INVALID_CAPACITY, "capacity %d" % cap)
@@ -20,9 +20,9 @@ func test_invalid_capacities_are_rejected() -> void:
 
 
 func test_legal_counts_for_every_capacity() -> void:
-	for cap in range(1, 9):
+	for cap in range(1, CapacityPolicy.MAX_SUPPORTED_PLAYERS + 1):
 		var p = CapacityPolicy.new(cap)
-		for n in range(0, 10):
+		for n in range(0, CapacityPolicy.MAX_SUPPORTED_PLAYERS + 2):
 			assert_eq(p.is_legal_count(n), n >= 1 and n <= cap, "cap %d n %d" % [cap, n])
 
 

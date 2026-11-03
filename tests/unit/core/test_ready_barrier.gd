@@ -4,6 +4,7 @@ extends "res://tests/runner/test_case.gd"
 
 const ReadyBarrier = preload("res://mods-unpacked/CoopPlus-OnlineExtendedCoop/scripts/core/ready_barrier.gd")
 const FlowGuard = preload("res://mods-unpacked/CoopPlus-OnlineExtendedCoop/scripts/core/flow_guard.gd")
+const CapacityPolicy = preload("res://mods-unpacked/CoopPlus-OnlineExtendedCoop/scripts/core/capacity_policy.gd")
 
 # Non-zero start time catches absolute-vs-elapsed time mistakes.
 const T0 := 1000000
@@ -265,7 +266,7 @@ func test_remove_expected_rules() -> void:
 
 func test_invalid_construction_never_completes() -> void:
 	var cases = [
-		[_slots(9), _stamp(), 10000, 30000, ReadyBarrier.REJECT_TOO_MANY_SLOTS],
+		[_slots(CapacityPolicy.MAX_SUPPORTED_PLAYERS + 1), _stamp(), 10000, 30000, ReadyBarrier.REJECT_TOO_MANY_SLOTS],
 		[[], _stamp(), 10000, 30000, ReadyBarrier.REJECT_NO_SLOTS],
 		[null, _stamp(), 10000, 30000, ReadyBarrier.REJECT_NO_SLOTS],
 		[[0, 0], _stamp(), 10000, 30000, ReadyBarrier.REJECT_DUPLICATE_SLOT],
@@ -293,7 +294,7 @@ func test_invalid_construction_never_completes() -> void:
 		assert_eq(b.state(), ReadyBarrier.STATE_INVALID, "case %d" % i)
 		assert_eq(b.expected(), [], "case %d: nothing kept from bad arguments" % i)
 		assert_eq(b.remaining_msec(T0), 0, "case %d" % i)
-	assert_true(_barrier(8).is_valid(), "eight slots are fine")
+	assert_true(_barrier(CapacityPolicy.MAX_SUPPORTED_PLAYERS).is_valid(), "max slots are fine")
 	assert_true(ReadyBarrier.new(_slots(2), _stamp(), T0, 0, 1).is_valid(), "immediate hint")
 
 

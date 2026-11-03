@@ -1,8 +1,8 @@
 # 超四人联机合作扩展（BrotatoOnline-ExtendedCoop）
 
-独立扩展 Mod `CoopPlus-OnlineExtendedCoop`（中文名「超四人联机合作扩展」）：配合**未经修改**的工坊版 Brotato Online（`six666-BrotatoOnline`，2026-11-03 更新版，网络协议 6.2.0），让《土豆兄弟》联机合作支持每机一人、最多 8 人。
+独立扩展 Mod `CoopPlus-OnlineExtendedCoop`（中文名「超四人联机合作扩展」）：配合**未经修改**的工坊版 Brotato Online（`six666-BrotatoOnline`，2026-11-04 更新版，网络协议 6.3.0），让《土豆兄弟》联机合作支持每机一人、最多 16 人（D-015）。
 
-当前状态：M0/M1 之间。容量与虚拟输入原型（AP-006）已在单个隔离实例中验证：容量 8、1 本地 + 7 名模拟远程玩家各自独立输入、第 9 人被拒、移除后恢复。单机本地模拟（模拟控制器）中，5～8 人可以连续多波完成战斗、升级、商店与结算：战斗 HUD、升级、商店、结算界面支持 P5～P8，5～8 人时每台电脑只放大显示本机玩家的面板、其余玩家收进状态条（显示武器；在商店和结算界面可用手柄或鼠标选择某人，展开其面板与本机面板平分左侧，鼠标需 CoopFix-OnlineMouseUI 1.0.1，现可与超四人共存），也可按 V / 手柄 Back 键切换为原版式的四人视图并左右逐个切换玩家；打开存档时 5～8 人局写入独立检查点，不写坏原版存档。角色、武器、难度选择界面也支持 5～8 人（本地模拟可从选人一路进入战斗）。房主可选标准房间（4 人，原版兼容）或扩展房间（5～8 人），5～8 人局退出后可以继续。尚未用真实客户端联机测试，**还不能安装给玩家使用**。执行计划见 [docs/plan/ACTION_PLAN.md](docs/plan/ACTION_PLAN.md)，任务状态见 [docs/tasks.md](docs/tasks.md)。
+当前状态：M0/M1 之间。容量与虚拟输入原型（AP-006）已在单个隔离实例中验证：容量 8、1 本地 + 7 名模拟远程玩家各自独立输入、第 9 人被拒、移除后恢复。单机本地模拟（模拟控制器）中，5～8 人可以连续多波完成战斗、升级、商店与结算：战斗 HUD、升级、商店、结算界面支持 P5～P8，5～8 人时每台电脑只放大显示本机玩家的面板、其余玩家收进状态条（显示武器；在商店和结算界面可用手柄或鼠标选择某人，展开其面板与本机面板平分左侧，鼠标需 CoopFix-OnlineMouseUI 1.0.1，现可与超四人共存），也可按 V / 手柄 Back 键切换为原版式的四人视图并左右逐个切换玩家；打开存档时 5～8 人局写入独立检查点，不写坏原版存档。角色、武器、难度选择界面也支持 5～8 人（本地模拟可从选人一路进入战斗）。房主可选标准房间（4 人，原版兼容）或扩展房间（5～16 人），5 人以上的局退出后可以继续。9 人以上时战斗 HUD 改为细血条与小号材料，状态条一次显示 7 名玩家（结算界面 6 名），可用鼠标滚轮、右摇杆或光标翻看，整页翻动或逐个滚动在“设置 → 游戏操作”里选（D-015）。尚未用真实客户端联机测试，**还不能安装给玩家使用**。执行计划见 [docs/plan/ACTION_PLAN.md](docs/plan/ACTION_PLAN.md)，任务状态见 [docs/tasks.md](docs/tasks.md)。
 
 创意工坊（测试版，公开）：https://steamcommunity.com/sharedfiles/filedetails/?id=3829355835 。发布步骤见 [workshop-release.md](docs/runbooks/workshop-release.md)。
 
@@ -22,7 +22,7 @@
 
 ## 开发环境
 
-需要：Windows、PowerShell 7.4+、已安装的 Brotato 1.2.0.0（含工坊订阅 Brotato Online）、Python 3.12（仅 setup 的脚本还原步骤使用；没有 Python 时集成测试标记为 SKIPPED）。不需要单独安装 Godot：测试使用复制到 `.local/engine/` 的游戏自带引擎，版本与目标完全一致（见 [ADR-000](docs/adr/ADR-000-test-runtime.md)）。
+需要：Windows、PowerShell 7.4+、已安装的 Brotato 1.2.0.1（含工坊订阅 Brotato Online）、Python 3.12（仅 setup 的脚本还原步骤使用；没有 Python 时集成测试标记为 SKIPPED）。不需要单独安装 Godot：测试使用复制到 `.local/engine/` 的游戏自带引擎，版本与目标完全一致（见 [ADR-000](docs/adr/ADR-000-test-runtime.md)）。
 
 ```powershell
 pwsh ./tools/setup.ps1 -GamePath "<Steam 库>\steamapps\common\Brotato"

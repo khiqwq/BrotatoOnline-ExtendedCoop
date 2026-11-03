@@ -15,6 +15,7 @@ extends Reference
 # checkpoint.
 # Pure rules: no autoloads, no file access, no scene tree.
 
+const CapacityPolicy = preload("res://mods-unpacked/CoopPlus-OnlineExtendedCoop/scripts/core/capacity_policy.gd")
 const VANILLA_SLOTS := 4
 const MARKER_KEY := "coopplus_extended_run"
 const PAYLOAD_SCHEMA := 1
@@ -137,7 +138,7 @@ const REFUSE_PLAYER_COUNT := "bad_player_count"
 const REFUSE_STATE := "state_mismatch"
 const REFUSE_SHOP := "shop_mismatch"
 const REFUSE_GAME_VERSION := "game_version_changed"
-const MAX_PLAYERS := 8
+const MAX_PLAYERS := CapacityPolicy.MAX_SUPPORTED_PLAYERS
 
 
 static func validate_payload(data, current_versions: Dictionary) -> Dictionary:
