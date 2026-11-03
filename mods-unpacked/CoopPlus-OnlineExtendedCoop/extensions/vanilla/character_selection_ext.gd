@@ -35,6 +35,7 @@ const RoomPolicy = preload("res://mods-unpacked/CoopPlus-OnlineExtendedCoop/scri
 const CapacityPolicy = preload("res://mods-unpacked/CoopPlus-OnlineExtendedCoop/scripts/core/capacity_policy.gd")
 const DlcBadges = preload("res://mods-unpacked/CoopPlus-OnlineExtendedCoop/ui/dlc_badges.gd")
 const COOPPLUS_ROOM_REFRESH_SEC := 0.5
+const COOPPLUS_SESSION_PATH := "/root/ModLoader/six666-BrotatoOnline/BrotatoOnlineSessionManager"
 const COOPPLUS_ROOM_TEXT := {
 	"zh": {"standard": "标准房间（4 人，原版兼容）", "extended": "扩展房间（最多 %d 人）"},
 	"en": {"standard": "Standard room (4, vanilla compatible)", "extended": "Extended room (up to %d players)"},
@@ -95,7 +96,7 @@ func _process(delta: float) -> void:
 	_coopplus_room_refresh -= delta
 	if _coopplus_room_refresh <= 0.0:
 		_coopplus_room_refresh = COOPPLUS_ROOM_REFRESH_SEC
-		_coopplus_room_button.disabled = RuntimeGate.room_capacity() > 0
+		_coopplus_room_button.disabled = _coopplus_room_locked()
 
 
 func _coopplus_add_room_button() -> void:
@@ -121,7 +122,7 @@ func _coopplus_add_room_button() -> void:
 	var _e = button.connect("item_selected", self, "_coopplus_on_room_selected")
 	_run_options_panel_content.add_child(button)
 	_coopplus_room_button = button
-	_coopplus_room_button.disabled = RuntimeGate.room_capacity() > 0
+	_coopplus_room_button.disabled = _coopplus_room_locked()
 
 
 static func _coopplus_copy_overrides(source: Control, target: Control) -> void:
@@ -136,11 +137,30 @@ static func _coopplus_copy_overrides(source: Control, target: Control) -> void:
 				target.set(key, value)
 
 
+# Locked while a room is open, unless this PC hosts it alone (then the room is
+# opened again with the new type, session_manager_ext.gd coopplus_reopen_room).
+func _coopplus_room_locked() -> bool:
+	if RuntimeGate.room_capacity() <= 0:
+		return false
+	var session = get_node_or_null(COOPPLUS_SESSION_PATH)
+	return session == null or not session.has_method("coopplus_can_change_room") or not session.coopplus_can_change_room()
+
+
 func _coopplus_on_room_selected(index: int) -> void:
 	var choices := _coopplus_room_choices()
-	if index < 0 or index >= choices.size() or RuntimeGate.room_capacity() > 0:
+	if index < 0 or index >= choices.size():
+		return
+	var open := RuntimeGate.room_capacity() > 0
+	var session = get_node_or_null(COOPPLUS_SESSION_PATH)
+	if open and _coopplus_room_locked():
 		return
 	RoomPolicy.save_preference({"type": choices[index][0], "capacity": choices[index][1]})
+	if not open or session == null or not session.has_method("coopplus_get_room"):
+		return
+	var room: Dictionary = session.coopplus_get_room()
+	if str(room.get("type", "")) == choices[index][0] and int(room.get("capacity", 0)) == choices[index][1]:
+		return
+	var _r = session.coopplus_reopen_room()
 
 
 # Standard, or extended for as many players as this version supports: a

@@ -43,6 +43,7 @@ const COOPPLUS_LAN_STALE_REPLACE_INTERVAL_MSEC := 15000
 const COOPPLUS_LAN_STALE_SILENCE_MSEC := 4000
 # Bound of the per-peer rate tables; a Steam lobby holds at most 8 members.
 const COOPPLUS_MAX_TRACKED_PEERS := 64
+const COOPPLUS_REOPEN_DELAY_SEC := 0.5
 const COOPPLUS_ROOM_TEXT := {
 	"zh": {
 		"extended_room_unsupported": "这是超四人扩展房间，本机的超四人扩展未启用或版本未验证，无法加入。",
@@ -116,6 +117,33 @@ func leave_lobby() -> void:
 
 func coopplus_get_room() -> Dictionary:
 	return _coopplus_room.duplicate()
+
+
+# A room's type is fixed while it is open, but a host still alone in its room
+# at character selection may switch it (the run options' room dropdown,
+# D-015): the room is closed and opened again, as Brotato Online's own lobby
+# switch does (session_manager.gd _on_lobby_toggle_button_toggled:
+# leave_lobby, then create_lobby_and_invite), and create_session above reads
+# the new preference. Never with anyone else in the room: they would be
+# dropped.
+func coopplus_can_change_room() -> bool:
+	return bool(_session_active) and _is_game_host() and get_session_member_count() <= 1 \
+			and not bool(_lobby_toggle_pending_create) and _can_create_lobby_from_current_scene()
+
+
+func coopplus_reopen_room() -> bool:
+	if not coopplus_can_change_room():
+		return false
+	leave_lobby()
+	# A moment for Steam to process leaveLobby before the new lobby is asked for.
+	var _t = get_tree().create_timer(COOPPLUS_REOPEN_DELAY_SEC).connect("timeout", self, "_coopplus_open_again")
+	return true
+
+
+func _coopplus_open_again() -> void:
+	if bool(_session_active) or bool(_lobby_toggle_pending_create) or not _can_create_lobby_from_current_scene():
+		return
+	create_lobby_and_invite(false)
 
 
 func _coopplus_leave_room(_reason: String) -> void:
