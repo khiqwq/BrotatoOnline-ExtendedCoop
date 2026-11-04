@@ -31,6 +31,7 @@
    python tools/workshop_upload.py --upload --note "0.1.1：……"
    ```
 
+   上传后在物品页（中英文各一次）核对截图数量。2026-11-04 一次上传在截图 05 超时失败后，物品仍登记着 9 张，但页面只显示 1 张：后几张的图片没有传上去。之后用 `--keep-media` 的上传不会补上它们；不带 `--keep-media` 重新上传即可，Steam 只补传缺的那几张（未变的会跳过）。
    截图没有变化时加 `--keep-media`，保留物品现有的预览图与截图、只传内容和文字：Steam 上传图片偶尔超时（`Failed to upload workshop preview file … (Timeout)`，整次提交失败，EResult 16），2026-11-04 连续三次都卡在截图上。`EResult 2`（下载或上传清单失败）也是网络问题，隔一分钟重试即可。
 
    Steam 客户端必须在运行并已登录。上传期间 Steam 会显示你在玩 Brotato。结果以 `D:\steam\logs\workshop_log.txt`（Steam 安装目录下的 `logs`）中的 `Upload finished for workshop item … : OK` 为准。
