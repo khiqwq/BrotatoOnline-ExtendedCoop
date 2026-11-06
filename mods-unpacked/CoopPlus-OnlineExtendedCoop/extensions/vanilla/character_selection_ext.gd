@@ -39,8 +39,8 @@ const COOPPLUS_ROOM_HINT_SEC := 4.0
 const COOPPLUS_ROOM_LOCKED_ALPHA := 0.5
 const COOPPLUS_ROOM_HINT_COLOR := Color(1.0, 0.85, 0.4)
 const COOPPLUS_ROOM_TEXT := {
-	"zh": {"standard": "标准房间（4 人，原版兼容）", "extended": "扩展房间（最多 %d 人）", "locked": "大厅开启时不能更改房间类型，请先关闭“开启大厅”"},
-	"en": {"standard": "Standard room (4, vanilla compatible)", "extended": "Extended room (up to %d players)", "locked": "The room type cannot change while the lobby is open; turn the lobby off first"},
+	"zh": {"standard": "标准房间（4 人，原版兼容）", "extended": "扩展房间 %d 人", "locked": "大厅开启时不能更改房间类型，请先关闭“开启大厅”"},
+	"en": {"standard": "Standard room (4, vanilla compatible)", "extended": "Extended (%d)", "locked": "The room type cannot change while the lobby is open; turn the lobby off first"},
 }
 
 const COOPPLUS_MOD_ID := "CoopPlus-OnlineExtendedCoop"
@@ -127,6 +127,10 @@ func _coopplus_add_room_button() -> void:
 		_coopplus_copy_overrides(_zone_selection_button.get_popup(), button.get_popup())
 		button.rect_min_size = _zone_selection_button.rect_min_size
 		button.size_flags_horizontal = _zone_selection_button.size_flags_horizontal
+	# The button would otherwise grow to its longest text and push the whole
+	# run options panel past the right edge of the screen (2026-11-06: the
+	# "up to 16" label did); the zone button's width is kept, text is clipped.
+	button.clip_text = true
 	var _e = button.connect("item_selected", self, "_coopplus_on_room_selected")
 	# Deferred: runs once whoever opened it (OptionButton or the co-op cursor,
 	# focus_emulator.gd _open_option_button) has shown it.

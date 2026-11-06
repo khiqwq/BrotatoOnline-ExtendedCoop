@@ -7,6 +7,7 @@
 创意工坊：0.1.0 测试版于 2026-10-29 上传为物品 3829355835（起初仅好友可见，2026-11-03 起公开；所需物品 Brotato Online），用于多机联机测试（`tools/workshop_upload.py`，[workshop-release.md](docs/runbooks/workshop-release.md)）。
 
 ### Fixed
+- 角色选择：运行选项面板被挤出屏幕右侧（有玩家加入后更明显）。房间类型按钮按最长的文字“扩展房间（最多 16 人）”撑宽了整个面板；现在按钮保持与“碰撞区域”下拉框相同宽度、文字超出时截断，文字改为“扩展房间 16 人”。
 - 创意工坊页面在中文 Steam 客户端里仍显示旧的 5～8 人标题和说明：Steam 按语言保存标题和说明，上传工具只写了英文那份。`tools/workshop_upload.py` 现在同时写英文与简体中文（另有只更新文字的 `--text-only`）。
 - 模组列表里的说明（`manifest.json` 的 description）仍写 5～8 人与 Brotato Online 11-03 更新（协议 6.2.0），改为 5～16 人与 11-04 更新（协议 6.3.0）。
 - 集成测试的游戏工程里，自动加载单例的替身（`tools/recovery/project_binary.py`）现在也带上原脚本里声明了返回类型的公开函数（参数一律可省）。Brotato 1.2.0.1 的商店脚本用 `var next_wave:= RunData.get_next_wave()` 推断类型，替身没有这个函数时整个商店脚本链（含本扩展的 `coop_shop_ext.gd`）在测试里编译失败；游戏本身不受影响。
