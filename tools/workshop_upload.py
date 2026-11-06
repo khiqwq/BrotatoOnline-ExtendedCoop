@@ -18,15 +18,18 @@ English one was updated. Every upload therefore writes the same title and
 description for each of TEXT_LANGUAGES (one update per language, the first
 also carrying the content); --text-only writes only those.
 
---keep-media leaves the item's preview and gallery as they are (Steam's
-image uploads time out now and then, and unchanged images need no upload).
+The preview and gallery are always sent: an update that leaves them out
+(a --keep-media option, removed 2026-11-06) kept the item's nine screenshot
+entries but the page then showed only one image, three times in a row.
+Steam skips unchanged images, and a timeout there is retried by running the
+upload again.
 
 --refresh-local asks this PC's Steam client to download the item's latest
 version now (ISteamUGC DownloadItem): its change feed can take a while to
 notice an upload, and until then the subscribed copy and the game stay on the
 previous version.
 
-Usage: python tools/workshop_upload.py --dry-run | --upload [--note "change note"] [--friends-only] [--keep-media]
+Usage: python tools/workshop_upload.py --dry-run | --upload [--note "change note"] [--friends-only]
        python tools/workshop_upload.py --text-only [--note "change note"]
        python tools/workshop_upload.py --refresh-local
 """
@@ -280,7 +283,7 @@ def refresh_local(steam, timeout=300):
     raise SystemExit("timed out waiting for the download")
 
 
-def upload(steam, title, description, zip_path, note, visibility, keep_media=False):
+def upload(steam, title, description, zip_path, note, visibility):
     lib, ugc = steam.lib, steam.ugc
     os.makedirs(CONTENT_DIR, exist_ok=True)
     for name in os.listdir(CONTENT_DIR):
@@ -301,7 +304,7 @@ def upload(steam, title, description, zip_path, note, visibility, keep_media=Fal
         print("created item", item_id)
         legal_note(needs)
 
-    gallery = [] if keep_media else gallery_files()
+    gallery = gallery_files()
     existing = count_gallery(steam, item_id) if gallery else 0
     if gallery:
         print("gallery: %d screenshots (item has %d)" % (len(gallery), existing))
@@ -311,10 +314,7 @@ def upload(steam, title, description, zip_path, note, visibility, keep_media=Fal
         "visibility": lib.SteamAPI_ISteamUGC_SetItemVisibility(ugc, handle, visibility),
         "content": lib.SteamAPI_ISteamUGC_SetItemContent(ugc, handle, CONTENT_DIR.encode("utf-8")),
     })
-    if keep_media:
-        print("preview and gallery: kept as they are on the item")
-    else:
-        fields["preview"] = lib.SteamAPI_ISteamUGC_SetItemPreview(ugc, handle, PREVIEW.encode("utf-8"))
+    fields["preview"] = lib.SteamAPI_ISteamUGC_SetItemPreview(ugc, handle, PREVIEW.encode("utf-8"))
     if gallery:
         fields["gallery"] = set_gallery(steam, handle, gallery, existing)
     submit(steam, handle, fields, note, TEXT_LANGUAGES[0])
@@ -344,7 +344,7 @@ def main(argv):
     print("steam: connected")
     try:
         if mode == "--upload":
-            upload(steam, title, description, zip_path, note, visibility, "--keep-media" in argv)
+            upload(steam, title, description, zip_path, note, visibility)
         elif mode == "--text-only":
             upload_text(steam, title, description, note)
         elif mode == "--refresh-local":
