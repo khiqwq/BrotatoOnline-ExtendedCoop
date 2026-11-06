@@ -25,11 +25,11 @@
       "role": "required",
       "version": "6.6.6",
       "workshop_id": 3741034628,
-      "workshop_manifest": "453270524552168926",
-      "workshop_timeupdated": 1793892365,
+      "workshop_manifest": "5723832237345422756",
+      "workshop_timeupdated": 1793941404,
       "zip": "six666-BrotatoOnline.zip",
-      "zip_sha256": "6a0eea567152e501609f835e428195ca289b54a65d7a8a29ca51c59a0d05ac11",
-      "normalized_fingerprint": "5c2970b682c083379705e481f4133336c011ea92c147015bbe9061f8e218e03e",
+      "zip_sha256": "8b0acb6a7c72386eab431491777be0824165f2f14b0a0097078bd34e1f5e8b95",
+      "normalized_fingerprint": "6ed0ffc2bb11b3c32660f137b92507db93dfff128ec78f65b8af3e0eef78b194",
       "file_count": 56
     },
     {
