@@ -12,6 +12,8 @@ extends "res://mods-unpacked/six666-BrotatoOnline/scripts/session_manager.gd"
 #                  get_lan_discovery_info
 #   display        _get_lobby_status_text
 #   LAN reconnect  _handle_transport_identity (stale peer of the same owner)
+#   host load      _poll_pending_p2p_chunk_sends, _handle_run_page_action_sync
+#                  (more than three clients only)
 # Left alone on purpose: create_session (steam_transport_ext passes the
 # capacity to createLobby, _setup_lobby_data fixes the native limit of the
 # fallback createLobby), the transport_welcome member_limit (clients never
@@ -64,6 +66,10 @@ const COOPPLUS_REASON_PREFIX := "coopplus_"
 # the room's mod_version marker, so a client without the extension shows
 # Brotato Online's "incompatible protocol or mod version").
 const COOPPLUS_WELCOME_REASON := "coopplus_reason"
+# Clients a vanilla host serves; the parent's send rate is sized for them.
+const COOPPLUS_VANILLA_CLIENTS := 3
+# Matches the clients' request cooldown (SHOP_ITEMS_RESYNC_REQUEST_COOLDOWN_MSEC).
+const COOPPLUS_RESYNC_REPLY_MSEC := 1500
 
 var _coopplus_capacity_notice_msec := {}
 var _coopplus_lan_replace_msec := {}
@@ -72,6 +78,8 @@ var _coopplus_room := {}
 # Host: capability version announced by each LAN connection
 # (_connection_lookup_key -> int), before its identity arrives.
 var _coopplus_lan_capability := {}
+# Host: last shop_items_resync_request answered per player (session key).
+var _coopplus_resync_reply_msec := {}
 
 
 # Single source of the capacity for this script, so AP-009 can switch it to
@@ -650,6 +658,48 @@ func _coopplus_lan_owner_silent(peer_key: String, now: int) -> bool:
 	if typeof(last_by_peer) != TYPE_DICTIONARY or not last_by_peer.has(peer_key):
 		return false
 	return now - int(last_by_peer[peer_key]) >= COOPPLUS_LAN_STALE_SILENCE_MSEC
+
+
+# --- host send load with more than three clients -----------------------------
+
+# The parent drains its send queue one message per frame for all peers
+# together (P2P_JSON_CHUNK_SENDS_PER_FRAME, session_manager.gd:61), and once
+# a peer/channel has anything queued every later reliable message waits
+# behind it (7677). That rate fits three clients; an 8-player host in the
+# shop queued 1,300+ messages, 37 s old, and every action reached the others
+# that late. Above three clients the host drains one message per client per
+# frame, in the parent's own order, stopping when a pass sends nothing.
+func _poll_pending_p2p_chunk_sends() -> void:
+	._poll_pending_p2p_chunk_sends()
+	if not _coopplus_extended() or not _is_game_host():
+		return
+	var extra: int = _get_remote_ids_for_host_sync().size() - 1
+	if extra < COOPPLUS_VANILLA_CLIENTS:
+		return
+	while extra > 0 and not _pending_p2p_chunk_sends.empty():
+		var before: int = _pending_p2p_chunk_sends.size()
+		._poll_pending_p2p_chunk_sends()
+		if _pending_p2p_chunk_sends.size() >= before:
+			return
+		extra -= 1
+
+
+# At every shop each client asks for a held-items resync of every player whose
+# hash differs (menu_sync_manager.gd _prepare_hash_only_run_data_for_apply),
+# and the host broadcasts each answer to all clients (2832). With 8 players
+# that is 56 requests per shop, each ~0.1 s of host time and a ~23 KB packet
+# to 7 peers. Every client applies a broadcast answer whoever asked (979), so
+# the host answers each player once per COOPPLUS_RESYNC_REPLY_MSEC; a client
+# still out of sync asks again after its own cooldown (4637, 1.5 s).
+func _handle_run_page_action_sync(from_steam_id: String, message: Dictionary) -> void:
+	if _coopplus_extended() and _is_game_host() and str(message.get("action_type", "")) == "shop_items_resync_request":
+		var player := int(message.get("requested_player_index", message.get("player_index", -1)))
+		var key := _coopplus_session_key(str(player))
+		var now := OS.get_ticks_msec()
+		if _coopplus_resync_reply_msec.has(key) and now - int(_coopplus_resync_reply_msec[key]) < COOPPLUS_RESYNC_REPLY_MSEC:
+			return
+		_coopplus_remember(_coopplus_resync_reply_msec, key, now, COOPPLUS_RESYNC_REPLY_MSEC)
+	._handle_run_page_action_sync(from_steam_id, message)
 
 
 # --- helpers ---------------------------------------------------------------
