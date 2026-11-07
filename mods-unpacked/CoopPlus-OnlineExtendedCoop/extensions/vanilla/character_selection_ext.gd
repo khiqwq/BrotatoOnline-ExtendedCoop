@@ -101,6 +101,11 @@ func _process(delta: float) -> void:
 	if _coopplus_room_refresh <= 0.0:
 		_coopplus_room_refresh = COOPPLUS_ROOM_REFRESH_SEC
 		_coopplus_refresh_room_lock()
+		# Online, the player count can change after connected_players_updated
+		# (a joining player's slot is filled in later), which left the new
+		# player's panel outside the layout and pushed the run options off
+		# screen. Cheap when nothing changed (same key).
+		_coopplus_update_view()
 	if _coopplus_room_hint_left > 0.0:
 		_coopplus_room_hint_left -= delta
 		if _coopplus_room_hint_left <= 0.0:

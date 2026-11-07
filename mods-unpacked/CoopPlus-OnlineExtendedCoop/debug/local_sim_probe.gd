@@ -117,6 +117,9 @@ const WAVE_END_SHOTS := [0.4, 1.5]
 # --coopplus-local-sim-late-join (with -menus): the last player joins while
 # character selection is open, the way an invited online player arrives;
 # screenshots and the grid's place before and after.
+# --coopplus-local-sim-late-join-silent: the same, but the player is added
+# without connected_players_updated (online, a client's count or local slot can
+# settle after the signal); the layout must still pick the new player up.
 const LATE_JOIN_WAIT_SEC := 1.5
 const SCROLL_PRESSES := 6
 const REMOVAL_MANAGER_PATH := "/root/ModLoader/six666-BrotatoOnline/BrotatoOnlinePlayerRemovalManager"
@@ -221,6 +224,7 @@ var _wave_end_at := -1.0
 var _wave_end_shots_done := 0
 var _remove_player := 0
 var _late_join := false
+var _late_join_silent := false
 var _dlc_missing := 0
 var _zone_logged_wave := -1
 var _late_join_state := ""
@@ -265,7 +269,8 @@ func _ready() -> void:
 	_menus = "--coopplus-local-sim-menus" in OS.get_cmdline_args()
 	_continue = "--coopplus-local-sim-continue" in OS.get_cmdline_args()
 	_remove_fix = not "--coopplus-local-sim-remove-nofix" in OS.get_cmdline_args()
-	_late_join = "--coopplus-local-sim-late-join" in OS.get_cmdline_args()
+	_late_join_silent = "--coopplus-local-sim-late-join-silent" in OS.get_cmdline_args()
+	_late_join = _late_join_silent or "--coopplus-local-sim-late-join" in OS.get_cmdline_args()
 	_options_shot = "--coopplus-local-sim-options-shot" in OS.get_cmdline_args()
 	_players_wanted = int(clamp(_players_wanted, 1, CapacityPolicy.MAX_SUPPORTED_PLAYERS))
 	_rng.seed = seed_value
@@ -1101,7 +1106,11 @@ func _late_join_step(scene, delta: float) -> bool:
 		_late_join_left = LATE_JOIN_WAIT_SEC
 		var device: int = _devices[_devices.size() - 1]
 		ProbeLog.event("local_sim.late_join", {"device": device, "before": _late_join_before})
-		CoopService._add_player(device, CoopService.PlayerType.GAMEPAD_XBOX)
+		if _late_join_silent:
+			CoopService.connected_players.append([device, CoopService.PlayerType.GAMEPAD_XBOX])
+			scene._on_connected_players_updated(CoopService.connected_players, false)
+		else:
+			CoopService._add_player(device, CoopService.PlayerType.GAMEPAD_XBOX)
 		return true
 	if _late_join_state == "joined":
 		_late_join_left -= delta
@@ -1111,7 +1120,7 @@ func _late_join_step(scene, delta: float) -> bool:
 		_late_join_presses = 0
 		_save_screenshot("character_selection_joined_%dp.png" % _players_wanted)
 		ProbeLog.event("local_sim.late_join.after", {"before": _late_join_before, "after": _grid_layout(scene),
-				"count": RunData.get_player_count()})
+				"count": RunData.get_player_count(), "view_key": scene.get("_coopplus_view_key")})
 		_late_join_before = _grid_layout(scene)
 		return true
 	# A remote player's cursor (P2) moves down the shared grid, then P1's own.
