@@ -10,8 +10,8 @@
 
 [h2]需要[/h2]
 [list]
-[*]Brotato 1.2.0.1（内置 Mod Loader 6.3.0）
-[*]订阅并启用 Brotato Online 2026-11-04 更新版（网络协议 6.3.0）
+[*]Brotato 1.2.0.2（内置 Mod Loader 6.3.0）
+[*]订阅并启用 Brotato Online 2026-11-11 更新版（网络协议 6.3.0）
 [*]扩展房间里的每个人都要订阅本扩展
 [/list]
 
@@ -33,8 +33,8 @@
 [h2]兼容性[/h2]
 [list]
 [*]不修改 Brotato Online 的任何文件。
-[*]只认 Brotato Online 2026-11-04 更新版（网络协议 6.3.0）（锁定文件指纹）。Brotato Online 或游戏更新后，本扩展会自动关闭超四人功能，Brotato Online 照常以 4 人运行，等本扩展更新后再恢复。
-[*]已验证组合：Brotato 1.2.0.1（DLC 已并入游戏本体），Mod Loader 6.3.0，Brotato Online 2026-11-04 更新版（网络协议 6.3.0），可选 CoopFix-OnlineMouseUI 1.0.1。
+[*]只认 Brotato Online 2026-11-11 更新版（网络协议 6.3.0）（锁定文件指纹）。Brotato Online 或游戏更新后，本扩展会自动关闭超四人功能，Brotato Online 照常以 4 人运行，等本扩展更新后再恢复。
+[*]已验证组合：Brotato 1.2.0.2（DLC 已并入游戏本体），Mod Loader 6.3.0，Brotato Online 2026-11-11 更新版（网络协议 6.3.0），可选 CoopFix-OnlineMouseUI 1.0.1。
 [*]性能：房主的电脑负担最重。在一台笔记本 RTX 5070 上单机模拟、每人带满后期炮台套装时，12 人后期约 94～163 FPS，14 人最低约 40 FPS，16 人最后几波在约 6～50 FPS 之间（随场上敌人数量波动）。
 [*]每台电脑一名玩家；本地（同屏）合作仍最多 4 人。
 [/list]
@@ -57,7 +57,7 @@ Extends [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3741034628]B
 [b]Test release 0.1.0:[/b] the full 5-16 player flow (character selection, waves, upgrades, shop, end of run, continue after quitting) works in local simulation; it has not yet been tested online across several PCs.
 
 [list]
-[*]Requires Brotato 1.2.0.1 (Mod Loader 6.3.0) and the 4 Nov 2026 update of Brotato Online (network protocol 6.3.0). Everyone in an extended room needs this mod.
+[*]Requires Brotato 1.2.0.2 (Mod Loader 6.3.0) and the 11 Nov 2026 update of Brotato Online (network protocol 6.3.0). Everyone in an extended room needs this mod.
 [*]Pick the room type in the run options on character selection: Standard (4, vanilla-compatible) or Extended (up to 16; it runs with 5 players too).
 [*]Shop / upgrades / end of run: your panel is large, the others are shown as status rows; select a player to open their panel. Press V or gamepad Back for the vanilla-style four-panel view and slide with the arrow keys, right stick or D-pad.
 [*]With 9+ players the battle HUD uses thin bars and small material counts, and the player list shows 7 players at a time (6 on the end-of-run screen): scroll it with the mouse wheel over it, the right stick, or by moving the cursor past its first/last row. Settings > Gameplay chooses page by page (default) or one row at a time.

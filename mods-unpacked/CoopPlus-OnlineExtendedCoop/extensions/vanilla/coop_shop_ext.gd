@@ -48,6 +48,9 @@ const COOPPLUS_BASE_SHOP_FIELDS := [
 	["_pause_press_received", PerPlayerArrays.KIND_VALUE, false],
 	["_dismantle_press_item", PerPlayerArrays.KIND_VALUE, null],
 	["_ban_press_item", PerPlayerArrays.KIND_VALUE, null],
+	# 1.2.0.2 (base_shop.gd:23): items mutated on purchase (Primal Dread),
+	# read in _ready and appended in buy_item.
+	["_recent_mutations", PerPlayerArrays.KIND_ARRAY],
 ]
 
 # Index 0 belongs to player_index 4.

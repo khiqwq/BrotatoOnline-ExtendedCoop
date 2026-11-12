@@ -240,9 +240,10 @@ func _get_locked_panels() -> Array:
 	return panels
 
 
-# Parent: character_selection.gd:525/539 refresh the background of Panel1..4.
-func _setup_zone(index: int) -> void:
-	._setup_zone(index)
+# Parent: character_selection.gd _setup_zone / _on_ZoneSelectionButton_item_selected refresh
+# the background of Panel1..4 (1.2.0.2 passes a zone id, not a dropdown index).
+func _setup_zone(zone_id: int) -> void:
+	._setup_zone(zone_id)
 	_coopplus_update_extra_backgrounds()
 
 

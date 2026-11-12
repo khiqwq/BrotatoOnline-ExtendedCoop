@@ -804,7 +804,14 @@ func _press_shop_go(scene) -> void:
 		ProbeLog.event("local_sim.shop.no_go_handler")
 		return
 	for player_index in RunData.get_player_count():
-		ProbeLog.event("local_sim.shop.go", {"player_index": player_index})
+		# wired: base_shop._ready connected this player's GO button (it stops
+		# short when a per-player array is too small, EV-0050).
+		var go_button = scene._get_go_button(player_index) if scene.has_method("_get_go_button") else null
+		var wired: bool = go_button != null and go_button.is_connected("pressed", scene, "_on_GoButton_pressed")
+		var mutations = scene.get("_recent_mutations")
+		ProbeLog.event("local_sim.shop.go", {"player_index": player_index, "wired": wired,
+				"recent_mutations": mutations.size() if mutations is Array else -1,
+				"primal_dread": "primal_dread" in ProgressData.active_update_data})
 		scene._on_GoButton_pressed(player_index)
 
 

@@ -1,16 +1,16 @@
 {
   "schema": 1,
-  "updated": "2026-11-07",
+  "updated": "2026-11-12",
   "game": {
     "app_id": 1942280,
-    "version": "1.2.0.1",
-    "steam_build_id": 26406319,
+    "version": "1.2.0.2",
+    "steam_build_id": 26615634,
     "engine_version": "3.7.dev.custom_build.74e86be54",
     "pck_format": 1,
     "gdscript_bytecode_version": 13,
     "files": {
-      "Brotato.exe": "1d148584b83764099e52c641f4f3037703cb12ccd63d86e465f4b1a3b3938483",
-      "Brotato.pck": "4490fd1b6afe91e18c321bdb9d7a68ebe0246d9e8e87940c2823bd80ce8aa593",
+      "Brotato.exe": "e6155681fd1f6b7262d7f6ba2ce0ed02c720e8644b73ed71d1bc18911f6b5017",
+      "Brotato.pck": "2d4d55b4e57d07bd75e03c3516f9ed1f9f2dec347d75fd2eb7574ebd0591ba98",
       "steam_api64.dll": "e3fe06e2d802c2f753aeb46869e2af898f34715ce85f08001456fd8a80ecd21e"
     }
   },
@@ -25,12 +25,12 @@
       "role": "required",
       "version": "6.6.6",
       "workshop_id": 3741034628,
-      "workshop_manifest": "8213984878427351264",
-      "workshop_timeupdated": 1794032919,
+      "workshop_manifest": "8249931243595668394",
+      "workshop_timeupdated": 1794407193,
       "zip": "six666-BrotatoOnline.zip",
-      "zip_sha256": "75c27a4e6f3e41844b5b01234d25ac0fead810d7568b492c5cbb0d73056cd534",
-      "normalized_fingerprint": "5e16f57e0834719f915f83c3917bc9e9321f3fbc63ff83cc9da6994528e53b2e",
-      "file_count": 55
+      "zip_sha256": "629251d49ccf3aac10003707c254fa4b0e45e3a8f0aba8cd1cb6b1ae10b0ab15",
+      "normalized_fingerprint": "7a1a87280abff0426a70fedc7d690faf6202a3d30b2f8d8e83b435f2a2592875",
+      "file_count": 56
     },
     {
       "id": "CoopFix-OnlineMouseUI",

@@ -24,7 +24,9 @@
         "_accept_client_protocol": 2,
         "_on_transport_packet_received": 4,
         "_handle_transport_welcome": 3,
-        "_ui_text": 1
+        "_ui_text": 1,
+        "_poll_pending_p2p_chunk_sends": 0,
+        "_handle_run_page_action_sync": 2
       },
       "constants": {
         "MAX_LOBBY_MEMBERS": "4",
