@@ -5,7 +5,7 @@
   "network_capability_version": 1,
   "save_schema_version": 1,
   "game_versions": [
-    "1.2.0.2"
+    "1.2.0.3"
   ],
   "engine_versions": [
     "3.7.dev.custom_build.74e86be54"
@@ -17,7 +17,7 @@
     {
       "id": "six666-BrotatoOnline",
       "version": "6.6.6",
-      "normalized_fingerprint": "7a1a87280abff0426a70fedc7d690faf6202a3d30b2f8d8e83b435f2a2592875",
+      "normalized_fingerprint": "263ad75101ce99446c79cd9819b6a4ebbcb61ec7ac5982c755616e3cae543fe2",
       "role": "required"
     },
     {

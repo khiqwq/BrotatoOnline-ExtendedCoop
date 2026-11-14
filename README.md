@@ -22,7 +22,7 @@
 
 ## 开发环境
 
-需要：Windows、PowerShell 7.4+、已安装的 Brotato 1.2.0.2（含工坊订阅 Brotato Online）、Python 3.12（仅 setup 的脚本还原步骤使用；没有 Python 时集成测试标记为 SKIPPED）。不需要单独安装 Godot：测试使用复制到 `.local/engine/` 的游戏自带引擎，版本与目标完全一致（见 [ADR-000](docs/adr/ADR-000-test-runtime.md)）。
+需要：Windows、PowerShell 7.4+、已安装的 Brotato 1.2.0.3（含工坊订阅 Brotato Online）、Python 3.12（仅 setup 的脚本还原步骤使用；没有 Python 时集成测试标记为 SKIPPED）。不需要单独安装 Godot：测试使用复制到 `.local/engine/` 的游戏自带引擎，版本与目标完全一致（见 [ADR-000](docs/adr/ADR-000-test-runtime.md)）。
 
 ```powershell
 pwsh ./tools/setup.ps1 -GamePath "<Steam 库>\steamapps\common\Brotato"

@@ -20,6 +20,7 @@ const RuntimeGate = preload("res://mods-unpacked/CoopPlus-OnlineExtendedCoop/scr
 const PerPlayerArrays = preload("res://mods-unpacked/CoopPlus-OnlineExtendedCoop/scripts/core/per_player_arrays.gd")
 const ExtraPlayerPanels = preload("res://mods-unpacked/CoopPlus-OnlineExtendedCoop/ui/extra_player_panels.gd")
 const LocalFocusLayout = preload("res://mods-unpacked/CoopPlus-OnlineExtendedCoop/ui/local_focus_layout.gd")
+const DescriptionWheel = preload("res://mods-unpacked/CoopPlus-OnlineExtendedCoop/ui/description_wheel.gd")
 
 const COOPPLUS_MOD_ID := "CoopPlus-OnlineExtendedCoop"
 const COOPPLUS_RESUMED_FIELDS := [
@@ -98,6 +99,8 @@ func _coopplus_regrow_shop_arrays() -> void:
 
 # Runs after BaseShop/CoopShop _ready set up every player's panel.
 func _ready() -> void:
+	if RuntimeGate.is_extended():
+		var _w = DescriptionWheel.attach(self)
 	if _coopplus_extra_containers.empty():
 		return
 	var panels := []

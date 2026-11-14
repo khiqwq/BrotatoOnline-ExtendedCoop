@@ -150,7 +150,9 @@ const VIEW_STEPS := {
 	"character_selection": ["room_popup", "shot_room_popup", "room_popup_close",
 			"room_lock", "room_popup", "shot_room_locked", "room_popup_close", "room_unlock", "key_v", "shot_pages", "stick_right", "shot_pages_slid", "stick_left", "key_v", "check"],
 	"weapon_selection": ["key_v", "shot_pages", "stick_right", "shot_pages_slid", "stick_left", "key_v", "check"],
-	"shop": ["shot", "pad_right", "pad_down", "pad_accept", "shot_view_pad", "click_last", "shot_view_click", "click_last", "check",
+	"shop": ["shot", "pad_right", "pad_down", "pad_accept", "shot_view_pad",
+			"desc_focus", "desc_wheel", "desc_read", "desc_wheel_bo", "desc_read",
+			"desc_mute_emu", "desc_wheel_bo", "desc_read", "desc_unmute", "desc_mute_view", "desc_wheel_bo", "desc_read", "desc_unmute", "click_last", "shot_view_click", "click_last", "check",
 			"key_v", "shot_pages", "pad_right", "stick_right", "shot_pages_slid", "pad_left", "stick_left", "pad_left", "key_v", "check"],
 	"coop_end_run": ["click_first", "shot_view_click", "click_first", "check",
 			"key_v", "shot_pages", "stick_right", "shot_pages_slid", "stick_left", "key_v", "check"],
@@ -927,6 +929,29 @@ func _run_view_check(scene, prefix: String, delta: float) -> bool:
 				RuntimeGate.clear_room()
 		"pad_right", "pad_left", "pad_down", "pad_accept":
 			_pad_press(emulator, "ui_" + step.substr(4))
+		"desc_focus":
+			var items = scene._get_shop_items_container(0) if scene.has_method("_get_shop_items_container") else null
+			var first = items.get_focus_control() if items != null and items.has_method("get_focus_control") else null
+			detail["focused"] = first != null
+			if first != null:
+				Utils.focus_player_control(first, 0)
+		"desc_wheel", "desc_wheel_bo":
+			# Brotato Online scrolls descriptions itself only online
+			# (long_description_input.gd); "_bo" turns that path on.
+			get_tree().root.set_meta("brotato_online_session_active", step == "desc_wheel_bo")
+			detail["desc"] = _desc_wheel(scene)
+		"desc_mute_emu", "desc_mute_view", "desc_unmute":
+			# Which _input handler takes the wheel first: switch one kind off.
+			for node in scene.get_children():
+				var emu: bool = str(node.name).begins_with("FocusEmulator")
+				var view: bool = node.has_method("toggle_mode")
+				if step == "desc_unmute" and (emu or view):
+					node.set_process_input(true)
+				elif (step == "desc_mute_emu" and emu) or (step == "desc_mute_view" and view):
+					node.set_process_input(false)
+		"desc_read":
+			detail["desc"] = _desc_state(_desc_target)
+			get_tree().root.set_meta("brotato_online_session_active", false)
 		"key_v":
 			for pressed in [true, false]:
 				var key := InputEventKey.new()
@@ -1033,6 +1058,59 @@ func _room_popup(scene: Node, open: bool) -> Dictionary:
 
 
 # Moves the mouse to the middle of `control` and turns the wheel there once.
+# Shop item description wheel check: P1's open popup shows the item with the
+# longest description, the wheel turns down twice over it, and desc_read
+# logs the scroll position a step later.
+var _desc_target = null
+
+
+func _desc_wheel(scene) -> Dictionary:
+	var popup = scene._get_item_popup(0) if scene != null and scene.has_method("_get_item_popup") else null
+	var desc = _find_description(popup)
+	_desc_target = desc
+	if desc == null:
+		return {"error": "no_description", "popup_visible": popup != null and popup.visible}
+	var longest = null
+	var lines := -1
+	for item in ItemService.items:
+		if item.effects.size() > lines:
+			lines = item.effects.size()
+			longest = item
+	desc.allow_scroll_when_crowded = true
+	desc.set_item(longest, 0)
+	# Overflow on purpose: the check is where the wheel goes, not which item is long.
+	desc.reduce_scroll_min_height(desc._default_scroll_min_height - 100.0)
+	var out := _desc_state(desc)
+	out["item"] = longest.my_id if longest != null else ""
+	var scroll: Control = desc.get_scroll_container()
+	for i in 2:
+		out["wheel_%d" % i] = _wheel_over(scroll, BUTTON_WHEEL_DOWN)
+	return out
+
+
+func _desc_state(desc) -> Dictionary:
+	if desc == null or not is_instance_valid(desc):
+		return {"error": "no_description"}
+	var scroll: ScrollContainer = desc.get_scroll_container()
+	return {"visible": desc.is_visible_in_tree(), "scroll_visible": scroll.visible,
+			"scroll": scroll.scroll_vertical, "content": scroll.get_v_scrollbar().max_value,
+			"height": scroll.rect_size.y, "input": desc.is_processing_input(),
+			"expand": desc.expand_indefinitely, "online": get_tree().root.get_meta("brotato_online_session_active", false),
+			"listening": CoopService.listening_for_inputs}
+
+
+func _find_description(node):
+	if node == null:
+		return null
+	if node.has_method("get_scroll_container") and node.has_method("reduce_scroll_min_height"):
+		return node
+	for child in node.get_children():
+		var found = _find_description(child)
+		if found != null:
+			return found
+	return null
+
+
 func _wheel_over(control: Control, button_index: int) -> Dictionary:
 	if control == null:
 		return {"error": "no_control"}
