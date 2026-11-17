@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updated": "2026-11-14",
+  "updated": "2026-11-17",
   "game": {
     "app_id": 1942280,
     "version": "1.2.0.3",
@@ -25,11 +25,11 @@
       "role": "required",
       "version": "6.6.6",
       "workshop_id": 3741034628,
-      "workshop_manifest": "632946762149778102",
-      "workshop_timeupdated": 1794625769,
+      "workshop_manifest": "6083453968393866919",
+      "workshop_timeupdated": 1794758594,
       "zip": "six666-BrotatoOnline.zip",
-      "zip_sha256": "e73f90b1b11388c76ecee5240fad5984aff2113578690c51df8e9b065084d4ab",
-      "normalized_fingerprint": "263ad75101ce99446c79cd9819b6a4ebbcb61ec7ac5982c755616e3cae543fe2",
+      "zip_sha256": "30c1352dbc5d8e4aec44793b3e2c4d5a72f121db3119237acd41e8ba183499a6",
+      "normalized_fingerprint": "965a230dffaf094da1efd0c387929e9c24a4f9f92064c39cd02884c4b655e02d",
       "file_count": 57
     },
     {

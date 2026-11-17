@@ -1,0 +1,64 @@
+{
+  "evidence": "EV-0052",
+  "date": "2026-11-17",
+  "source_base": "1dbe4f7",
+  "game": "1.2.0.3",
+  "game_build": 26642464,
+  "upstream_workshop_manifest": "6083453968393866919",
+  "upstream_fingerprint": "965a230dffaf094da1efd0c387929e9c24a4f9f92064c39cd02884c4b655e02d",
+  "checks": {
+    "setup": 8,
+    "check": 5,
+    "contract_entries_added": 0,
+    "compiled_scripts": 79,
+    "unit_tests": 427,
+    "integration_tests": 3
+  },
+  "limits": [
+    "Hidden local simulation only; no real online lobby or multi-PC synchronization test."
+  ],
+  "runs": [
+    {
+      "players": 4,
+      "passed": true,
+      "reason": "reached:coop_shop.tscn after 2 waves",
+      "waves": 2,
+      "spawned": 4,
+      "moved": 4,
+      "devices": 4,
+      "script_errors": 0,
+      "gate": "runtime gate: extended capacity=16 virtual_devices=16..30 six666-BrotatoOnline=965a230d(match, expected 965a230d)",
+      "wall_seconds": 68.0,
+      "events": "evidence/local-sim/EV-0052-4p-events.log",
+      "events_sha256": "5fd7626b29800612f98f68564789fab8bbd00f9d8b0d125569e53561800b3d13"
+    },
+    {
+      "players": 8,
+      "passed": true,
+      "reason": "reached:coop_shop.tscn after 2 waves",
+      "waves": 2,
+      "spawned": 8,
+      "moved": 8,
+      "devices": 8,
+      "script_errors": 0,
+      "gate": "runtime gate: extended capacity=16 virtual_devices=16..30 six666-BrotatoOnline=965a230d(match, expected 965a230d)",
+      "wall_seconds": 126.2,
+      "events": "evidence/local-sim/EV-0052-8p-events.log",
+      "events_sha256": "67e039b4e5ace4d215262ab5a5dfc36699f86a651816261a113d5a8ccf21cd73"
+    },
+    {
+      "players": 16,
+      "passed": true,
+      "reason": "reached:coop_shop.tscn after 2 waves",
+      "waves": 2,
+      "spawned": 16,
+      "moved": 16,
+      "devices": 16,
+      "script_errors": 0,
+      "gate": "runtime gate: extended capacity=16 virtual_devices=16..30 six666-BrotatoOnline=965a230d(match, expected 965a230d)",
+      "wall_seconds": 139.8,
+      "events": "evidence/local-sim/EV-0052-16p-events.log",
+      "events_sha256": "6104a832adb60e964b8c16cf6457095ca3b68ca7b5a8c07ea1348a80d6b15aa7"
+    }
+  ]
+}
