@@ -1,0 +1,64 @@
+{
+  "date": "2026-11-26",
+  "base_commit": "feec9bd1ce31b6c03dd93e20da7267d5260fb9e6",
+  "game_version": "1.2.0.4",
+  "game_build": 26865350,
+  "workshop_manifest": "7345568862778401808",
+  "upstream_fingerprint": "f0f55fb04b49200a807e120878fc5c802f5ca018bb331686ff25fc636fcb87f8",
+  "setup_passed": 8,
+  "check_passed": 5,
+  "unit_passed": 427,
+  "integration_passed": 3,
+  "integration_scripts_compiled": 79,
+  "release_zip_sha256": "1c4230b15f5a7ba8146ca8f34e41bfd5434e834d21b187be501ddd2ff30edd59",
+  "release_smoke": {
+    "seconds": 40,
+    "script_errors": 0,
+    "gate_capacity": 16,
+    "stopped_by_harness": true
+  },
+  "real_multiplayer_tested": false,
+  "simulations": [
+    {
+      "players": 4,
+      "passed": true,
+      "reason": "reached:coop_shop.tscn after 2 waves",
+      "waves": 2,
+      "spawned": 4,
+      "moved": 4,
+      "devices": 4,
+      "script_errors": 0,
+      "gate": "runtime gate: extended capacity=16 virtual_devices=16..30 six666-BrotatoOnline=f0f55fb0(match, expected f0f55fb0)",
+      "wall_seconds": 66.2
+    },
+    {
+      "players": 8,
+      "passed": true,
+      "reason": "reached:coop_shop.tscn after 2 waves",
+      "waves": 2,
+      "spawned": 8,
+      "moved": 8,
+      "devices": 8,
+      "script_errors": 0,
+      "gate": "runtime gate: extended capacity=16 virtual_devices=16..30 six666-BrotatoOnline=f0f55fb0(match, expected f0f55fb0)",
+      "wall_seconds": 126.4
+    },
+    {
+      "players": 16,
+      "passed": true,
+      "reason": "reached:coop_shop.tscn after 2 waves",
+      "waves": 2,
+      "spawned": 16,
+      "moved": 16,
+      "devices": 16,
+      "script_errors": 0,
+      "gate": "runtime gate: extended capacity=16 virtual_devices=16..30 six666-BrotatoOnline=f0f55fb0(match, expected f0f55fb0)",
+      "wall_seconds": 139.6
+    }
+  ],
+  "event_log_sha256": {
+    "evidence/local-sim/EV-0053-4p-events.log": "5f112688c9ceda65c800d056c02ba904ec6aebedde388ec641a0dea6a8215df9",
+    "evidence/local-sim/EV-0053-8p-events.log": "df53b72e67949f9b4e36768fa9168f593b10808237e5e49ee1bfa1c8e91c1dbe",
+    "evidence/local-sim/EV-0053-16p-events.log": "ee6f25ddd9a8104129c91a49ac9b3539636d2bcc7b030e6fcfb4cd51e8fe2b27"
+  }
+}
